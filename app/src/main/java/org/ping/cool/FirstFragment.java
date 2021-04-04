@@ -20,10 +20,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
+
 import org.ping.cool.databinding.FragmentFirstBinding;
 import org.ping.cool.databinding.FragmentSecondBinding;
 import org.ping.cool.network.TracerouteContainer;
 import org.ping.cool.network.TracerouteWithPing;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +35,8 @@ public class FirstFragment extends Fragment {
 
     public static final String tag = "TraceroutePing";
     public static final String INTENT_TRACE = "INTENT_TRACE";
-    private Button buttonLaunch,buttonSecond;
-    private EditText editTextPing;
+    private Button buttonLaunch, buttonPing, buttonSecond;
+    private EditText editTextPing, editTextTextConsole;
     private ProgressBar progressBarPing;
     private ListView listViewTraceroute;
     private TraceListAdapter traceListAdapter;
@@ -54,14 +56,16 @@ public class FirstFragment extends Fragment {
         this.tracerouteWithPing = new TracerouteWithPing(this);
         this.traces = new ArrayList<TracerouteContainer>();
 
-        View v = inflater.inflate(R.layout.fragment_first,container,false);
+        View v = inflater.inflate(R.layout.fragment_first, container, false);
 
         this.buttonLaunch = (Button) v.findViewById(R.id.buttonLaunch);
+        this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.editTextPing = (EditText) v.findViewById(R.id.editTextPing);
+        this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.listViewTraceroute = (ListView) v.findViewById(R.id.listViewTraceroute);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
-        this.buttonSecond  = (Button) v.findViewById(R.id.buttonSecond);
-
+        this.buttonSecond = (Button) v.findViewById(R.id.buttonSecond);
+        editTextPing.setText("www.google.com");
         buttonSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,7 +76,6 @@ public class FirstFragment extends Fragment {
 
 
         initView();
-
 
 
         return v;
@@ -95,28 +98,75 @@ public class FirstFragment extends Fragment {
      * initView, init the main view components (action, adapter...)
      */
     private void initView() {
-        buttonLaunch.setOnClickListener(new View.OnClickListener() {
+
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void onClick(View v) {
+            public void run() {
 
-                if (editTextPing.getText().length() == 0) {
-                    Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
-                }
-                else if (!isOnline(getActivity().getApplicationContext())){
-                    Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
+                buttonLaunch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                } else {
-                    traces.clear();
-                    traceListAdapter.notifyDataSetChanged();
-                    startProgressBar();
-                    hideSoftwareKeyboard(editTextPing);
-                    tracerouteWithPing.executeTraceroute(editTextPing.getText().toString(), maxTtl);
-                }
+                        if (editTextPing.getText().length() == 0) {
+                            Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
+                        } else if (!isOnline(getActivity().getApplicationContext())) {
+                            Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            if(buttonLaunch.getText().equals("Tracert")) {
+                                traces.clear();
+                                traceListAdapter.notifyDataSetChanged();
+                                startProgressBar();
+                                buttonLaunch.setText(getString(R.string.activity_buttonStop));
+                                hideSoftwareKeyboard(editTextPing);
+                                tracerouteWithPing.executeTraceroute(editTextPing.getText().toString(), maxTtl);
+                                TracerouteWithPing.StopPing(false);
+                                buttonPing.setEnabled(false);
+                            }else{
+                                stopProgressBar();
+                                TracerouteWithPing.StopPing(true);
+                            }
+                        }
+                    }
+                });
+                traceListAdapter = new TraceListAdapter(getActivity());
+                listViewTraceroute.setAdapter(traceListAdapter);
             }
         });
 
-        traceListAdapter = new TraceListAdapter(getActivity());
-        listViewTraceroute.setAdapter(traceListAdapter);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buttonPing.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (editTextPing.getText().length() == 0) {
+                            Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
+                        } else if (!isOnline(getActivity().getApplicationContext())) {
+                            Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
+
+                        } else {
+
+                            if (buttonPing.getText().equals("Ping")) {
+                                startProgressBar();
+                                hideSoftwareKeyboard(editTextPing);
+                                editTextTextConsole.setText("");
+                                tracerouteWithPing.executePing(editTextPing.getText().toString(),editTextTextConsole);
+                                TracerouteWithPing.StopPing(false);
+                                buttonPing.setText(getText(R.string.activity_buttonStop));
+                                buttonLaunch.setEnabled(false);
+                            } else {
+                                TracerouteWithPing.StopPing(true);
+                                stopProgressBar();
+
+                            }
+
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public void refreshList(TracerouteContainer trace) {
@@ -212,8 +262,7 @@ public class FirstFragment extends Fragment {
     /**
      * Hides the keyboard
      *
-     * @param currentEditText
-     *            The current selected edittext
+     * @param currentEditText The current selected edittext
      */
     public void hideSoftwareKeyboard(EditText currentEditText) {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -224,10 +273,16 @@ public class FirstFragment extends Fragment {
 
     public void startProgressBar() {
         progressBarPing.setVisibility(View.VISIBLE);
+
     }
 
     public void stopProgressBar() {
-        progressBarPing.setVisibility(View.GONE);
+        progressBarPing.setVisibility(View.INVISIBLE);
+        buttonPing.setText("Ping");
+        buttonPing.setEnabled(true);
+        buttonLaunch.setText("Tracert");
+        buttonLaunch.setEnabled(true);
+
     }
 
 }

@@ -10,6 +10,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\java\org\ping\cool\FirstFragment.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\java\org\ping\cool\network\TracerouteWithPing.java">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\java\org\ping\cool\utils\WellKnownPort.java">
           <value>
             <Attribute>

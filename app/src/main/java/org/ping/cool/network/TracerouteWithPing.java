@@ -25,11 +25,13 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 import org.ping.cool.FirstFragment;
 import org.ping.cool.R;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 
 /**
@@ -62,6 +64,12 @@ public class TracerouteWithPing {
 	private Handler handlerTimeout;
 	private static Runnable runnableTimeout;
 
+	public static boolean STOP = false;
+
+	public static synchronized void StopPing(boolean b) {
+		STOP = b;
+	}
+
 	public TracerouteWithPing(FirstFragment context) {
 		this.context = context;
 	}
@@ -80,6 +88,11 @@ public class TracerouteWithPing {
 		this.urlToPing = url;
 
 		new ExecutePingAsyncTask(maxTtl).execute();
+
+	}
+	public void executePing(String url, EditText editTextTextConsole){
+		new ExecutePing(url, editTextTextConsole).execute();
+
 	}
 
 	/**
@@ -131,7 +144,85 @@ public class TracerouteWithPing {
 			super.onPostExecute(result);
 		}
 	}
-	
+
+	private class ExecutePing extends AsyncTask<Void, Void, String>{
+
+		private String url;
+		private EditText editTextTextConsole;
+
+		public ExecutePing(String url, EditText editTextTextConsole) {
+			this.url = url;
+			this.editTextTextConsole = editTextTextConsole;
+			context.startProgressBar();
+		}
+
+		@Override
+		protected String doInBackground(Void... voids) {
+			try {
+				launchPing();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		@Override
+		protected void onPostExecute(String result) {
+
+		}
+
+		@SuppressLint("NewApi")
+		private void launchPing() throws Exception {
+
+			Process p;
+			String command = "ping ";
+			int pid;
+
+			Log.d(FirstFragment.tag, "Will launch : " + command + url);
+
+			p = Runtime.getRuntime().exec(command + url);
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			//getting process id
+			Field f = p.getClass().getDeclaredField("pid");
+			f.setAccessible(true);
+			pid = (int) f.get(p);
+
+			// Construct the response from ping
+			String s;
+			String res = "";
+			while ((s = stdInput.readLine()) != null) {
+				res += s + "\n";
+				String finalS = s.replace(url+":","") + "\n";
+
+				context.getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						editTextTextConsole.append(finalS);
+					}
+				});
+
+				if(STOP){
+					Runtime.getRuntime().exec("kill -INT " + pid);
+					context.getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							context.stopProgressBar();
+						}
+					});
+
+				}
+			}
+
+			p.waitFor();
+
+			if (res.equals("")) {
+				throw new IllegalArgumentException();
+			}
+
+		}
+
+	}
+
 	/**
 	 * The task that ping an ip, with increasing time to live (ttl) value
 	 */
@@ -139,6 +230,7 @@ public class TracerouteWithPing {
 
 		private boolean isCancelled;
 		private int maxTtl;
+		private String ip;
 
 		public ExecutePingAsyncTask(int maxTtl) {
 			this.maxTtl = maxTtl;
@@ -154,7 +246,7 @@ public class TracerouteWithPing {
 					String res = launchPing(urlToPing);
 
 					TracerouteContainer trace;
-                    			String ip = parseIpFromPing(res);
+                    ip = parseIpFromPing(res);
 
 					if (res.contains(UNREACHABLE_PING) && !res.contains(EXCEED_PING)) {
 						// Create the TracerouteContainer object when ping
@@ -184,7 +276,6 @@ public class TracerouteWithPing {
                     			if (!ip.equals(ipToPing) || ttl == maxTtl) {
                         			context.refreshList(trace);
                     			}
-
 					return res;
 				} catch (final Exception e) {
 					context.getActivity().runOnUiThread(new Runnable() {
@@ -194,6 +285,9 @@ public class TracerouteWithPing {
 						}
 					});
 				}
+
+
+
 			} else {
 				return context.getString(R.string.no_connectivity);
 			}
@@ -226,15 +320,27 @@ public class TracerouteWithPing {
 			p = Runtime.getRuntime().exec(command + url);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
+			//getting process id
+			Field f = p.getClass().getDeclaredField("pid");
+			f.setAccessible(true);
+			int pid = (int) f.get(p);
+
 			// Construct the response from ping
 			String s;
 			String res = "";
 			while ((s = stdInput.readLine()) != null) {
 				res += s + "\n";
+
+				if(STOP){
+					Runtime.getRuntime().exec("kill -INT " + pid);
+					context.stopProgressBar();
+				}
+
 				if (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING)) {
 					// We store the elapsedTime when the line from ping comes
 					elapsedTime = (System.nanoTime() - startTime) / 1000000.0f;
 				}
+
 			}
 
 			p.destroy();

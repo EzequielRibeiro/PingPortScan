@@ -9,14 +9,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.PingCool.AppBarOverlay">
+        android:theme="@style/Widget.AppCompat.ActionBar.TabBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.PingCool.PopupOverlay" />
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            app:subtitleTextColor="@color/black_color"
+            app:titleTextColor="@color/black_color" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

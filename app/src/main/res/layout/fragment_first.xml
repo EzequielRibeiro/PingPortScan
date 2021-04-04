@@ -14,6 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:gravity="center"
         android:hint="@string/placeholder"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,22 +23,21 @@
 
     <Button
         android:id="@+id/buttonLaunch"
-        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextPing"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="@string/activity_button"
+        android:text="Tracert"
         android:textColor="@color/black_color"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonSecond"
+        app:layout_constraintStart_toEndOf="@+id/buttonPing"
         app:layout_constraintTop_toBottomOf="@+id/editTextPing" />
 
     <ListView
         android:id="@+id/listViewTraceroute"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/buttonLaunch"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="8dp"
@@ -45,32 +45,67 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/editTextTextConsole"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLaunch"></ListView>
+        app:layout_constraintTop_toBottomOf="@+id/progressBarPing"></ListView>
 
     <ProgressBar
         android:id="@+id/progressBarPing"
-        android:layout_width="wrap_content"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/listViewTraceroute"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:layout_toRightOf="@+id/buttonLaunch"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:indeterminate="true"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonLaunch" />
 
     <Button
         android:id="@+id/buttonSecond"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Port Scan"
+        android:textColor="@color/purple_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonLaunch"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPing" />
+
+    <Button
+        android:id="@+id/buttonPing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Ping"
+        android:textColor="@color/black_color"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLaunch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPing" />
+
+    <EditText
+        android:id="@+id/editTextTextConsole"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="second"
-        android:textColor="@color/purple_color"
-        app:layout_constraintBottom_toTopOf="@+id/listViewTraceroute"
-        app:layout_constraintStart_toEndOf="@+id/buttonLaunch" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:editable="false"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listViewTraceroute" />
 </androidx.constraintlayout.widget.ConstraintLayout>
