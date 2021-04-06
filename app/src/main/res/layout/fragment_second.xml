@@ -44,7 +44,7 @@
     <EditText
         android:id="@+id/editTextPort1"
         android:layout_width="60dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
@@ -58,7 +58,7 @@
     <EditText
         android:id="@+id/editTextPort3"
         android:layout_width="60dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:ems="10"
@@ -71,7 +71,7 @@
     <EditText
         android:id="@+id/editTextPort2"
         android:layout_width="60dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:ems="10"
@@ -85,7 +85,7 @@
     <Button
         android:id="@+id/buttonScanPort"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
@@ -97,7 +97,7 @@
     <Button
         android:id="@+id/buttonScanRangePort"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
@@ -150,7 +150,9 @@
                     android:ems="10"
                     android:enabled="true"
                     android:hint="Log"
-                    android:inputType="textMultiLine" />
+                    android:textIsSelectable="true"
+                    android:inputType="none"
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
@@ -178,21 +180,23 @@
     <EditText
         android:id="@+id/editTextTimeout"
         android:layout_width="60dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="number"
+        android:textColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="@+id/editTextPort3"
         app:layout_constraintTop_toBottomOf="@+id/editTextPort3" />
 
     <EditText
         android:id="@+id/editTextThreads"
         android:layout_width="60dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:ems="10"
         android:inputType="number"
+        android:textColor="@color/black_color"
         app:layout_constraintBottom_toBottomOf="@+id/editTextTimeout"
         app:layout_constraintEnd_toStartOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="@+id/editTextPort2"
@@ -240,8 +244,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/white_color"
+        app:rippleColor="@null"
+        app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_help" />
+        app:srcCompat="@android:drawable/ic_dialog_info" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

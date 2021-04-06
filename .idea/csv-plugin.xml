@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\java\org\ping\cool\CheckPortTask.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\java\org\ping\cool\FirstFragment.java">
           <value>
             <Attribute>

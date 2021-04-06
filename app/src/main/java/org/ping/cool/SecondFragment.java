@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -62,9 +63,10 @@ public class SecondFragment extends Fragment {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
+      //  binding.editTextPortScan.setText("www.google.com");
         binding.webViewPort.loadUrl("file:///android_asset/port.html");
         ArrayList<String> listArgument = new ArrayList<>();
+
 
         binding.fabSecondFragment.setOnClickListener(new View.OnClickListener() {
             @Override

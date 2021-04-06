@@ -94,11 +94,15 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
                     PutLogConsole(context, binding.editTextTextLog, "\nThe host is reachable (" + inetAddress.getHostAddress() + ")!");
                     PortScanner portScanner = new PortScanner(inetAddress.getHostAddress());
 
-                    if (cmd.getOptionValue("threads") != null)
-                        portScanner.setThreads(Integer.parseInt(cmd.getOptionValue("threads").trim()));
+                    if (cmd.getOptionValue("threads") != null) {
+                        int threads = Integer.parseInt(cmd.getOptionValue("threads").replace("h ", "").trim());
+                        portScanner.setThreads(threads);
+                    }
 
-                    if (cmd.getOptionValue("timeout") != null)
-                        portScanner.setTimeout(Integer.parseInt(cmd.getOptionValue("timeout").trim()));
+                    if (cmd.getOptionValue("timeout") != null) {
+                        int timeout = Integer.parseInt(cmd.getOptionValue("timeout").replace("h ", "").trim());
+                        portScanner.setTimeout(timeout);
+                    }
 
                     if (cmd.getOptionValue("ports") != null)
                         if (cmd.getOptionValue("ports").trim().contains("-")) {

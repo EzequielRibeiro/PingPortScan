@@ -66,6 +66,7 @@ public class Logger {
             @Override
             public void run() {
                 editText.append(log);
+                editText.setSelection(editText.getText().toString().length());
             }
         });
     }

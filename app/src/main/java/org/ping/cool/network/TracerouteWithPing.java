@@ -228,7 +228,7 @@ public class TracerouteWithPing {
 				context.getActivity().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						editTextTextConsole.append(" IllegalArgumentException: "+ finalCommand + url);
+						editTextTextConsole.append(" Wrong arguments or host not found: "+ finalCommand + url);
 					}
 				});
 				throw new IllegalArgumentException();

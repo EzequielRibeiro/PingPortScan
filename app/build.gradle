@@ -5,6 +5,14 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('D:\\Projeto-Android\\PingCool\\pingcool.keystore')
+            storePassword '123456'
+            keyAlias 'key'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -12,8 +20,8 @@ android {
         applicationId "org.ping.cool"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "1.1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,6 +50,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.4'
     implementation 'commons-cli:commons-cli:1.4'
     implementation platform('com.google.firebase:firebase-bom:26.7.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-ads:19.8.0'

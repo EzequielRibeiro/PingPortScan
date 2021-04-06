@@ -34,7 +34,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/buttonLaunch"
+        android:id="@+id/buttonTracert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/input_layout_port"
@@ -46,32 +46,18 @@
         app:layout_constraintStart_toEndOf="@+id/buttonPing"
         app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
 
-    <ListView
-        android:id="@+id/listViewTraceroute"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonLaunch"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBarPing"></ListView>
-
     <ProgressBar
         android:id="@+id/progressBarPing"
         style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/listViewTraceroute"
-        android:layout_toRightOf="@+id/buttonLaunch"
+        android:layout_above="@id/buttonTracert"
+        android:layout_toRightOf="@+id/buttonTracert"
         android:indeterminate="true"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLaunch" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonTracert" />
 
     <Button
         android:id="@+id/buttonSecond"
@@ -81,7 +67,7 @@
         android:text="Port Scan"
         android:textColor="@color/purple_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonLaunch"
+        app:layout_constraintStart_toEndOf="@+id/buttonTracert"
         app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
 
     <Button
@@ -91,7 +77,7 @@
         android:layout_marginTop="16dp"
         android:text="Ping"
         android:textColor="@color/black_color"
-        app:layout_constraintEnd_toStartOf="@+id/buttonLaunch"
+        app:layout_constraintEnd_toStartOf="@+id/buttonTracert"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
 
@@ -101,9 +87,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:fabSize="mini"
+        app:backgroundTint="@color/white_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_help" />
+        app:rippleColor="@null"
+        app:srcCompat="@android:drawable/ic_dialog_info" />
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -112,7 +101,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listViewTraceroute">
+        app:layout_constraintTop_toBottomOf="@id/progressBarPing">
+
+        <ListView
+            android:id="@+id/listViewTraceroute"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/buttonTracert"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"></ListView>
 
         <EditText
             android:id="@+id/editTextTextConsole"
@@ -126,14 +126,13 @@
             android:ems="10"
             android:enabled="true"
             android:gravity="start|top"
-            android:inputType="textMultiLine"
+            android:inputType="none"
             android:textIsSelectable="true" />
 
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/black_color"
             android:visibility="visible" />
 
     </FrameLayout>

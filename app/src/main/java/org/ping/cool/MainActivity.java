@@ -57,19 +57,11 @@ public class MainActivity extends AppCompatActivity {
 
         assetManager = getAssets();
         /*
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-       */
-
-        List<String> testDeviceIds = Arrays.asList("49EB8CE6C2EA8D132E11FA3F75D28D0B");
+        List<String> testDeviceIds = Arrays.asList("DB530A1BBBDBFE8567328113528A19EF");
         RequestConfiguration configuration =
                 new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
         MobileAds.setRequestConfiguration(configuration);
+        */
 
         AdRequest adRequest = new AdRequest.Builder().build();
         binding.adView.loadAd(adRequest);

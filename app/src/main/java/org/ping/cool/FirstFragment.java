@@ -36,7 +36,7 @@ public class FirstFragment extends Fragment {
 
     public static final String tag = "TraceroutePing";
     public static final String INTENT_TRACE = "INTENT_TRACE";
-    private Button buttonLaunch, buttonPing, buttonSecondFragment;
+    private Button buttonTracert, buttonPing, buttonSecondFragment;
     private FloatingActionButton floatingActionButton;
     private EditText editTextPing, editTextTextConsole;
     private WebView webView;
@@ -61,7 +61,7 @@ public class FirstFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_first, container, false);
 
-        this.buttonLaunch = (Button) v.findViewById(R.id.buttonLaunch);
+        this.buttonTracert = (Button) v.findViewById(R.id.buttonTracert);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.floatingActionButton = (FloatingActionButton) v.findViewById(R.id.fabFirstFragment);
         this.editTextPing = (EditText) v.findViewById(R.id.editTextPing);
@@ -97,11 +97,13 @@ public class FirstFragment extends Fragment {
     private void initView() {
 
         webView.loadUrl("file:///android_asset/ping.html");
-
+      //  editTextPing.setText("www.google.com");
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 webView.setVisibility(View.VISIBLE);
+                listViewTraceroute.setVisibility(View.GONE);
+                editTextTextConsole.setVisibility(View.GONE);
                 TracerouteWithPing.StopPing(true);
                 stopProgressBar();
                 traces.clear();
@@ -121,7 +123,7 @@ public class FirstFragment extends Fragment {
             @Override
             public void run() {
 
-                buttonLaunch.setOnClickListener(new View.OnClickListener() {
+                buttonTracert.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
@@ -131,17 +133,20 @@ public class FirstFragment extends Fragment {
                             Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
 
                         } else {
-                            if(buttonLaunch.getText().equals("Tracert")) {
-                                editTextTextConsole.setText("");
+                            if(buttonTracert.getText().equals("Tracert")) {
+
                                 traces.clear();
                                 traceListAdapter.notifyDataSetChanged();
                                 startProgressBar();
-                                buttonLaunch.setText(getString(R.string.activity_buttonStop));
+                                buttonTracert.setText(getString(R.string.activity_buttonStop));
                                 hideSoftwareKeyboard(editTextPing);
                                 tracerouteWithPing.executeTraceroute(editTextPing.getText().toString(), maxTtl);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setEnabled(false);
                                 buttonSecondFragment.setEnabled(false);
+                                listViewTraceroute.setVisibility(View.VISIBLE);
+                                webView.setVisibility(View.GONE);
+                                editTextTextConsole.setVisibility(View.GONE);
                             }else{
                                 stopProgressBar();
                                 TracerouteWithPing.StopPing(true);
@@ -169,16 +174,17 @@ public class FirstFragment extends Fragment {
                         } else {
 
                             if (buttonPing.getText().equals("Ping")) {
-                                traces.clear();
-                                traceListAdapter.notifyDataSetChanged();
                                 startProgressBar();
                                 hideSoftwareKeyboard(editTextPing);
                                 editTextTextConsole.setText("");
                                 tracerouteWithPing.executePing(editTextPing.getText().toString().replace("ping",""),editTextTextConsole);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setText(getText(R.string.activity_buttonStop));
-                                buttonLaunch.setEnabled(false);
+                                buttonTracert.setEnabled(false);
                                 buttonSecondFragment.setEnabled(false);
+                                listViewTraceroute.setVisibility(View.GONE);
+                                webView.setVisibility(View.GONE);
+                                editTextTextConsole.setVisibility(View.VISIBLE);
                             } else {
                                 TracerouteWithPing.StopPing(true);
                                 stopProgressBar();
@@ -296,7 +302,6 @@ public class FirstFragment extends Fragment {
 
     public void startProgressBar() {
         progressBarPing.setVisibility(View.VISIBLE);
-        webView.setVisibility(View.GONE);
 
     }
 
@@ -304,8 +309,8 @@ public class FirstFragment extends Fragment {
         progressBarPing.setVisibility(View.INVISIBLE);
         buttonPing.setText("Ping");
         buttonPing.setEnabled(true);
-        buttonLaunch.setText("Tracert");
-        buttonLaunch.setEnabled(true);
+        buttonTracert.setText("Tracert");
+        buttonTracert.setEnabled(true);
         buttonSecondFragment.setEnabled(true);
 
     }
