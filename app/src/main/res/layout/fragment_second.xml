@@ -7,21 +7,241 @@
     tools:context=".SecondFragment">
 
     <TextView
-        android:id="@+id/textview_second"
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/button_second"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="_"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextPort3"
+        app:layout_constraintEnd_toStartOf="@+id/editTextPort3"
+        app:layout_constraintTop_toTopOf="@+id/editTextPort3" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_layout_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <EditText
+            android:id="@+id/editTextPortScan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:ems="10"
+            android:hint="@string/placeholder"
+            android:textColor="@color/black_color" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <EditText
+        android:id="@+id/editTextPort1"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="number"
+        android:textColor="@color/black_color"
+        app:layout_constraintEnd_toStartOf="@+id/buttonScanPort"
+        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
+
+    <EditText
+        android:id="@+id/editTextPort3"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="number"
+        android:textColor="@color/black_color"
+        app:layout_constraintEnd_toStartOf="@+id/buttonScanRangePort"
+        app:layout_constraintTop_toTopOf="@+id/buttonScanRangePort" />
+
+    <EditText
+        android:id="@+id/editTextPort2"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="number"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextPort3"
+        app:layout_constraintEnd_toStartOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/editTextPort3" />
 
     <Button
-        android:id="@+id/button_second"
+        android:id="@+id/buttonScanPort"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/previous"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="Scan"
+        android:textColor="@color/black_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
+
+    <Button
+        android:id="@+id/buttonScanRangePort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="Scan"
+        android:textColor="@color/black_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonScanPort" />
+
+    <ProgressBar
+        android:id="@+id/progressBarScan"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextThreads" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_second" />
+        app:layout_constraintTop_toBottomOf="@+id/progressBarScan">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/listViewPort"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_layout_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintTextColor="@color/blue_color">
+
+                <EditText
+                    android:id="@+id/editTextTextLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:ems="10"
+                    android:enabled="true"
+                    android:hint="Log"
+                    android:inputType="textMultiLine" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <WebView
+            android:id="@+id/webViewPort"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="center"
+        android:text="Range port\n1 - 65535"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextPort2"
+        app:layout_constraintEnd_toStartOf="@+id/editTextPort2"
+        app:layout_constraintTop_toTopOf="@+id/editTextPort2" />
+
+    <EditText
+        android:id="@+id/editTextTimeout"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="@+id/editTextPort3"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPort3" />
+
+    <EditText
+        android:id="@+id/editTextThreads"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:ems="10"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextTimeout"
+        app:layout_constraintEnd_toStartOf="@+id/textView3"
+        app:layout_constraintStart_toStartOf="@+id/editTextPort2"
+        app:layout_constraintTop_toTopOf="@+id/editTextTimeout" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="-t"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextTimeout"
+        app:layout_constraintEnd_toStartOf="@+id/editTextTimeout"
+        app:layout_constraintTop_toTopOf="@+id/editTextTimeout" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="-th"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextThreads"
+        app:layout_constraintEnd_toStartOf="@+id/editTextThreads"
+        app:layout_constraintTop_toTopOf="@+id/editTextThreads" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Port"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextPort1"
+        app:layout_constraintEnd_toStartOf="@+id/editTextPort1"
+        app:layout_constraintTop_toTopOf="@+id/editTextPort1" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSecondFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_help" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

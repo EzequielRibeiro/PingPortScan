@@ -12,9 +12,11 @@
     <string name="string_test">test</string>
     <string name="error">An error occurred, please try again</string>
     <string name="timeout">Timeout</string>
-    <string name="placeholder">www.google.com</string>
-    <string name="second_fragment_label">SecondFragment</string>
-    <string name="first_fragment_label">FirstFragment</string>
+    <string name="placeholder">type a url or ip</string>
+    <string name="second_fragment_label">Port Scanner</string>
+    <string name="first_fragment_label">Ping Tracert</string>
     <string name="previous">Previous</string>
+    <string name="banner_ad_unit_id">ca-app-pub-0822808376839371/8383424039</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-0822808376839371/8856722474</string>
 
 </resources>

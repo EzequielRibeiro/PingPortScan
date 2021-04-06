@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="\app\build.gradle">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\assets\ports.csv">
           <value>
             <Attribute>
@@ -10,7 +17,28 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\java\org\ping\cool\CheckPort.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\java\org\ping\cool\FirstFragment.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\java\org\ping\cool\MainActivity.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\java\org\ping\cool\SecondFragment.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />
@@ -24,10 +52,52 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\java\org\ping\cool\utils\Port.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\java\org\ping\cool\utils\PortScanner.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\java\org\ping\cool\utils\WellKnownPort.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\res\layout\activity_main.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\res\layout\fragment_first.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\res\layout\fragment_second.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\res\layout\port_list.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>

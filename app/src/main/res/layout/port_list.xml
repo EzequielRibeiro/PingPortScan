@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textViewPortProtocol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1"
+        android:text="Protocol"
+        android:textColor="@color/blue_color"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textViewPorService"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Service"
+        android:textColor="@color/green_color"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textViewPortNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Number"
+        android:textColor="@color/black_color"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textViewPortIsOpen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="PortIsOpen"
+        android:textSize="16sp" />
+
+
+</LinearLayout>

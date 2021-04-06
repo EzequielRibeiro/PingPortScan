@@ -4,13 +4,21 @@
  */
 
 package org.ping.cool.utils;
+import android.util.Log;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import androidx.fragment.app.Fragment;
+
+import org.ping.cool.PortAdapter;
 import org.ping.cool.utils.logger.Color;
 import org.ping.cool.utils.logger.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static org.ping.cool.CheckPort.SEPARATOR;
+import static org.ping.cool.CheckPortTask.SEPARATOR;
+import static org.ping.cool.utils.logger.Logger.PutLogConsole;
 
 /**
  * This class  is used for handling the connections
@@ -58,9 +66,12 @@ public class PortScanner {
 
   /**
    * This method is used to start the scanning of the server.
+   * @param context
+   * @param editTextTextLog
    */
-  public void start() {
+  public void start(Fragment context, EditText editTextTextLog, ListView listView) {
     Logger.log("Start scanning " + this.ip + "...", Color.CYAN);
+    PutLogConsole(context, editTextTextLog,"\nStart scanning " + this.ip + "...");
 
     ExecutorService executorService = Executors.newFixedThreadPool(this.threads);
     ports = new ArrayList<>();
@@ -73,24 +84,56 @@ public class PortScanner {
       ports.add(Port.scan(executorService, this.ip, this.portFrom, this.timeout));
 
     try {
-      // This for loop verifies that all Threads have completed their task
-      for (Future<Port> port : ports)
+      // This for loop verifies that all Threads have completed their task and load list
+      ArrayList<Port> arrayOfPorts = new ArrayList<Port>();
+      PortAdapter adapter = new PortAdapter(context.getContext(), arrayOfPorts);
+      context.getActivity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          listView.setAdapter(adapter);
+        }
+      });
+
+      for (Future<Port> port : ports) {
         port.get();
 
-      executorService.shutdown();
+        context.getActivity().runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              arrayOfPorts.add(port.get());
+            } catch (ExecutionException e) {
+              e.printStackTrace();
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            adapter.notifyDataSetChanged();
+          }
+        });
 
+      }
+
+      executorService.shutdown();
+      StringBuffer stringBuffer = new StringBuffer();
       // This for loop counts the number of open ports
       int openPorts = 0;
       for (final Future<Port> f : ports) {
+
         if (f.get().isOpen()) {
           openPorts++;
+          stringBuffer.append(f.get().getPort()+" ");
         }
       }
 
+
+      Log.e("Port","there are "+openPorts);
+
       Logger.log(Color.CYAN.getColor() + "There are " + Color.YELLOW.getColor() + openPorts + Color.CYAN.getColor() +  " open ports on host " + Color.YELLOW.getColor() + ip);
+      PutLogConsole(context, editTextTextLog,"\nThere are " + openPorts + " open ports on host: "+stringBuffer.toString() );
       Logger.log(SEPARATOR);
     } catch (InterruptedException | ExecutionException ex) {
       ex.printStackTrace();
+      PutLogConsole(context, editTextTextLog,"\nscanning canceled !");
     }
   }
 

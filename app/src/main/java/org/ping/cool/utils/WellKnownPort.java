@@ -5,134 +5,143 @@
 
 package org.ping.cool.utils;
 
-import android.content.Context;
-import android.content.res.AssetManager;
+import android.widget.EditText;
+
+import androidx.fragment.app.Fragment;
 
 import org.ping.cool.MainActivity;
 import org.ping.cool.utils.logger.Color;
 import org.ping.cool.utils.logger.Logger;
+
 import java.io.DataInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static org.ping.cool.utils.logger.Logger.PutLogConsole;
+
 /**
- * This class is used for handling the ports associated 
+ * This class is used for handling the ports associated
  * with known protocols.
  */
 public class WellKnownPort {
-  /**
-   * This protocol is associated with the port. (TCP or UDP)
-   */
-  private String protocol;
+    /**
+     * This protocol is associated with the port. (TCP or UDP)
+     */
+    private String protocol;
 
-  /**
-   * Name of the protocol
-   */
-  private String name;
+    /**
+     * Name of the protocol
+     */
+    private String name;
 
-  /**
-   * Port
-   */
-  private int port;
+    /**
+     * Port
+     */
+    private int port;
 
-  private static List<WellKnownPort> wellKnownPorts = new ArrayList<>();
+    private static List<WellKnownPort> wellKnownPorts = new ArrayList<>();
 
-  /**
-   * Constructor of the class
-   *
-   * @param protocol The protocol associated with the port
-   * @param port Scanned port
-   * @param name name of the protocol
-   */
-  WellKnownPort(String protocol, int port, String name) {
+    /**
+     * Constructor of the class
+     *
+     * @param protocol The protocol associated with the port
+     * @param port     Scanned port
+     * @param name     name of the protocol
+     */
+    WellKnownPort(String protocol, int port, String name) {
 
-    this.protocol = protocol;
-    this.port = port;
-    this.name = name;
-  }
-
-  /**
-  * This function is used to load all known ports
-  * from the "ports.csv" file. These ports are loaded into the list
-  * wellKnownPorts, which is used to associate the open port's number
-  * of a server to its protocol.
-  */
-  public static void load() {
-    Logger.log("Loading WellKnown ports...", Color.YELLOW);
-    try {
-      DataInputStream textFileStream = new DataInputStream(MainActivity.assetManager.open(String.format("ports.csv")));
-      Scanner scanner = new Scanner(textFileStream);
-      scanner.nextLine(); //skips first line
-
-      // Lettura del file ports.csv
-      while (scanner.hasNextLine()){
-        final String line = scanner.nextLine();
-        String[] comps = line.split(",");
-
-        // Adding the port to the list
-        wellKnownPorts.add(new WellKnownPort(comps[0].replace("\"", ""), Integer.parseInt(comps[1]), comps[2].replace("\"", "")));
-      }
-
-      // Closing the scanner
-      scanner.close();
-      Logger.log("All WellKnown ports have been loaded", Color.GREEN);
-    } catch (Exception e) {
-      Logger.log("It was not possible to load WellKnownPorts", Color.RED);
-      e.printStackTrace();
-     // System.exit(-1);
+        this.protocol = protocol;
+        this.port = port;
+        this.name = name;
     }
-  }
 
-  /**
-   *
-   * @param port port number that needs to be check
-   * @return WellKnownPort is associated with the port 
-   *         passed down as a method's parameter
-   */
-  public static WellKnownPort getByPortNumber(int port) {
-    for (WellKnownPort wellKnownPort : wellKnownPorts) {
-      if (wellKnownPort.getPort() == port)
-        return wellKnownPort;
+    /**
+     * This function is used to load all known ports
+     * from the "ports.csv" file. These ports are loaded into the list
+     * wellKnownPorts, which is used to associate the open port's number
+     * of a server to its protocol.
+     *
+     * @param context
+     * @param editTextTextLog
+     */
+    public static void load(Fragment context, EditText editTextTextLog) {
+        Logger.log("Loading known ports...", Color.YELLOW);
+        PutLogConsole(context, editTextTextLog, "\nLoading known ports");
+        if (wellKnownPorts.isEmpty())
+            try {
+                DataInputStream textFileStream = new DataInputStream(MainActivity.assetManager.open(String.format("ports.csv")));
+                Scanner scanner = new Scanner(textFileStream);
+                scanner.nextLine(); //skips first line
+
+                // Lettura del file ports.csv
+                while (scanner.hasNextLine()) {
+                    final String line = scanner.nextLine();
+                    String[] comps = line.split(",");
+
+                    // Adding the port to the list
+                    wellKnownPorts.add(new WellKnownPort(comps[0].replace("\"", ""), Integer.parseInt(comps[1]), comps[2].replace("\"", "")));
+                }
+
+                // Closing the scanner
+                scanner.close();
+                Logger.log("All WellKnown ports have been loaded", Color.GREEN);
+                PutLogConsole(context, editTextTextLog, "\nAll known ports have been loaded");
+            } catch (Exception e) {
+                Logger.log("It was not possible to load WellKnownPorts", Color.RED);
+                PutLogConsole(context, editTextTextLog, "\nIt was not possible to load known ports");
+                e.printStackTrace();
+                // System.exit(-1);
+            }
     }
-    return new WellKnownPort(null, -1,"Unknown");
-  }
 
-  /**
-   *
-   * @param name name to search for
-   * @return WellKnownPort is associated with the name 
-              passed down as a method's argument
-   */
-  public static WellKnownPort getByName(String name) {
-    for (WellKnownPort wellKnownPort : wellKnownPorts) {
-      if (wellKnownPort.getName().equals(name))
-        return wellKnownPort;
+    /**
+     * @param port port number that needs to be check
+     * @return WellKnownPort is associated with the port
+     * passed down as a method's parameter
+     */
+    public static WellKnownPort getByPortNumber(int port) {
+        for (WellKnownPort wellKnownPort : wellKnownPorts) {
+            if (wellKnownPort.getPort() == port)
+                return wellKnownPort;
+        }
+        return new WellKnownPort(null, -1, "Unknown");
     }
-    return new WellKnownPort(null, -1,"Unknown");
-  }
 
-  public String getProtocol() {
-    return protocol;
-  }
+    /**
+     * @param name name to search for
+     * @return WellKnownPort is associated with the name
+     * passed down as a method's argument
+     */
+    public static WellKnownPort getByName(String name) {
+        for (WellKnownPort wellKnownPort : wellKnownPorts) {
+            if (wellKnownPort.getName().equals(name))
+                return wellKnownPort;
+        }
+        return new WellKnownPort(null, -1, "Unknown");
+    }
 
-  public void setProtocol(String protocol) {
-    this.protocol = protocol;
-  }
+    public String getProtocol() {
+        return protocol;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public int getPort() {
-    return port;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setPort(int port) {
-    this.port = port;
-  }
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

@@ -177,6 +177,11 @@ public class TracerouteWithPing {
 			String command = "ping ";
 			int pid;
 
+			if(url.contains("su")){
+				url = url.replace("su","");
+				command = "su ping";
+			}
+
 			Log.d(FirstFragment.tag, "Will launch : " + command + url);
 
 			p = Runtime.getRuntime().exec(command + url);
@@ -192,7 +197,7 @@ public class TracerouteWithPing {
 			String res = "";
 			while ((s = stdInput.readLine()) != null) {
 				res += s + "\n";
-				String finalS = s.replace(url+":","") + "\n";
+				final String finalS = s.replace(url+":","") + "\n";
 
 				context.getActivity().runOnUiThread(new Runnable() {
 					@Override
@@ -203,19 +208,29 @@ public class TracerouteWithPing {
 
 				if(STOP){
 					Runtime.getRuntime().exec("kill -INT " + pid);
-					context.getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							context.stopProgressBar();
-						}
-					});
+
 
 				}
 			}
 
 			p.waitFor();
+			context.getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					context.stopProgressBar();
+				}
+			});
+
 
 			if (res.equals("")) {
+				final String finalCommand = command;
+
+				context.getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						editTextTextConsole.append(" IllegalArgumentException: "+ finalCommand + url);
+					}
+				});
 				throw new IllegalArgumentException();
 			}
 
@@ -334,6 +349,7 @@ public class TracerouteWithPing {
 				if(STOP){
 					Runtime.getRuntime().exec("kill -INT " + pid);
 					context.stopProgressBar();
+
 				}
 
 				if (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING)) {

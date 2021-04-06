@@ -6,33 +6,45 @@
     android:layout_height="match_parent"
     tools:context=".FirstFragment">
 
-    <EditText
-        android:id="@+id/editTextPing"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_layout_port"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="@string/placeholder"
-        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <EditText
+            android:id="@+id/editTextPing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:ems="10"
+            android:gravity="start"
+            android:hint="@string/placeholder"
+            android:inputType="text"
+            android:textColor="@color/black_color" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/buttonLaunch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editTextPing"
+        android:layout_below="@+id/input_layout_port"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Tracert"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonSecond"
         app:layout_constraintStart_toEndOf="@+id/buttonPing"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPing" />
+        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
 
     <ListView
         android:id="@+id/listViewTraceroute"
@@ -42,11 +54,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextTextConsole"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBarPing"></ListView>
@@ -57,11 +66,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/listViewTraceroute"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:layout_toRightOf="@+id/buttonLaunch"
         android:indeterminate="true"
         android:visibility="invisible"
@@ -78,7 +82,7 @@
         android:textColor="@color/purple_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonLaunch"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPing" />
+        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
 
     <Button
         android:id="@+id/buttonPing"
@@ -89,23 +93,49 @@
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonLaunch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPing" />
+        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
 
-    <EditText
-        android:id="@+id/editTextTextConsole"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabFirstFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_help" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:editable="false"
-        android:ems="10"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:textIsSelectable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listViewTraceroute" />
+        app:layout_constraintTop_toBottomOf="@+id/listViewTraceroute">
+
+        <EditText
+            android:id="@+id/editTextTextConsole"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@android:color/white"
+            android:ems="10"
+            android:enabled="true"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:textIsSelectable="true" />
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_color"
+            android:visibility="visible" />
+
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,7 @@
 package org.ping.cool.utils;
 
+import android.util.Log;
+
 import org.ping.cool.utils.logger.Color;
 import org.ping.cool.utils.logger.Logger;
 
@@ -33,10 +35,16 @@ public class Port {
    * has been established to this port.
    */
   private boolean isOpen;
+  private String portService;
 
-  public Port(int port, boolean isOpen) {
+  private String portProtocol;
+
+  public Port(int port,String protocol ,String service,boolean isOpen) {
     this.port = port;
     this.isOpen = isOpen;
+    setPortProtocol(protocol);
+    setPortService(service);
+
   }
 
   /**
@@ -61,17 +69,18 @@ public class Port {
           socket.close();
 
           String portService = WellKnownPort.getByPortNumber(port).getName();
+
           if (!portService.toLowerCase().equals("unknown"))
             Logger.log(Color.GREEN.getColor() + "Port " + Color.CYAN.getColor() + port + Color.GREEN.getColor() + " [" + Color.CYAN.getColor() + portService +  Color.GREEN.getColor() + "] seems to be reachable!");
           else
             Logger.log(Color.GREEN.getColor() + "Port " + Color.CYAN.getColor() + port + Color.GREEN.getColor() + " seems to be reachable!");
 
           // Returning the port and the parameter "isOpen" is set to true.
-          return new Port(port, true);
+          return new Port(port, WellKnownPort.getByPortNumber(port).getProtocol(),WellKnownPort.getByPortNumber(port).getName(),true);
         } catch (Exception ex) {
           // This happens when the connection has not been successful.
           // Returning the port and the parameter "isOpen" is set to false.
-          return new Port(port, false);
+          return new Port(port, WellKnownPort.getByPortNumber(port).getProtocol(),WellKnownPort.getByPortNumber(port).getName(),false);
         }
       }
     });
@@ -88,4 +97,21 @@ public class Port {
   public void setOpen(boolean open) {
     isOpen = open;
   }
+
+  public String getPortService() {
+    return portService;
+  }
+
+  public void setPortService(String portService) {
+    this.portService = portService;
+  }
+
+  public String getPortProtocol() {
+    return portProtocol;
+  }
+
+  public void setPortProtocol(String portProtocol) {
+    this.portProtocol = portProtocol;
+  }
+
 }

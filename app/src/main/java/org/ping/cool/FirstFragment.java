@@ -2,11 +2,11 @@ package org.ping.cool;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,8 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.ping.cool.databinding.FragmentFirstBinding;
-import org.ping.cool.databinding.FragmentSecondBinding;
 import org.ping.cool.network.TracerouteContainer;
 import org.ping.cool.network.TracerouteWithPing;
 
@@ -35,8 +36,10 @@ public class FirstFragment extends Fragment {
 
     public static final String tag = "TraceroutePing";
     public static final String INTENT_TRACE = "INTENT_TRACE";
-    private Button buttonLaunch, buttonPing, buttonSecond;
+    private Button buttonLaunch, buttonPing, buttonSecondFragment;
+    private FloatingActionButton floatingActionButton;
     private EditText editTextPing, editTextTextConsole;
+    private WebView webView;
     private ProgressBar progressBarPing;
     private ListView listViewTraceroute;
     private TraceListAdapter traceListAdapter;
@@ -60,20 +63,14 @@ public class FirstFragment extends Fragment {
 
         this.buttonLaunch = (Button) v.findViewById(R.id.buttonLaunch);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
+        this.floatingActionButton = (FloatingActionButton) v.findViewById(R.id.fabFirstFragment);
         this.editTextPing = (EditText) v.findViewById(R.id.editTextPing);
+        this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.listViewTraceroute = (ListView) v.findViewById(R.id.listViewTraceroute);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
-        this.buttonSecond = (Button) v.findViewById(R.id.buttonSecond);
-        editTextPing.setText("www.google.com");
-        buttonSecond.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
-            }
-        });
-
+        this.buttonSecondFragment = (Button) v.findViewById(R.id.buttonSecond);
+       // editTextPing.setText("-c 5 www.google.com");
 
         initView();
 
@@ -99,6 +96,27 @@ public class FirstFragment extends Fragment {
      */
     private void initView() {
 
+        webView.loadUrl("file:///android_asset/ping.html");
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                webView.setVisibility(View.VISIBLE);
+                TracerouteWithPing.StopPing(true);
+                stopProgressBar();
+                traces.clear();
+                traceListAdapter.notifyDataSetChanged();
+            }
+        });
+
+        buttonSecondFragment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(FirstFragment.this)
+                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
+            }
+        });
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -114,6 +132,7 @@ public class FirstFragment extends Fragment {
 
                         } else {
                             if(buttonLaunch.getText().equals("Tracert")) {
+                                editTextTextConsole.setText("");
                                 traces.clear();
                                 traceListAdapter.notifyDataSetChanged();
                                 startProgressBar();
@@ -122,6 +141,7 @@ public class FirstFragment extends Fragment {
                                 tracerouteWithPing.executeTraceroute(editTextPing.getText().toString(), maxTtl);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setEnabled(false);
+                                buttonSecondFragment.setEnabled(false);
                             }else{
                                 stopProgressBar();
                                 TracerouteWithPing.StopPing(true);
@@ -149,13 +169,16 @@ public class FirstFragment extends Fragment {
                         } else {
 
                             if (buttonPing.getText().equals("Ping")) {
+                                traces.clear();
+                                traceListAdapter.notifyDataSetChanged();
                                 startProgressBar();
                                 hideSoftwareKeyboard(editTextPing);
                                 editTextTextConsole.setText("");
-                                tracerouteWithPing.executePing(editTextPing.getText().toString(),editTextTextConsole);
+                                tracerouteWithPing.executePing(editTextPing.getText().toString().replace("ping",""),editTextTextConsole);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setText(getText(R.string.activity_buttonStop));
                                 buttonLaunch.setEnabled(false);
+                                buttonSecondFragment.setEnabled(false);
                             } else {
                                 TracerouteWithPing.StopPing(true);
                                 stopProgressBar();
@@ -273,6 +296,7 @@ public class FirstFragment extends Fragment {
 
     public void startProgressBar() {
         progressBarPing.setVisibility(View.VISIBLE);
+        webView.setVisibility(View.GONE);
 
     }
 
@@ -282,6 +306,7 @@ public class FirstFragment extends Fragment {
         buttonPing.setEnabled(true);
         buttonLaunch.setText("Tracert");
         buttonLaunch.setEnabled(true);
+        buttonSecondFragment.setEnabled(true);
 
     }
 
