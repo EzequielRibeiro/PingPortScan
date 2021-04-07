@@ -71,7 +71,7 @@ public class PortScanner {
    */
   public void start(Fragment context, EditText editTextTextLog, ListView listView) {
     Logger.log("Start scanning " + this.ip + "...", Color.CYAN);
-    PutLogConsole(context, editTextTextLog,"\nStart scanning " + this.ip + "...");
+    PutLogConsole(context, editTextTextLog,"\nStart scanning " + this.ip + ".....");
 
     ExecutorService executorService = Executors.newFixedThreadPool(this.threads);
     ports = new ArrayList<>();
@@ -81,7 +81,7 @@ public class PortScanner {
       for (int i = this.portFrom; i <= this.portTo; i++)
         ports.add(Port.scan(executorService, this.ip, i, this.timeout));
     else
-      ports.add(Port.scan(executorService, this.ip, this.portFrom, this.timeout));
+        ports.add(Port.scan(executorService, this.ip, this.portFrom, this.timeout));
 
     try {
       // This for loop verifies that all Threads have completed their task and load list
@@ -102,6 +102,7 @@ public class PortScanner {
           public void run() {
             try {
               arrayOfPorts.add(port.get());
+
             } catch (ExecutionException e) {
               e.printStackTrace();
             } catch (InterruptedException e) {
@@ -129,7 +130,7 @@ public class PortScanner {
       Log.e("Port","there are "+openPorts);
 
       Logger.log(Color.CYAN.getColor() + "There are " + Color.YELLOW.getColor() + openPorts + Color.CYAN.getColor() +  " open ports on host " + Color.YELLOW.getColor() + ip);
-      PutLogConsole(context, editTextTextLog,"\nThere are " + openPorts + " open ports on host: "+stringBuffer.toString() );
+      PutLogConsole(context, editTextTextLog,"\nThere are " + openPorts + " open ports on host "+stringBuffer.toString() );
       Logger.log(SEPARATOR);
     } catch (InterruptedException | ExecutionException ex) {
       ex.printStackTrace();

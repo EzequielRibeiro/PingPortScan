@@ -9,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import org.ping.cool.databinding.FragmentSecondBinding;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.ping.cool.MainActivity.isOnline;
 import static org.ping.cool.utils.logger.Logger.PutLogConsole;
@@ -26,6 +29,10 @@ public class SecondFragment extends Fragment {
 
     private FragmentSecondBinding binding;
     private CheckPortTask checkPortTask;
+    private MainActivity mainActivity;
+    private AutoCompleteTextView autoCompleteTextViewUrl;
+    private List<UrlHistoric> urlHistoricList;
+    private ArrayAdapter<String> adapter;
 
     @Override
     public View onCreateView(
@@ -50,6 +57,29 @@ public class SecondFragment extends Fragment {
         });
 
        */
+
+        if ( getActivity() instanceof MainActivity){
+            mainActivity = (MainActivity) getActivity();
+        }
+
+        this.autoCompleteTextViewUrl = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
+        DBAdapter dbAdapter = new DBAdapter(getActivity());
+        urlHistoricList = dbAdapter.getAllValuesGlyphs();
+
+        if(urlHistoricList.size() > 0) {
+            String[] urlArray = new String[urlHistoricList.size()];
+            int i = 0;
+            for(UrlHistoric u : urlHistoricList){
+                urlArray[i] = u.getText();
+                i++;
+            }
+
+            adapter = new ArrayAdapter<String>(getContext(),
+                    android.R.layout.simple_dropdown_item_1line, urlArray);
+            autoCompleteTextViewUrl.setAdapter(adapter);
+        }
+        dbAdapter.close();
+
 
     }
 
@@ -91,11 +121,15 @@ public class SecondFragment extends Fragment {
                     }
 
                 if (isOnline(getActivity().getApplicationContext())) {
-                    if (!binding.editTextPortScan.getText().toString().isEmpty() &&
+                    if (!autoCompleteTextViewUrl.getText().toString().isEmpty() &&
                             !binding.editTextPort1.getText().toString().isEmpty()) {
 
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
+                        dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+                        dbAdapter.close();
+
                         binding.webViewPort.setVisibility(View.GONE);
-                        listArgument.add("-h " + binding.editTextPortScan.getText().toString());
+                        listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
 
                         if (!binding.editTextTimeout.getText().toString().isEmpty())
                             listArgument.add("-t " + binding.editTextTimeout.getText().toString());
@@ -108,7 +142,7 @@ public class SecondFragment extends Fragment {
                         String args[] = new String[listArgument.size()];
                         args = listArgument.toArray(args);
 
-                        hideSoftwareKeyboard(binding.editTextPortScan);
+                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
                         new CheckPortTask(args, binding, SecondFragment.this).execute();
 
 
@@ -134,12 +168,16 @@ public class SecondFragment extends Fragment {
                     }
 
                 if (isOnline(getActivity().getApplicationContext())) {
-                    if (!binding.editTextPortScan.getText().toString().isEmpty() &&
+                    if (!autoCompleteTextViewUrl.getText().toString().isEmpty() &&
                             !binding.editTextPort2.getText().toString().isEmpty() &&
                             !binding.editTextPort3.getText().toString().isEmpty()) {
 
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
+                        dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+                        dbAdapter.close();
+
                         binding.webViewPort.setVisibility(View.GONE);
-                        listArgument.add("-h " + binding.editTextPortScan.getText().toString());
+                        listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
 
                         if (!binding.editTextTimeout.getText().toString().isEmpty())
                             listArgument.add("-t " + binding.editTextTimeout.getText().toString());
@@ -152,7 +190,7 @@ public class SecondFragment extends Fragment {
                         String args[] = new String[listArgument.size()];
                         args = listArgument.toArray(args);
 
-                        hideSoftwareKeyboard(binding.editTextPortScan);
+                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
                         checkPortTask = new CheckPortTask(args, binding, SecondFragment.this);
                         checkPortTask.execute();
 

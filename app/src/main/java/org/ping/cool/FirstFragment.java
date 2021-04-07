@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,7 +40,8 @@ public class FirstFragment extends Fragment {
     public static final String INTENT_TRACE = "INTENT_TRACE";
     private Button buttonTracert, buttonPing, buttonSecondFragment;
     private FloatingActionButton floatingActionButton;
-    private EditText editTextPing, editTextTextConsole;
+    private EditText editTextTextConsole;
+    private AutoCompleteTextView autoCompleteTextViewUrl;
     private WebView webView;
     private ProgressBar progressBarPing;
     private ListView listViewTraceroute;
@@ -46,6 +49,9 @@ public class FirstFragment extends Fragment {
     private FragmentFirstBinding binding;
     private TracerouteWithPing tracerouteWithPing;
     private final int maxTtl = 40;
+    private MainActivity mainActivity;
+    private ArrayAdapter<String> adapter;
+    private List<UrlHistoric> urlHistoricList;
 
     private List<TracerouteContainer> traces;
 
@@ -61,16 +67,37 @@ public class FirstFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_first, container, false);
 
+        if ( getActivity() instanceof MainActivity){
+            mainActivity = (MainActivity) getActivity();
+        }
+
+        this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
         this.buttonTracert = (Button) v.findViewById(R.id.buttonTracert);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.floatingActionButton = (FloatingActionButton) v.findViewById(R.id.fabFirstFragment);
-        this.editTextPing = (EditText) v.findViewById(R.id.editTextPing);
         this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.listViewTraceroute = (ListView) v.findViewById(R.id.listViewTraceroute);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
         this.buttonSecondFragment = (Button) v.findViewById(R.id.buttonSecond);
        // editTextPing.setText("-c 5 www.google.com");
+
+        DBAdapter dbAdapter = new DBAdapter(getActivity());
+        urlHistoricList = dbAdapter.getAllValuesGlyphs();
+
+        if(urlHistoricList.size() > 0) {
+            String[] urlArray = new String[urlHistoricList.size()];
+            int i = 0;
+            for(UrlHistoric u : urlHistoricList){
+                urlArray[i] = u.getText();
+                i++;
+            }
+
+            adapter = new ArrayAdapter<String>(getContext(),
+                    android.R.layout.simple_dropdown_item_1line, urlArray);
+            autoCompleteTextViewUrl.setAdapter(adapter);
+        }
+        dbAdapter.close();
 
         initView();
 
@@ -127,7 +154,7 @@ public class FirstFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
-                        if (editTextPing.getText().length() == 0) {
+                        if (autoCompleteTextViewUrl.getText().length() == 0) {
                             Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
                         } else if (!isOnline(getActivity().getApplicationContext())) {
                             Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
@@ -135,12 +162,15 @@ public class FirstFragment extends Fragment {
                         } else {
                             if(buttonTracert.getText().equals("Tracert")) {
 
+                                DBAdapter dbAdapter = new DBAdapter(getActivity());
+                                dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+                                dbAdapter.close();
                                 traces.clear();
                                 traceListAdapter.notifyDataSetChanged();
                                 startProgressBar();
                                 buttonTracert.setText(getString(R.string.activity_buttonStop));
-                                hideSoftwareKeyboard(editTextPing);
-                                tracerouteWithPing.executeTraceroute(editTextPing.getText().toString(), maxTtl);
+                                hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                                tracerouteWithPing.executeTraceroute(autoCompleteTextViewUrl.getText().toString(), maxTtl);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setEnabled(false);
                                 buttonSecondFragment.setEnabled(false);
@@ -166,7 +196,7 @@ public class FirstFragment extends Fragment {
                 buttonPing.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (editTextPing.getText().length() == 0) {
+                        if (autoCompleteTextViewUrl.getText().length() == 0) {
                             Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
                         } else if (!isOnline(getActivity().getApplicationContext())) {
                             Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
@@ -174,10 +204,13 @@ public class FirstFragment extends Fragment {
                         } else {
 
                             if (buttonPing.getText().equals("Ping")) {
+                                DBAdapter dbAdapter = new DBAdapter(getActivity());
+                                dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+                                dbAdapter.close();
                                 startProgressBar();
-                                hideSoftwareKeyboard(editTextPing);
+                                hideSoftwareKeyboard(autoCompleteTextViewUrl);
                                 editTextTextConsole.setText("");
-                                tracerouteWithPing.executePing(editTextPing.getText().toString().replace("ping",""),editTextTextConsole);
+                                tracerouteWithPing.executePing(autoCompleteTextViewUrl.getText().toString().replace("ping",""),editTextTextConsole);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setText(getText(R.string.activity_buttonStop));
                                 buttonTracert.setEnabled(false);

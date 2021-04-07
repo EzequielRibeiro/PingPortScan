@@ -12,7 +12,7 @@
     <string name="string_test">test</string>
     <string name="error">An error occurred, please try again</string>
     <string name="timeout">Timeout</string>
-    <string name="placeholder">type a url or ip</string>
+    <string name="placeholder">Target host</string>
     <string name="second_fragment_label">Port Scanner</string>
     <string name="first_fragment_label">Ping Tracert</string>
     <string name="previous">Previous</string>

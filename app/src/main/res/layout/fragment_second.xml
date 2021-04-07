@@ -18,34 +18,10 @@
         app:layout_constraintEnd_toStartOf="@+id/editTextPort3"
         app:layout_constraintTop_toTopOf="@+id/editTextPort3" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/input_layout_port"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-
-        <EditText
-            android:id="@+id/editTextPortScan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:ems="10"
-            android:hint="@string/placeholder"
-            android:textColor="@color/black_color" />
-    </com.google.android.material.textfield.TextInputLayout>
-
     <EditText
         android:id="@+id/editTextPort1"
         android:layout_width="60dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:ems="10"
@@ -53,7 +29,7 @@
         android:inputType="number"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonScanPort"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextPort3"
@@ -86,13 +62,12 @@
         android:id="@+id/buttonScanPort"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="Scan"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_port" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonScanRangePort"
