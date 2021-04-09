@@ -1,7 +1,13 @@
 package org.ping.cool;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,20 +31,26 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.ping.cool.Local.network.Discovery;
+import org.ping.cool.Local.network.Wireless;
+import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.databinding.FragmentFirstBinding;
 import org.ping.cool.network.TracerouteContainer;
 import org.ping.cool.network.TracerouteWithPing;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static org.ping.cool.MainActivity.isOnline;
 
-public class FirstFragment extends Fragment {
+public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public static final String tag = "TraceroutePing";
     public static final String INTENT_TRACE = "INTENT_TRACE";
-    private Button buttonTracert, buttonPing, buttonSecondFragment;
+    private Button buttonTracert, buttonPing,buttonLocal, buttonSecondFragment;
     private FloatingActionButton floatingActionButton;
     private EditText editTextTextConsole;
     private AutoCompleteTextView autoCompleteTextViewUrl;
@@ -50,8 +62,13 @@ public class FirstFragment extends Fragment {
     private TracerouteWithPing tracerouteWithPing;
     private final int maxTtl = 40;
     private MainActivity mainActivity;
-    private ArrayAdapter<String> adapter;
-    private List<UrlHistoric> urlHistoricList;
+    private Wireless wifi;
+    private Discovery discovery = new Discovery();
+    private Handler mHandler = new Handler();
+    private BroadcastReceiver receiver;
+    private IntentFilter intentFilter = new IntentFilter();
+    private ArrayAdapter hostsAdapter;
+    private List<Map<String, String>> hosts = new ArrayList<>();
 
     private List<TracerouteContainer> traces;
 
@@ -74,33 +91,19 @@ public class FirstFragment extends Fragment {
         this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
         this.buttonTracert = (Button) v.findViewById(R.id.buttonTracert);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
+        this.buttonLocal = (Button) v.findViewById(R.id.buttonLocal);
+        this.buttonSecondFragment = (Button) v.findViewById(R.id.buttonSecond);
         this.floatingActionButton = (FloatingActionButton) v.findViewById(R.id.fabFirstFragment);
         this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.listViewTraceroute = (ListView) v.findViewById(R.id.listViewTraceroute);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
-        this.buttonSecondFragment = (Button) v.findViewById(R.id.buttonSecond);
        // editTextPing.setText("-c 5 www.google.com");
-
-        DBAdapter dbAdapter = new DBAdapter(getActivity());
-        urlHistoricList = dbAdapter.getAllValuesGlyphs();
-
-        if(urlHistoricList.size() > 0) {
-            String[] urlArray = new String[urlHistoricList.size()];
-            int i = 0;
-            for(UrlHistoric u : urlHistoricList){
-                urlArray[i] = u.getText();
-                i++;
-            }
-
-            adapter = new ArrayAdapter<String>(getContext(),
-                    android.R.layout.simple_dropdown_item_1line, urlArray);
-            autoCompleteTextViewUrl.setAdapter(adapter);
-        }
-        dbAdapter.close();
+        this.wifi = new Wireless(getActivity());
+        this.setupHostsAdapter();
+        this.setupReceivers();
 
         initView();
-
 
         return v;
 
@@ -108,6 +111,12 @@ public class FirstFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if(savedInstanceState != null)
+            this.hosts = (ArrayList<Map<String, String>>) savedInstanceState.getSerializable("hosts");
+
+        if (this.hosts != null)
+            this.setupHostsAdapter();
 
 
     }
@@ -138,6 +147,24 @@ public class FirstFragment extends Fragment {
             }
         });
 
+        buttonLocal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              if(buttonLocal.getText().toString().equals("Local")) {
+                  buttonLocal.setText("Stop");
+                  buttonTracert.setEnabled(false);
+                  buttonSecondFragment.setEnabled(false);
+                  buttonPing.setEnabled(false);
+                  setupHostDiscovery();
+              }else{
+                  buttonLocal.setText("Local");
+                  stopProgressBar();
+                  discovery.stop();
+
+              }
+            }
+        });
+
         buttonSecondFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,8 +190,12 @@ public class FirstFragment extends Fragment {
                             if(buttonTracert.getText().equals("Tracert")) {
 
                                 DBAdapter dbAdapter = new DBAdapter(getActivity());
-                                dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+
+                                if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
+                                    mainActivity.refreshAutoCompleteTextView();
+                                }
                                 dbAdapter.close();
+
                                 traces.clear();
                                 traceListAdapter.notifyDataSetChanged();
                                 startProgressBar();
@@ -204,13 +235,28 @@ public class FirstFragment extends Fragment {
                         } else {
 
                             if (buttonPing.getText().equals("Ping")) {
+
                                 DBAdapter dbAdapter = new DBAdapter(getActivity());
-                                dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+
+                                if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
+                                    mainActivity.refreshAutoCompleteTextView();
+                                }
                                 dbAdapter.close();
+
                                 startProgressBar();
                                 hideSoftwareKeyboard(autoCompleteTextViewUrl);
                                 editTextTextConsole.setText("");
-                                tracerouteWithPing.executePing(autoCompleteTextViewUrl.getText().toString().replace("ping",""),editTextTextConsole);
+
+                                if(autoCompleteTextViewUrl.getText().toString().contains("whois ")){
+                                    Whois whois = new Whois(FirstFragment.this);
+                                    String host = autoCompleteTextViewUrl.getText().toString().replace("whois ","").
+                                            replace("www.","");
+                                    editTextTextConsole.setText(whois.getWhois(host));
+                                    webView.setVisibility(View.GONE);
+                                    return;
+                                }
+
+                                tracerouteWithPing.executePing(autoCompleteTextViewUrl.getText().toString(),editTextTextConsole);
                                 TracerouteWithPing.StopPing(false);
                                 buttonPing.setText(getText(R.string.activity_buttonStop));
                                 buttonTracert.setEnabled(false);
@@ -339,13 +385,128 @@ public class FirstFragment extends Fragment {
     }
 
     public void stopProgressBar() {
-        progressBarPing.setVisibility(View.INVISIBLE);
-        buttonPing.setText("Ping");
-        buttonPing.setEnabled(true);
-        buttonTracert.setText("Tracert");
-        buttonTracert.setEnabled(true);
-        buttonSecondFragment.setEnabled(true);
 
+       getActivity().runOnUiThread(new Runnable() {
+           @Override
+           public void run() {
+               progressBarPing.setVisibility(View.INVISIBLE);
+               buttonPing.setText("Ping");
+               buttonPing.setEnabled(true);
+               buttonTracert.setText("Tracert");
+               buttonTracert.setEnabled(true);
+               buttonSecondFragment.setEnabled(true);
+               buttonLocal.setText("Local");
+               buttonLocal.setEnabled(true);
+           }
+       });
+
+
+
+    }
+
+    private void setupHostsAdapter() {
+        this.hostsAdapter = new ArrayAdapter<Map<String, String>>(getActivity(), android.R.layout.simple_list_item_2, android.R.id.text1, this.hosts) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+                text2.setTextColor(getResources().getColor(R.color.grey_color));
+                text1.setText(hosts.get(position).get("First Line"));
+                text2.setText(hosts.get(position).get("Second Line"));
+                return view;
+            }
+        };
+        listViewTraceroute.setAdapter(this.hostsAdapter);
+    }
+
+    private void setupHostDiscovery() {
+
+                if (!wifi.isConnectedWifi()) {
+                    Toast.makeText(getContext(), "You're not connected to a WiFi network!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                hosts.clear();
+                hostsAdapter.notifyDataSetChanged();
+                progressBarPing.setVisibility(View.VISIBLE);
+                discovery.scanHosts(wifi.getInternalWifiIpAddress(), FirstFragment.this);
+                listViewTraceroute.setVisibility(View.VISIBLE);
+                editTextTextConsole.setVisibility(View.GONE);
+                webView.setVisibility(View.GONE);
+
+    }
+
+    private void setupReceivers() {
+        this.receiver = new BroadcastReceiver() {
+
+            //Detect if a network connection has been lost
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if (info == null) {
+                    mHandler.removeCallbacksAndMessages(null);
+                }
+            }
+        };
+        this.intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        requireActivity().registerReceiver(receiver, this.intentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (progressBarPing != null && (progressBarPing.getVisibility() == View.VISIBLE)) {
+            progressBarPing.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (this.receiver != null) {
+            requireActivity().unregisterReceiver(this.receiver);
+        }
+    }
+
+
+    public void onResume() {
+        super.onResume();
+        requireActivity().registerReceiver(this.receiver, this.intentFilter);
+    }
+
+
+    @Override
+    public void processFinish(Map<String, String> output) {
+        getActivity().runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                synchronized (hosts) {
+                    if (!hosts.contains(output)) {
+                        hosts.add(output);
+                    } else {
+                        hosts.set(hosts.indexOf(output), output);
+                    }
+                    Collections.sort(hosts, new Comparator<Map<String, String>>() {
+                        @Override
+                        public int compare(Map<String, String> lhs, Map<String, String> rhs) {
+                            int left = Integer.parseInt(lhs.get("Second Line").substring(lhs.get("Second Line").lastIndexOf(".") + 1, lhs.get("Second Line").indexOf("[") - 1));
+                            int right = Integer.parseInt(rhs.get("Second Line").substring(rhs.get("Second Line").lastIndexOf(".") + 1, rhs.get("Second Line").indexOf("[") - 1));
+                            return left - right;
+                        }
+                    });
+                    hostsAdapter.notifyDataSetChanged();
+                }
+                stopProgressBar();
+            }
+        });
+    }
+
+    @Override
+    public void processFinish(int output) {
+        stopProgressBar();
     }
 
 }

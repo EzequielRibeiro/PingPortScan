@@ -23,6 +23,7 @@ import org.ping.cool.utils.logger.Logger;
 import java.io.IOException;
 import java.net.*;
 
+import static org.ping.cool.MainActivity.FOOTER;
 import static org.ping.cool.utils.logger.Logger.PutLogConsole;
 
 public class CheckPortTask extends AsyncTask<Void, Void, Void> {
@@ -71,7 +72,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
         //header of the menu section
         String header = "";
         //footer of the menu section
-        String footer = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
@@ -80,8 +81,8 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("portscanner", header, options, footer, true);
-            PutLogConsole(context, binding.editTextTextLog, e.getLocalizedMessage()+'\n'+options+footer);
+            formatter.printHelp("portscanner", header, options, FOOTER, true);
+            PutLogConsole(context, binding.editTextTextLog, e.getLocalizedMessage()+'\n'+options+FOOTER);
             // System.exit(1);
         }
 

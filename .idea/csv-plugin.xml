@@ -59,7 +59,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\java\org\ping\cool\PortAdapter.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\java\org\ping\cool\SecondFragment.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\java\org\ping\cool\Whois.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />
@@ -98,6 +112,13 @@
           <value>
             <Attribute>
               <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\res\drawable\edittextcorner.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
             </Attribute>
           </value>
         </entry>

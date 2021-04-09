@@ -75,7 +75,7 @@ public class SecondFragment extends Fragment {
             }
 
             adapter = new ArrayAdapter<String>(getContext(),
-                    android.R.layout.simple_dropdown_item_1line, urlArray);
+                    android.R.layout.simple_spinner_dropdown_item, urlArray);
             autoCompleteTextViewUrl.setAdapter(adapter);
         }
         dbAdapter.close();
@@ -125,7 +125,9 @@ public class SecondFragment extends Fragment {
                             !binding.editTextPort1.getText().toString().isEmpty()) {
 
                         DBAdapter dbAdapter = new DBAdapter(getActivity());
-                        dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
+                        if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
+                        }
                         dbAdapter.close();
 
                         binding.webViewPort.setVisibility(View.GONE);

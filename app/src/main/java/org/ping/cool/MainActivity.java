@@ -1,20 +1,18 @@
 package org.ping.cool;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,15 +20,21 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
+import org.ping.cool.Local.network.Discovery;
+import org.ping.cool.Local.network.Wireless;
+import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.databinding.ActivityMainBinding;
-
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import java.util.Arrays;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
     public static AssetManager assetManager;
     private FirebaseAnalytics mFirebaseAnalytics;
     private InterstitialAd mInterstitialAd;
+    public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
+    private ArrayAdapter<String> adapter;
+    private List<UrlHistoric> urlHistoricList;
+    private ArrayList<String> urlArray;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +72,34 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.setRequestConfiguration(configuration);
         */
 
+        refreshAutoCompleteTextView();
+
         AdRequest adRequest = new AdRequest.Builder().build();
         binding.adView.loadAd(adRequest);
         mInterstitialAd = new InterstitialAd(MainActivity.this);
         mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
+    }
+
+    public void refreshAutoCompleteTextView() {
+
+        DBAdapter dbAdapter = new DBAdapter(this);
+        urlHistoricList = dbAdapter.getAllValuesGlyphs();
+        dbAdapter.close();
+
+        if(urlHistoricList.size() > 0) {
+
+            urlArray = new ArrayList<>();
+
+            for(UrlHistoric u : urlHistoricList){
+                urlArray.add(u.getText());
+            }
+
+            adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_spinner_dropdown_item, urlArray);
+            adapter.getFilter().filter(binding.autoCompleteTextViewUrl.getText(), null);
+            binding.autoCompleteTextViewUrl.setAdapter(adapter);
+        }
     }
 
     @Override
@@ -144,5 +176,6 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 
 }

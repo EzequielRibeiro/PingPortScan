@@ -24,6 +24,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.text.Html;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -33,6 +34,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+
+import static org.ping.cool.MainActivity.FOOTER;
+
 
 /**
  * This class contain everything needed to launch a traceroute using the ping command
@@ -161,6 +165,21 @@ public class TracerouteWithPing {
 			try {
 				launchPing();
 			} catch (Exception e) {
+				context.getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+
+						String msg = e.getMessage();
+						if(msg == null){
+							msg = "";
+						}
+                        context.stopProgressBar();
+						editTextTextConsole.setText(Html.fromHtml(
+								"<p>Wrong arguments or host not found: <p><font color='red'>"+url+"</font></p>"+
+										msg));
+					}
+				});
+
 				e.printStackTrace();
 			}
 			return null;
@@ -173,19 +192,27 @@ public class TracerouteWithPing {
 		@SuppressLint("NewApi")
 		private void launchPing() throws Exception {
 
-			Process p;
+			Process p = null;
+			BufferedReader stdInput = null;
 			String command = "ping ";
 			int pid;
 
-			if(url.contains("su")){
-				url = url.replace("su","");
-				command = "su ping";
+			if(!url.contains("ping ") && !url.contains("su ping ") && !url.contains("su ping6 ") && !url.contains("ping6 ")
+			&& !url.contains("netstat") && !url.contains("ifconfig") && !url.contains("host ") && !url.contains("su")){
+
+				p = Runtime.getRuntime().exec("ping " + url);
+
+			}else{
+
+				if(url.contains("ping6 "))
+				   url = url.concat("%wlan0");
+
+     		    p = Runtime.getRuntime().exec(url);
+
 			}
 
-			Log.d(FirstFragment.tag, "Will launch : " + command + url);
-
-			p = Runtime.getRuntime().exec(command + url);
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			if(p != null)
+			    stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			//getting process id
 			Field f = p.getClass().getDeclaredField("pid");
@@ -223,14 +250,7 @@ public class TracerouteWithPing {
 
 
 			if (res.equals("")) {
-				final String finalCommand = command;
 
-				context.getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						editTextTextConsole.append(" Wrong arguments or host not found: "+ finalCommand + url);
-					}
-				});
 				throw new IllegalArgumentException();
 			}
 

@@ -20,7 +20,7 @@ android {
         applicationId "org.ping.cool"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 8
+        versionCode 9
         versionName "1.1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-ads:19.8.0'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'commons-net:commons-net:3.3'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

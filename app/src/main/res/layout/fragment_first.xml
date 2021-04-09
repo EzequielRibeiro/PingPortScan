@@ -10,11 +10,10 @@
         android:id="@+id/buttonTracert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/input_layout_port"
         android:layout_centerHorizontal="true"
         android:text="Tracert"
         android:textColor="@color/black_color"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSecond"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLocal"
         app:layout_constraintStart_toEndOf="@+id/buttonPing"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,7 +24,7 @@
         android:text="Port Scan"
         android:textColor="@color/purple_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonTracert"
+        app:layout_constraintStart_toEndOf="@+id/buttonLocal"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -36,6 +35,16 @@
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonTracert"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonLocal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Local"
+        android:textColor="@color/black_color"
+        app:layout_constraintEnd_toStartOf="@+id/buttonSecond"
+        app:layout_constraintStart_toEndOf="@+id/buttonTracert"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
@@ -92,11 +101,13 @@
             android:layout_marginLeft="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
-            android:background="@android:color/white"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/edittextcorner"
             android:ems="10"
             android:enabled="true"
             android:gravity="start|top"
             android:inputType="none"
+            android:padding="5dp"
             android:textIsSelectable="true" />
 
         <WebView

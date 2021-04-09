@@ -124,10 +124,9 @@
                     android:layout_height="100dp"
                     android:ems="10"
                     android:enabled="true"
-                    android:hint="Log"
-                    android:textIsSelectable="true"
+                    android:hint="Event Log"
                     android:inputType="none"
-                    />
+                    android:textIsSelectable="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
@@ -158,6 +157,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:gravity="center_horizontal|center_vertical"
         android:inputType="number"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="@+id/editTextPort3"
@@ -170,6 +170,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:ems="10"
+        android:gravity="center_horizontal|center_vertical"
         android:inputType="number"
         android:textColor="@color/black_color"
         app:layout_constraintBottom_toBottomOf="@+id/editTextTimeout"
