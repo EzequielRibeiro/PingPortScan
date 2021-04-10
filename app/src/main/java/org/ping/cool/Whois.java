@@ -1,6 +1,10 @@
 package org.ping.cool;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.NetworkOnMainThreadException;
 import android.os.StrictMode;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 
 import org.apache.commons.net.whois.WhoisClient;
 import java.io.IOException;

@@ -8,9 +8,11 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
@@ -18,6 +20,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -50,13 +53,13 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public static final String tag = "TraceroutePing";
     public static final String INTENT_TRACE = "INTENT_TRACE";
-    private Button buttonTracert, buttonPing,buttonLocal, buttonSecondFragment;
+    private Button buttonTracert, buttonPing, buttonLocal, buttonWhois, buttonSecondFragment;
+    private FrameLayout frameLayout;
     private FloatingActionButton floatingActionButton;
     private EditText editTextTextConsole;
     private AutoCompleteTextView autoCompleteTextViewUrl;
     private WebView webView;
     private ProgressBar progressBarPing;
-    private ListView listViewTraceroute;
     private TraceListAdapter traceListAdapter;
     private FragmentFirstBinding binding;
     private TracerouteWithPing tracerouteWithPing;
@@ -69,8 +72,10 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private IntentFilter intentFilter = new IntentFilter();
     private ArrayAdapter hostsAdapter;
     private List<Map<String, String>> hosts = new ArrayList<>();
-
     private List<TracerouteContainer> traces;
+    private ViewGroup parentFrameLayout;
+    private ListView listViewLocal, listViewTracert;
+    private ViewTreeObserver.OnPreDrawListener mOnPreDrawListener;
 
     @Override
     public View onCreateView(
@@ -80,11 +85,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
         this.tracerouteWithPing = new TracerouteWithPing(this);
-        this.traces = new ArrayList<TracerouteContainer>();
+
 
         View v = inflater.inflate(R.layout.fragment_first, container, false);
 
-        if ( getActivity() instanceof MainActivity){
+        if (getActivity() instanceof MainActivity) {
             mainActivity = (MainActivity) getActivity();
         }
 
@@ -92,32 +97,26 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         this.buttonTracert = (Button) v.findViewById(R.id.buttonTracert);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.buttonLocal = (Button) v.findViewById(R.id.buttonLocal);
+        this.buttonWhois = (Button) v.findViewById(R.id.buttonWhois);
+        this.frameLayout = (FrameLayout) v.findViewById(R.id.frameLayout);
+        this.parentFrameLayout = (ViewGroup) frameLayout.getParent();
         this.buttonSecondFragment = (Button) v.findViewById(R.id.buttonSecond);
         this.floatingActionButton = (FloatingActionButton) v.findViewById(R.id.fabFirstFragment);
         this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
-        this.listViewTraceroute = (ListView) v.findViewById(R.id.listViewTraceroute);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
-       // editTextPing.setText("-c 5 www.google.com");
-        this.wifi = new Wireless(getActivity());
-        this.setupHostsAdapter();
-        this.setupReceivers();
+        listViewLocal = new ListView(getActivity());
+        listViewLocal.setBackgroundColor(getResources().getColor(R.color.white_color));
+        listViewTracert = new ListView(getActivity());
+        listViewTracert.setBackgroundColor(getResources().getColor(R.color.white_color));
 
         initView();
-
         return v;
 
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        if(savedInstanceState != null)
-            this.hosts = (ArrayList<Map<String, String>>) savedInstanceState.getSerializable("hosts");
-
-        if (this.hosts != null)
-            this.setupHostsAdapter();
-
 
     }
 
@@ -132,36 +131,75 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
      */
     private void initView() {
 
+        traces = new ArrayList<TracerouteContainer>();
+        traceListAdapter = new TraceListAdapter(getActivity());
+        listViewTracert.setAdapter(traceListAdapter);
+        frameLayout.addView(listViewTracert);
+
+        setupHostsAdapter();
+        setupReceivers();
         webView.loadUrl("file:///android_asset/ping.html");
-      //  editTextPing.setText("www.google.com");
+        webView.setVisibility(View.VISIBLE);
+        editTextTextConsole.setVisibility(View.INVISIBLE);
+        listViewLocal.setVisibility(View.INVISIBLE);
+        listViewTracert.setVisibility(View.INVISIBLE);
+
+        //  editTextPing.setText("www.google.com");
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 webView.setVisibility(View.VISIBLE);
-                listViewTraceroute.setVisibility(View.GONE);
-                editTextTextConsole.setVisibility(View.GONE);
-                TracerouteWithPing.StopPing(true);
-                stopProgressBar();
-                traces.clear();
-                traceListAdapter.notifyDataSetChanged();
+                editTextTextConsole.setVisibility(View.INVISIBLE);
+                listViewLocal.setVisibility(View.INVISIBLE);
+                listViewTracert.setVisibility(View.INVISIBLE);
+
+            }
+        });
+
+        buttonWhois.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (!autoCompleteTextViewUrl.getText().toString().isEmpty()) {
+
+                    webView.setVisibility(View.INVISIBLE);
+                    listViewLocal.setVisibility(View.INVISIBLE);
+                    listViewTracert.setVisibility(View.INVISIBLE);
+                    editTextTextConsole.setVisibility(View.VISIBLE);
+
+                    new WhoisTask(FirstFragment.this, editTextTextConsole, autoCompleteTextViewUrl.getText().toString()).execute();
+
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.no_text_web), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         buttonLocal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              if(buttonLocal.getText().toString().equals("Local")) {
-                  buttonLocal.setText("Stop");
-                  buttonTracert.setEnabled(false);
-                  buttonSecondFragment.setEnabled(false);
-                  buttonPing.setEnabled(false);
-                  setupHostDiscovery();
-              }else{
-                  buttonLocal.setText("Local");
-                  stopProgressBar();
-                  discovery.stop();
 
-              }
+                if (buttonLocal.getText().toString().equals("Local")) {
+                    startProgressBar();
+                    buttonLocal.setText("Stop");
+                    buttonTracert.setEnabled(false);
+                    buttonSecondFragment.setEnabled(false);
+                    buttonPing.setEnabled(false);
+                    buttonWhois.setEnabled(false);
+                    listViewLocal.setVisibility(View.VISIBLE);
+                    listViewTracert.setVisibility(View.INVISIBLE);
+                    webView.setVisibility(View.INVISIBLE);
+                    editTextTextConsole.setVisibility(View.INVISIBLE);
+                    wifi = new Wireless(getActivity());
+
+                    setupHostDiscovery();
+
+                } else {
+                    stopProgressBar();
+                    discovery.stop();
+
+                }
             }
         });
 
@@ -173,106 +211,89 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             }
         });
 
-        getActivity().runOnUiThread(new Runnable() {
+        buttonTracert.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
+            public void onClick(View v) {
 
-                buttonTracert.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                if (autoCompleteTextViewUrl.getText().length() == 0) {
+                    Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
+                } else if (!isOnline(getActivity().getApplicationContext())) {
+                    Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
 
-                        if (autoCompleteTextViewUrl.getText().length() == 0) {
-                            Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
-                        } else if (!isOnline(getActivity().getApplicationContext())) {
-                            Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (buttonTracert.getText().equals("Tracert")) {
 
-                        } else {
-                            if(buttonTracert.getText().equals("Tracert")) {
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                                DBAdapter dbAdapter = new DBAdapter(getActivity());
-
-                                if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
-                                    mainActivity.refreshAutoCompleteTextView();
-                                }
-                                dbAdapter.close();
-
-                                traces.clear();
-                                traceListAdapter.notifyDataSetChanged();
-                                startProgressBar();
-                                buttonTracert.setText(getString(R.string.activity_buttonStop));
-                                hideSoftwareKeyboard(autoCompleteTextViewUrl);
-                                tracerouteWithPing.executeTraceroute(autoCompleteTextViewUrl.getText().toString(), maxTtl);
-                                TracerouteWithPing.StopPing(false);
-                                buttonPing.setEnabled(false);
-                                buttonSecondFragment.setEnabled(false);
-                                listViewTraceroute.setVisibility(View.VISIBLE);
-                                webView.setVisibility(View.GONE);
-                                editTextTextConsole.setVisibility(View.GONE);
-                            }else{
-                                stopProgressBar();
-                                TracerouteWithPing.StopPing(true);
-                            }
+                        if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
                         }
+                        dbAdapter.close();
+
+                        traces.clear();
+                        traceListAdapter.notifyDataSetChanged();
+                        startProgressBar();
+                        buttonTracert.setText(getString(R.string.activity_buttonStop));
+                        buttonPing.setEnabled(false);
+                        buttonLocal.setEnabled(false);
+                        buttonWhois.setEnabled(false);
+                        buttonSecondFragment.setEnabled(false);
+                        webView.setVisibility(View.INVISIBLE);
+                        editTextTextConsole.setVisibility(View.INVISIBLE);
+                        listViewLocal.setVisibility(View.INVISIBLE);
+                        listViewTracert.setVisibility(View.VISIBLE);
+                        tracerouteWithPing.executeTraceroute(autoCompleteTextViewUrl.getText().toString(), maxTtl);
+                        TracerouteWithPing.StopPing(false);
+                    } else {
+                        stopProgressBar();
+                        TracerouteWithPing.StopPing(true);
                     }
-                });
-                traceListAdapter = new TraceListAdapter(getActivity());
-                listViewTraceroute.setAdapter(traceListAdapter);
+                }
             }
         });
 
-
-        getActivity().runOnUiThread(new Runnable() {
+        buttonPing.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                buttonPing.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (autoCompleteTextViewUrl.getText().length() == 0) {
-                            Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
-                        } else if (!isOnline(getActivity().getApplicationContext())) {
-                            Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
 
-                        } else {
+                if (autoCompleteTextViewUrl.getText().length() == 0) {
+                    Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
+                } else if (!isOnline(getActivity().getApplicationContext())) {
+                    Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
 
-                            if (buttonPing.getText().equals("Ping")) {
+                } else {
 
-                                DBAdapter dbAdapter = new DBAdapter(getActivity());
+                    if (buttonPing.getText().equals("Ping")) {
 
-                                if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
-                                    mainActivity.refreshAutoCompleteTextView();
-                                }
-                                dbAdapter.close();
+                        webView.setVisibility(View.INVISIBLE);
+                        listViewTracert.setVisibility(View.INVISIBLE);
+                        listViewLocal.setVisibility(View.INVISIBLE);
+                        editTextTextConsole.setVisibility(View.VISIBLE);
 
-                                startProgressBar();
-                                hideSoftwareKeyboard(autoCompleteTextViewUrl);
-                                editTextTextConsole.setText("");
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                                if(autoCompleteTextViewUrl.getText().toString().contains("whois ")){
-                                    Whois whois = new Whois(FirstFragment.this);
-                                    String host = autoCompleteTextViewUrl.getText().toString().replace("whois ","").
-                                            replace("www.","");
-                                    editTextTextConsole.setText(whois.getWhois(host));
-                                    webView.setVisibility(View.GONE);
-                                    return;
-                                }
-
-                                tracerouteWithPing.executePing(autoCompleteTextViewUrl.getText().toString(),editTextTextConsole);
-                                TracerouteWithPing.StopPing(false);
-                                buttonPing.setText(getText(R.string.activity_buttonStop));
-                                buttonTracert.setEnabled(false);
-                                buttonSecondFragment.setEnabled(false);
-                                listViewTraceroute.setVisibility(View.GONE);
-                                webView.setVisibility(View.GONE);
-                                editTextTextConsole.setVisibility(View.VISIBLE);
-                            } else {
-                                TracerouteWithPing.StopPing(true);
-                                stopProgressBar();
-
-                            }
-
+                        if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
                         }
+                        dbAdapter.close();
+
+                        startProgressBar();
+                        editTextTextConsole.setText("");
+                        tracerouteWithPing.executePing(autoCompleteTextViewUrl.getText().toString(), editTextTextConsole);
+                        TracerouteWithPing.StopPing(false);
+                        buttonPing.setText(getText(R.string.activity_buttonStop));
+                        buttonTracert.setEnabled(false);
+                        buttonLocal.setEnabled(false);
+                        buttonWhois.setEnabled(false);
+                        buttonSecondFragment.setEnabled(false);
+
+                    } else {
+                        TracerouteWithPing.StopPing(true);
+                        stopProgressBar();
+
                     }
-                });
+
+                }
             }
         });
     }
@@ -381,30 +402,35 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public void startProgressBar() {
         progressBarPing.setVisibility(View.VISIBLE);
+        autoCompleteTextViewUrl.setEnabled(false);
+        hideSoftwareKeyboard(autoCompleteTextViewUrl);
+
 
     }
 
     public void stopProgressBar() {
 
-       getActivity().runOnUiThread(new Runnable() {
-           @Override
-           public void run() {
-               progressBarPing.setVisibility(View.INVISIBLE);
-               buttonPing.setText("Ping");
-               buttonPing.setEnabled(true);
-               buttonTracert.setText("Tracert");
-               buttonTracert.setEnabled(true);
-               buttonSecondFragment.setEnabled(true);
-               buttonLocal.setText("Local");
-               buttonLocal.setEnabled(true);
-           }
-       });
-
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBarPing.setVisibility(View.GONE);
+                buttonPing.setText("Ping");
+                buttonPing.setEnabled(true);
+                buttonTracert.setText("Tracert");
+                buttonTracert.setEnabled(true);
+                buttonSecondFragment.setEnabled(true);
+                buttonLocal.setText("Local");
+                buttonLocal.setEnabled(true);
+                buttonWhois.setEnabled(true);
+                autoCompleteTextViewUrl.setEnabled(true);
+            }
+        });
 
 
     }
 
     private void setupHostsAdapter() {
+
         this.hostsAdapter = new ArrayAdapter<Map<String, String>>(getActivity(), android.R.layout.simple_list_item_2, android.R.id.text1, this.hosts) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -417,22 +443,21 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 return view;
             }
         };
-        listViewTraceroute.setAdapter(this.hostsAdapter);
+        listViewLocal.setAdapter(this.hostsAdapter);
+        frameLayout.addView(listViewLocal);
+
     }
 
     private void setupHostDiscovery() {
 
-                if (!wifi.isConnectedWifi()) {
-                    Toast.makeText(getContext(), "You're not connected to a WiFi network!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                hosts.clear();
-                hostsAdapter.notifyDataSetChanged();
-                progressBarPing.setVisibility(View.VISIBLE);
-                discovery.scanHosts(wifi.getInternalWifiIpAddress(), FirstFragment.this);
-                listViewTraceroute.setVisibility(View.VISIBLE);
-                editTextTextConsole.setVisibility(View.GONE);
-                webView.setVisibility(View.GONE);
+        if (!wifi.isConnectedWifi()) {
+            Toast.makeText(getContext(), "You're not connected to a WiFi network!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        hosts.clear();
+        hostsAdapter.notifyDataSetChanged();
+        discovery.scanHosts(wifi.getInternalWifiIpAddress(), FirstFragment.this);
+        hideSoftwareKeyboard(editTextTextConsole);
 
     }
 
@@ -456,7 +481,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onPause() {
         super.onPause();
         if (progressBarPing != null && (progressBarPing.getVisibility() == View.VISIBLE)) {
-            progressBarPing.setVisibility(View.INVISIBLE);
+            progressBarPing.setVisibility(View.GONE);
         }
 
     }

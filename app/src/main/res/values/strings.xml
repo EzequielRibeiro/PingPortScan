@@ -8,6 +8,7 @@
     <string name="activity_buttonStop">Stop</string>
     <string name="no_connectivity">No connectivity</string>
     <string name="no_text">Please enter an ip or URL</string>
+    <string name="no_text_web">Please enter an URL</string>
     <string name="no_ping">Are you sure about the URL?</string>
     <string name="string_test">test</string>
     <string name="error">An error occurred, please try again</string>

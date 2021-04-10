@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_grey_color"
     tools:context=".FirstFragment">
 
     <Button
@@ -11,26 +12,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
         android:text="Tracert"
         android:textColor="@color/black_color"
+        app:layout_constraintBottom_toTopOf="@+id/buttonWhois"
         app:layout_constraintEnd_toStartOf="@+id/buttonLocal"
         app:layout_constraintStart_toEndOf="@+id/buttonPing"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonSecond"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Port Scan"
+        android:text="Scan"
         android:textColor="@color/purple_color"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonLocal"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
+        app:layout_constraintEnd_toEndOf="@+id/buttonLocal"
+        app:layout_constraintStart_toStartOf="@+id/buttonLocal"
+        app:layout_constraintTop_toBottomOf="@+id/buttonLocal" />
 
     <Button
         android:id="@+id/buttonPing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Ping"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonTracert"
@@ -41,24 +46,35 @@
         android:id="@+id/buttonLocal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Local"
         android:textColor="@color/black_color"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSecond"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSecond"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonTracert"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonWhois"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Whois"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
+        app:layout_constraintEnd_toEndOf="@+id/buttonTracert"
+        app:layout_constraintStart_toStartOf="@+id/buttonTracert"
+        app:layout_constraintTop_toBottomOf="@+id/buttonTracert" />
 
     <ProgressBar
         android:id="@+id/progressBarPing"
         style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_above="@id/buttonTracert"
-        android:layout_toRightOf="@+id/buttonTracert"
         android:indeterminate="true"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonTracert" />
+        app:layout_constraintTop_toBottomOf="@id/buttonWhois" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabFirstFragment"
@@ -66,8 +82,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:fabSize="mini"
         app:backgroundTint="@color/white_color"
+        app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@null"
@@ -77,45 +93,40 @@
         android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_margin="3dp"
+        android:background="@drawable/layout_border"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/progressBarPing">
 
-        <ListView
-            android:id="@+id/listViewTraceroute"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/buttonTracert"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"></ListView>
-
         <EditText
             android:id="@+id/editTextTextConsole"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/edittextcorner"
             android:ems="10"
             android:enabled="true"
             android:gravity="start|top"
             android:inputType="none"
-            android:padding="5dp"
+            android:overScrollMode="always"
+            android:selectAllOnFocus="false"
             android:textIsSelectable="true" />
 
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:layout_height="match_parent" />
 
     </FrameLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/buttonPing"
+        app:layout_constraintStart_toStartOf="@+id/buttonPing"
+        app:layout_constraintTop_toBottomOf="@+id/buttonPing" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,40 +1,53 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<style>
+    <style>
 table, th, td ,body{
   border: 1px solid black;
 }
 
-</style>
+
+    </style>
 </head>
 <body>
-<p>This software allows you to scan a Host by checking for any open ports. This program works with <code>Sockets</code>, to establish a possible connection with the server and with a port, which is obtained from the range passed as parameter. The operation of the program is very simple and basic: if the server manages to establish a connection, the tested port is open, otherwise, if it fails to establish a connection within the time indicated by the&nbsp;<code>timeout</code>&nbsp;parameter, the port will be closed.How it worksThe program accepts the following parameters as inputs, which must be passed at run time:</p>
+<p>This software allows you to scan a Host by checking for any open ports. This program works with
+    <code>Sockets</code>, to establish a possible connection with the server and with a port, which
+    is obtained from the range passed as parameter. The operation of the program is very simple and
+    basic: if the server manages to establish a connection, the tested port is open, otherwise, if
+    it fails to establish a connection within the time indicated by the&nbsp;<code>timeout</code>&nbsp;parameter,
+    the port will be closed.How it worksThe program accepts the following parameters: </p>
 <table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Required</th>
-<th>Description</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-t</td>
-<td>no</td>
-<td><strong>Timeout</strong>&nbsp;for Socket disconnection</td>
-<td>-t 100</td>
-</tr>
-<tr>
-<td>-th</td>
-<td>no</td>
-<td>Number of&nbsp;<strong>Threads</strong>&nbsp;to run</td>
-<td>-th 32</td>
-</tr>
-</tbody>
+    <thead>
+    <tr>
+        <th>Parameter</th>
+        <th>Required</th>
+        <th>Description</th>
+        <th>Example</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>-th</td>
+        <td>no</td>
+        <td>Number of&nbsp;<strong>Threads</strong>&nbsp;to run</td>
+        <td>-th 32</td>
+    </tr>
+    <tr>
+        <td>-t</td>
+        <td>no</td>
+        <td><strong>Timeout</strong>&nbsp;for Socket disconnection</td>
+        <td>-t 100</td>
+    </tr>
+
+    </tbody>
 </table>
-<p><strong>Warning</strong>: Since it's a program that uses the network to perform the verification, it is reccommended to use the Threads according to the speed of your internet connection and not the computational capacity of your device. Some tests show that with&nbsp;<strong>60Mbps</strong>&nbsp;in&nbsp;<strong>download</strong>&nbsp;and&nbsp;<strong>15Mbps</strong>&nbsp;in&nbsp;<strong>upload</strong>&nbsp;it is possible to use&nbsp;<strong>32 Threads</strong>&nbsp;without having any problems. A connection with&nbsp;<strong>500Mbps</strong>&nbsp;in&nbsp;<strong>download</strong>&nbsp;and&nbsp;<strong>200Mbps</strong>&nbsp;in&nbsp;<strong>upload</strong>&nbsp;can also handle&nbsp;<strong>800 Threads</strong>.</p>
+<p><strong>Warning</strong>: Since it's a program that uses the network to perform the verification,
+    it is reccommended to use the Threads according to the speed of your internet connection and not
+    the computational capacity of your device. Some tests show that
+    with <strong>60Mbps</strong> in <strong>download</strong> and <strong>15Mbps</strong> in <strong>upload</strong> it
+    is possible to use <strong>32 Threads</strong> without having any problems. A
+    connection with <strong>500Mbps</strong> in <strong>download</strong> and <strong>200Mbps</strong> in <strong>upload</strong> can
+    also handle <strong>800 Threads</strong>.
+</p>
 </body>
 </html>

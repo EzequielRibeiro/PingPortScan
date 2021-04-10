@@ -1,8 +1,10 @@
 package org.ping.cool.Local.async;
 
 import android.os.AsyncTask;
+import android.view.View;
 
 
+import org.ping.cool.FirstFragment;
 import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.Local.runnable.ScanHostsRunnable;
 
@@ -21,15 +23,18 @@ public class ScanHostsAsyncTask extends AsyncTask<String, Void, Void> {
     private MainAsyncResponse delegate;
     private final int SCAN_THREADS = 8;
     private final int HOST_THREADS = 255;
+    private FirstFragment firstFragment;
 
     //Constructor to set the delegate
-    public ScanHostsAsyncTask(MainAsyncResponse delegate) {
-        this.delegate = delegate;
+    public ScanHostsAsyncTask(FirstFragment firstFragment) {
+        this.delegate = firstFragment;
+        this.firstFragment = firstFragment;
     }
 
     //Scans for active hosts on the network
     @Override
     protected Void doInBackground(String... params) {
+
         String ip = params[0];
         String parts[] = ip.split("\\.");
         ExecutorService executor = Executors.newFixedThreadPool(SCAN_THREADS);
@@ -56,6 +61,20 @@ public class ScanHostsAsyncTask extends AsyncTask<String, Void, Void> {
 
         publishProgress();
         return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void unused) {
+        super.onPostExecute(unused);
+
+        firstFragment.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // firstFragment.stopProgressBar();
+            }
+        });
+
     }
 
     //Scans the ARP table and updates the list with hosts on the network
@@ -111,6 +130,7 @@ public class ScanHostsAsyncTask extends AsyncTask<String, Void, Void> {
                                 return;
                             }
                         }
+
                     });
                 }
             }
