@@ -2,6 +2,7 @@ package org.ping.cool;
 
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.text.Html;
 import android.widget.EditText;
 
 public class WhoisTask extends AsyncTask<Void, Void, Void> {

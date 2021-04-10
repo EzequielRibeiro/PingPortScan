@@ -2,9 +2,14 @@
 <html>
 <head>
     <style>
-table, th, td {
+table, th, td{
   border: 1px solid black;
 }
+body{
+padding: 5px;
+border: 1px solid #4CAF50
+}
+
 
     </style>
 </head>
@@ -18,7 +23,7 @@ table, th, td {
     </tr>
     <tr>
         <td>Ping</td>
-        <td>Ping is to test the reachability of a host. You can use ipv6 by typing: ip6 hostaddress</td>
+        <td>Ping is to test the reachability of a host.</td>
     </tr>
     <tr>
         <td>Whois</td>
@@ -31,6 +36,10 @@ table, th, td {
     <tr>
         <td>Local</td>
         <td>Shows all devices connected to your local network</td>
+    </tr>
+    <tr>
+        <td>Scan</td>
+        <td>The port scanner allows you to find open doors quickly</td>
     </tr>
 
     </tbody>
@@ -116,21 +125,30 @@ table, th, td {
         <td>-W (timeout)</td>
         <td>Use this option to set the time(seconds) to wait for a response</td>
     </tr>
+    <tr>
+        <td><strong>ping6</strong></td>
+        <td>To ping ipv6 addresses, type ping6 before the host address:
+            <strong>ping6 fe80::a00:27ff:feb7:f8ed</strong></td>
+    </tr>
+    <td><strong>ifconfig</strong></td>
+    <td>The ifconfig command is used for displaying current network configuration information:
+        <strong>ifconfig -a</strong></td>
+    </tr>
+    <td><strong>ip</strong></td>
+    <td>The ip command is a Linux net-tool for system and network administrators:
+        <strong>ip link show</strong></td>
+    </tr>
+    <td><strong>netstat</strong></td>
+    <td>Displays device connections
+        <strong>netstat -a</strong></td>
+    </tr>
+
     </tbody>
 </table>
-<p>You do not need to write the command "ping" just type the arguments and the urlHistoric or ip.
-    Eg: -c 5 www.google.com</p>
+
 <h2>Some Basic Ping functions</h2>
 <p>Here are some basic ping functions that you will be used to check the performance of your
     network:</p>
-<h3>Pinging the host for availability</h3>
-<p>You can check if a host is alive or not through the following ping command:</p>
-<pre>$ ping host-name/IP</pre>
-<p>Press button Stop for breaking the command</p>
-<p><img class="aligncenter wp-image-677" src="img/word-image-28.png"
-        sizes="(max-width: 594px) 100vw, 594px"
-        srcset="img/word-image-28.png 594w, img/word-image-28-300x110.png 300w"
-        alt="Pinging the host for availability" width="594" height="218"/></p>
 <h3>Increase/Decrease interval between ping packets</h3>
 <p>The default time interval between sending each packet is 1 second in Linux. You can increase the
     time interval by setting a value greater than 1 and decrease it by setting a value less than
@@ -139,52 +157,29 @@ table, th, td {
 <pre>$ ping -i 5 127.0.0.1</pre>
 <p>Here is an example to decrease the time interval between two pings:</p>
 <pre>$ ping -i 0.5 127.0.0.1</pre>
-<p>As you can see in the following image, you need to be a superuser in order to set this time
-    interval lesser than 0.2 seconds:<span id="ezoic-pub-ad-placeholder-112"
-                                           class="ezoic-adpicker-ad"></span></p>
-<p><img class="aligncenter wp-image-678" src="img/word-image-29.png"
-        sizes="(max-width: 578px) 100vw, 578px"
-        srcset="img/word-image-29.png 578w, img/word-image-29-300x28.png 300w"
-        alt="Increasing/Decreasing interval between ping packets" width="578" height="53"/></p>
+<p>You need to be a superuser in order to set this time interval lesser than 0.2 seconds:<span
+        id="ezoic-pub-ad-placeholder-112"
+        class="ezoic-adpicker-ad"></span></p>
 <p>Therefore, the command should be executed with su. It should look like the following,</p>
 <pre><em>&nbsp;$ su ping -i 0.5 127.0.0.1</em></pre>
-<p>Enter the password when you are prompted and the command should work.</p>
+
 <h3>Change ping packet size</h3>
 <p>The default ping packet size is 56 bytes. You can change it through the following command:</p>
 <pre>$ ping -s packetsize hostname/IP</pre>
-<p>Here we are setting the packet size to 100; you can see the value set to 100 in the first line of
-    output:</p>
-<p><img class="aligncenter wp-image-679" src="img/word-image-30.png"
-        sizes="(max-width: 591px) 100vw, 591px"
-        srcset="img/word-image-30.png 591w, img/word-image-30-300x102.png 300w"
-        alt="Change ping packet size" width="591" height="201"/><span
-        id="ezoic-pub-ad-placeholder-113" class="ezoic-adpicker-ad"></span></p>
+
 <h3>Set ping to send a desired number of packets</h3>
 <p>You can set ping to send a desired number of packets as follows:</p>
 <pre>$ ping -c NumberOfPackets IP/hostname</pre>
-<p>In the following example, we are setting the number of packets as 5; after that, the results will
-    end:</p>
-<p><img class="aligncenter wp-image-680" src="img/word-image-31.png"
-        sizes="(max-width: 591px) 100vw, 591px"
-        srcset="img/word-image-31.png 591w, img/word-image-31-300x99.png 300w"
-        alt="Set ping to send a desired number of packets" width="591" height="195"/></p>
+
 <h3>Flooding the network</h3>
 <p>Ping command allows super users to send 100 or more packets per second through the following
     command:</p>
 <pre>$ su ping -f hostname-IP</pre>
-<h2><img class="aligncenter wp-image-681" src="img/word-image-32.png"
-         sizes="(max-width: 689px) 100vw, 689px"
-         srcset="img/word-image-32.png 689w, img/word-image-32-300x59.png 300w"
-         alt="Flooding the network" width="689" height="135"/></h2>
 <p>Ping prints a &ldquo;.&rdquo; when sending a ping and &ldquo;/&rdquo; when receiving one.</p>
 <h3>Set ping timeout</h3>
 <p>You can set a time limit after which ping will exit; no matter how many ping packets are sent or
     received:<span id="ezoic-pub-ad-placeholder-114" class="ezoic-adpicker-ad"></span></p>
 <pre>$ ping -w timeinseconds hostname/ip</pre>
-<p>Here we are using 3 seconds as timeout:</p>
-<p><img class="aligncenter wp-image-682" src="img/word-image-33.png"
-        sizes="(max-width: 567px) 100vw, 567px"
-        srcset="img/word-image-33.png 567w, img/word-image-33-300x86.png 300w"
-        alt="Set ping timeout" width="567" height="162"/></p>
+
 </body>
 </html>

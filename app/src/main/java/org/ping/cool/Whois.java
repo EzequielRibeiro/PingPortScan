@@ -40,6 +40,7 @@ public class Whois {
             WhoisClient whois = new WhoisClient();
             try {
 
+                whois.setConnectTimeout(5000);
                // whois.connect(WhoisClient.DEFAULT_HOST);
                 whois.connect("whois.geektools.com",43);
 

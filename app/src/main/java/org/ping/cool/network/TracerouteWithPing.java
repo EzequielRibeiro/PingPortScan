@@ -26,11 +26,13 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import org.ping.cool.FirstFragment;
 import org.ping.cool.R;
+import org.ping.cool.databinding.FragmentFirstBinding;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -55,7 +57,6 @@ public class TracerouteWithPing {
     private static final String TIME_PING = "time=";
     private static final String EXCEED_PING = "exceed";
     private static final String UNREACHABLE_PING = "100%";
-
     private TracerouteContainer latestTrace;
     private int ttl;
     private int finishedTasks;
@@ -82,15 +83,16 @@ public class TracerouteWithPing {
     /**
      * Launches the Traceroute
      *
+     * @param editText
      * @param url    The url to trace
      * @param maxTtl The max time to live to set (ping param)
      */
-    public void executeTraceroute(String url, int maxTtl) {
+    public void executeTraceroute(EditText editText, String url, int maxTtl) {
         this.ttl = 1;
         this.finishedTasks = 0;
         this.urlToPing = url;
 
-        new ExecutePingAsyncTask(maxTtl).execute();
+        new ExecutePingAsyncTask(editText,maxTtl).execute();
 
     }
 
@@ -199,7 +201,8 @@ public class TracerouteWithPing {
             int pid;
 
             if (!url.contains("ping ") && !url.contains("su ping ") && !url.contains("su ping6 ") && !url.contains("ping6 ")
-                    && !url.contains("netstat") && !url.contains("ifconfig") && !url.contains("host ") && !url.contains("su")) {
+                    && !url.contains("netstat") && !url.contains("ifconfig") && !url.contains("host ")
+                    && !url.contains("arp ") && !url.contains("su ") && !url.contains("ip ")) {
 
                 p = Runtime.getRuntime().exec("ping " + url);
 
@@ -267,8 +270,10 @@ public class TracerouteWithPing {
         private boolean isCancelled;
         private int maxTtl;
         private String ip;
+        private EditText editTextTextConsole;
 
-        public ExecutePingAsyncTask(int maxTtl) {
+        public ExecutePingAsyncTask(EditText editText,int maxTtl) {
+            this.editTextTextConsole = editText;
             this.maxTtl = maxTtl;
         }
 
@@ -408,14 +413,14 @@ public class TracerouteWithPing {
                             if (latestTrace != null && latestTrace.getIp().equals(ipToPing)) {
                                 if (ttl < maxTtl) {
                                     ttl = maxTtl;
-                                    new ExecutePingAsyncTask(maxTtl).execute();
+                                    new ExecutePingAsyncTask(editTextTextConsole,maxTtl).execute();
                                 } else {
                                     context.stopProgressBar();
                                 }
                             } else {
                                 if (ttl < maxTtl) {
                                     ttl++;
-                                    new ExecutePingAsyncTask(maxTtl).execute();
+                                    new ExecutePingAsyncTask(editTextTextConsole,maxTtl).execute();
                                 }
                             }
 //							context.refreshList(traces);
@@ -448,9 +453,7 @@ public class TracerouteWithPing {
             } else {
                 Toast.makeText(context.getContext(), context.getString(R.string.error), Toast.LENGTH_SHORT).show();
             }
-
             context.stopProgressBar();
-
             finishedTasks++;
         }
 

@@ -12,12 +12,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
         android:text="Tracert"
         android:textColor="@color/black_color"
         app:layout_constraintBottom_toTopOf="@+id/buttonWhois"
-        app:layout_constraintEnd_toStartOf="@+id/buttonLocal"
-        app:layout_constraintStart_toEndOf="@+id/buttonPing"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -25,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Scan"
-        android:textColor="@color/purple_color"
+        android:textColor="@android:color/black"
         app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
         app:layout_constraintEnd_toEndOf="@+id/buttonLocal"
         app:layout_constraintStart_toStartOf="@+id/buttonLocal"
@@ -35,22 +34,22 @@
         android:id="@+id/buttonPing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:text="Ping"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonTracert"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonLocal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:text="Local"
         android:textColor="@color/black_color"
         app:layout_constraintBottom_toTopOf="@+id/buttonSecond"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonTracert"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -93,8 +92,6 @@
         android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="3dp"
-        android:background="@drawable/layout_border"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

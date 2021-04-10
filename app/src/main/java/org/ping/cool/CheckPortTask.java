@@ -199,7 +199,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
         context.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                binding.progressBarScan.setVisibility(View.INVISIBLE);
+                binding.progressBarScan.setVisibility(View.GONE);
                 binding.buttonScanRangePort.setText("Scan");
             }
         });

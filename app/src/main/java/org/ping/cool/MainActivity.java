@@ -2,6 +2,7 @@ package org.ping.cool;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,12 +26,19 @@ import org.ping.cool.Local.network.Wireless;
 import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.databinding.ActivityMainBinding;
 import android.os.Handler;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -157,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void about(){
+
+        TextView message = new TextView(MainActivity.this);
+        message.setPadding(10,0,0,0);
         String version = "v";
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -165,8 +176,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        String msg = getString(R.string.app_name) +" "+version+"\nDeveloper: Ezequiel A. Ribeiro"+"\nContact: https://ezequielportfolio.wordpress.com/contato/";
+        final SpannableString s = new SpannableString(msg);
+        Linkify.addLinks(s, Linkify.ALL);
+
+        message.setText(s);
+        message.setMovementMethod(LinkMovementMethod.getInstance());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.app_name) +" "+version+"\n"+"Developer: Ezequiel A. Ribeiro")
+
+        builder.setView(message)
                 .setTitle("About");
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override

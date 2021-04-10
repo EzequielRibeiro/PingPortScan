@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
@@ -75,7 +76,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private List<TracerouteContainer> traces;
     private ViewGroup parentFrameLayout;
     private ListView listViewLocal, listViewTracert;
-    private ViewTreeObserver.OnPreDrawListener mOnPreDrawListener;
 
     @Override
     public View onCreateView(
@@ -84,7 +84,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     ) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
-        this.tracerouteWithPing = new TracerouteWithPing(this);
+        this.tracerouteWithPing = new TracerouteWithPing(FirstFragment.this);
 
 
         View v = inflater.inflate(R.layout.fragment_first, container, false);
@@ -106,10 +106,18 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
         listViewLocal = new ListView(getActivity());
-        listViewLocal.setBackgroundColor(getResources().getColor(R.color.white_color));
         listViewTracert = new ListView(getActivity());
-        listViewTracert.setBackgroundColor(getResources().getColor(R.color.white_color));
 
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            listViewLocal.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border) );
+            listViewTracert.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border) );
+            editTextTextConsole.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border) );
+        } else {
+            listViewLocal.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
+            listViewTracert.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
+            editTextTextConsole.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
+        }
         initView();
         return v;
 
@@ -180,6 +188,14 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             @Override
             public void onClick(View v) {
 
+                wifi = new Wireless(getActivity());
+
+                if (!wifi.isConnectedWifi()) {
+                    Toast.makeText(getContext(), "You're not connected to a WiFi network!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
                 if (buttonLocal.getText().toString().equals("Local")) {
                     startProgressBar();
                     buttonLocal.setText("Stop");
@@ -242,7 +258,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         editTextTextConsole.setVisibility(View.INVISIBLE);
                         listViewLocal.setVisibility(View.INVISIBLE);
                         listViewTracert.setVisibility(View.VISIBLE);
-                        tracerouteWithPing.executeTraceroute(autoCompleteTextViewUrl.getText().toString(), maxTtl);
+                        tracerouteWithPing.executeTraceroute(editTextTextConsole,autoCompleteTextViewUrl.getText().toString(), maxTtl);
                         TracerouteWithPing.StopPing(false);
                     } else {
                         stopProgressBar();
@@ -450,10 +466,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     private void setupHostDiscovery() {
 
-        if (!wifi.isConnectedWifi()) {
-            Toast.makeText(getContext(), "You're not connected to a WiFi network!", Toast.LENGTH_SHORT).show();
-            return;
-        }
         hosts.clear();
         hostsAdapter.notifyDataSetChanged();
         discovery.scanHosts(wifi.getInternalWifiIpAddress(), FirstFragment.this);
