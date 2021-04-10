@@ -116,6 +116,7 @@ public class SecondFragment extends Fragment {
                     if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
                         checkPortTask.cancel(true);
                         binding.buttonScanPort.setText("Scan");
+                        binding.buttonScanRangePort.setText("Scan");
                         binding.progressBarScan.setVisibility(View.GONE);
                         return;
                     }
@@ -218,11 +219,12 @@ public class SecondFragment extends Fragment {
     public void startProgressBar() {
         binding.progressBarScan.setVisibility(View.VISIBLE);
         binding.webViewPort.setVisibility(View.GONE);
-
-    }
+        binding.fabSecondFragment.setVisibility(View.GONE);
+ }
 
     public void stopProgressBar() {
         binding.progressBarScan.setVisibility(View.GONE);
+        binding.fabSecondFragment.setVisibility(View.VISIBLE);
 
     }
 
