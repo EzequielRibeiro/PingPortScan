@@ -114,11 +114,7 @@ public class SecondFragment extends Fragment {
                 listArgument.clear();
                 if (checkPortTask != null)
                     if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
-                        checkPortTask.cancel(true);
-                        binding.buttonScanPort.setText("Scan");
-                        binding.buttonScanRangePort.setText("Scan");
-                        binding.progressBarScan.setVisibility(View.GONE);
-                        return;
+                         return;
                     }
 
                 if (isOnline(getActivity().getApplicationContext())) {
@@ -166,7 +162,7 @@ public class SecondFragment extends Fragment {
                     if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
                         checkPortTask.cancel(true);
                         binding.buttonScanRangePort.setText("Scan");
-                        binding.progressBarScan.setVisibility(View.GONE);
+                        stopProgressBar();
                         return;
                     }
 
@@ -194,6 +190,7 @@ public class SecondFragment extends Fragment {
                         args = listArgument.toArray(args);
 
                         hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                        binding.buttonScanRangePort.setText("Stop");
                         checkPortTask = new CheckPortTask(args, binding, SecondFragment.this);
                         checkPortTask.execute();
 
@@ -225,6 +222,7 @@ public class SecondFragment extends Fragment {
     public void stopProgressBar() {
         binding.progressBarScan.setVisibility(View.GONE);
         binding.fabSecondFragment.setVisibility(View.VISIBLE);
+        binding.buttonScanRangePort.setText("Scan");
 
     }
 

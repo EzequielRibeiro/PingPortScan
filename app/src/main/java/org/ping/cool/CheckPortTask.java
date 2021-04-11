@@ -31,10 +31,10 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
     public static final String VERSION = "v0.0.1";
     public static final String SEPARATOR = Color.WHITE_BOLD.getColor() + "-------------------------------------------------------------" + Color.RESET.getColor();
     private FragmentSecondBinding binding;
-    private Fragment context;
+    private SecondFragment context;
     private String args[];
 
-    public CheckPortTask(String[] args, FragmentSecondBinding binding, Fragment context) {
+    public CheckPortTask(String[] args, FragmentSecondBinding binding, SecondFragment context) {
         this.binding = binding;
         this.args = args;
         this.context = context;
@@ -182,8 +182,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
         context.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                binding.progressBarScan.setVisibility(View.VISIBLE);
-                binding.buttonScanRangePort.setText("Stop");
+                context.startProgressBar();
             }
         });
 
@@ -199,8 +198,8 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
         context.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                binding.progressBarScan.setVisibility(View.GONE);
-                binding.buttonScanRangePort.setText("Scan");
+                context.stopProgressBar();
+
             }
         });
 

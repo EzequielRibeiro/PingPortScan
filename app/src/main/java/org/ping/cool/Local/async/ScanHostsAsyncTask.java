@@ -1,13 +1,10 @@
 package org.ping.cool.Local.async;
 
 import android.os.AsyncTask;
-import android.view.View;
-
 
 import org.ping.cool.FirstFragment;
 import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.Local.runnable.ScanHostsRunnable;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -127,6 +124,7 @@ public class ScanHostsAsyncTask extends AsyncTask<String, Void, Void> {
                                 item.put("First Line", hostname);
                                 delegate.processFinish(item);
                             } catch (UnknownHostException ignored) {
+                                ignored.printStackTrace();
                                 return;
                             }
                         }

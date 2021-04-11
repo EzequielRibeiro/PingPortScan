@@ -106,14 +106,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/layout_border"
             android:orientation="vertical">
 
             <ListView
                 android:id="@+id/listViewPort"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:background="@drawable/layout_border" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_password"

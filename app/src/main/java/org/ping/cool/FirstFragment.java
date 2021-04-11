@@ -420,24 +420,27 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         progressBarPing.setVisibility(View.VISIBLE);
         autoCompleteTextViewUrl.setEnabled(false);
         hideSoftwareKeyboard(autoCompleteTextViewUrl);
+        floatingActionButton.setVisibility(View.GONE);
 
 
     }
 
     public void stopProgressBar() {
 
+        progressBarPing.setVisibility(View.GONE);
+        buttonPing.setText("Ping");
+        buttonPing.setEnabled(true);
+        buttonTracert.setText("Tracert");
+        buttonTracert.setEnabled(true);
+        buttonSecondFragment.setEnabled(true);
+        buttonLocal.setText("Local");
+        buttonLocal.setEnabled(true);
+        buttonWhois.setEnabled(true);
+        floatingActionButton.setVisibility(View.VISIBLE);
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progressBarPing.setVisibility(View.GONE);
-                buttonPing.setText("Ping");
-                buttonPing.setEnabled(true);
-                buttonTracert.setText("Tracert");
-                buttonTracert.setEnabled(true);
-                buttonSecondFragment.setEnabled(true);
-                buttonLocal.setText("Local");
-                buttonLocal.setEnabled(true);
-                buttonWhois.setEnabled(true);
                 autoCompleteTextViewUrl.setEnabled(true);
             }
         });
@@ -543,7 +546,13 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     @Override
     public void processFinish(int output) {
-        stopProgressBar();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopProgressBar();
+            }
+        });
+
     }
 
 }
