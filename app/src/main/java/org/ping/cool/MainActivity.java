@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.amazon.device.ads.Ad;
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private com.amazon.device.ads.AdLayout amazonAdView;
     private com.google.android.gms.ads.AdView admobAdView;
     private com.amazon.device.ads.InterstitialAd interstitialAdAmazon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +131,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
     }
+
+
 
     public void refreshAutoCompleteTextView() {
 

@@ -20,26 +20,26 @@ along with TraceroutePing.  If not, see <http://www.gnu.org/licenses/>.
 package org.ping.cool.network;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import org.ping.cool.FirstFragment;
 import org.ping.cool.R;
-import org.ping.cool.databinding.FragmentFirstBinding;
-
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
-
-import static org.ping.cool.MainActivity.FOOTER;
 
 
 /**
@@ -63,25 +63,29 @@ public class TracerouteWithPing {
     private String urlToPing;
     private String ipToPing;
     private float elapsedTime;
-    private FirstFragment context;
+    private static FirstFragment context;
     private static Process p = null;
     private static int pid   = -1;
     // timeout handling
     private static final int TIMEOUT = 30000;
     private Handler handlerTimeout;
     private static Runnable runnableTimeout;
+    private SoundPool soundPool;
 
-    public static boolean STOP = false;
-
-    public static synchronized void StopPing(boolean b) {
+    public static synchronized void StopPing() {
       if(p != null){
-         Runtime.getRuntime().exec("kill -INT " + pid)
-         p = null;
+          try {
+              Runtime.getRuntime().exec("kill -INT " + pid);
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+          p = null;
         }
   }
 
     public TracerouteWithPing(FirstFragment context) {
         this.context = context;
+        loadSoundBeep();
     }
 
     /**
@@ -95,14 +99,12 @@ public class TracerouteWithPing {
         this.ttl = 1;
         this.finishedTasks = 0;
         this.urlToPing = url;
-
         new ExecutePingAsyncTask(editText, maxTtl).execute();
 
     }
 
     public void executePing(String url, EditText editTextTextConsole) {
-        new ExecutePing(url, editTextTextConsole).execute();
-
+         new ExecutePing(url, editTextTextConsole).execute();
     }
 
     /**
@@ -197,9 +199,9 @@ public class TracerouteWithPing {
         }
 
         @SuppressLint("NewApi")
-        private static void launchPing() throws Exception {
+        private void launchPing() throws Exception {
 
-            BufferedReader stdInput = null
+            BufferedReader stdInput = null;
             String[] command = url.split(" ");
 
             if (!command[0].equals("ping") && !command[0].equals("su ping") && !command[0].equals("su ping6") && !command[0].equals("ping6")
@@ -207,7 +209,8 @@ public class TracerouteWithPing {
                     && !command[0].equals("arp") && !command[0].equals("su") && !command[0].equals("ip")
                     && !command[0].equals("exec")) {
 
-                p = Runtime.getRuntime().exec("ping " + url);
+                url = "ping ".concat(url);
+                p = Runtime.getRuntime().exec(url);
 
             } else {
 
@@ -237,24 +240,28 @@ public class TracerouteWithPing {
                 res += s + "\n";
                 final String finalS = s.replace(url + ":", "") + "\n";
 
+                if((url.contains("ping") || url.contains("ping6"))
+                        && url.contains("-a") && finalS.contains("icmp_seq") )
+                     playBeep();
+
                 context.getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         editTextTextConsole.append(finalS);
+                        editTextTextConsole.setSelection(editTextTextConsole.getText().length());
                     }
                 });
 
                 
             }
-
-            p.waitFor();
+            if(p != null)
+               p.waitFor();
             context.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     context.stopProgressBar();
                 }
             });
-
 
             if (res.equals("")) {
 
@@ -264,6 +271,54 @@ public class TracerouteWithPing {
         }
 
     }
+
+    int idSound;
+    public void playBeep(){
+
+        soundPool.play(
+                idSound, 1, 1, 0, 0, 1);
+
+    }
+
+    private void loadSoundBeep(){
+
+        if (Build.VERSION.SDK_INT
+                >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes
+                    audioAttributes
+                    = new AudioAttributes
+                    .Builder()
+                    .setUsage(
+                            AudioAttributes
+                                    .USAGE_ASSISTANCE_SONIFICATION)
+                    .setContentType(
+                            AudioAttributes
+                                    .CONTENT_TYPE_SONIFICATION)
+                    .build();
+            soundPool
+                    = new SoundPool
+                    .Builder()
+                    .setMaxStreams(1)
+                    .setAudioAttributes(
+                            audioAttributes)
+                    .build();
+        }
+        else {
+            soundPool
+                    = new SoundPool(
+                    1,
+                    AudioManager.STREAM_MUSIC,
+                    0);
+        }
+
+        idSound = soundPool
+                .load(
+                        context.getContext(),
+                        R.raw.beep,
+                        1);
+
+    }
+
 
     /**
      * The task that ping an ip, with increasing time to live (ttl) value
@@ -346,9 +401,8 @@ public class TracerouteWithPing {
         @SuppressLint("NewApi")
         private String launchPing(String url) throws Exception {
             // Build ping command with parameters
-            Process p;
-            String command = "";
 
+            String command = "";
             String format = "ping -c 1 -t %d ";
             command = String.format(format, ttl);
 
@@ -365,7 +419,7 @@ public class TracerouteWithPing {
             //getting process id
             Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);
-            int pid = (int) f.get(p);
+            pid = (int) f.get(p);
 
             // Construct the response from ping
             String s;
@@ -373,20 +427,14 @@ public class TracerouteWithPing {
             while ((s = stdInput.readLine()) != null) {
                 res += s + "\n";
 
-                if (STOP) {
-                    Runtime.getRuntime().exec("kill -INT " + pid);
-                    context.stopProgressBar();
-
-                }
-
                 if (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING)) {
                     // We store the elapsedTime when the line from ping comes
                     elapsedTime = (System.nanoTime() - startTime) / 1000000.0f;
                 }
 
             }
-
-            p.destroy();
+            if(p != null)
+               p.destroy();
 
             if (res.equals("")) {
                 throw new IllegalArgumentException();
