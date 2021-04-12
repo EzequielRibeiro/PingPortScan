@@ -74,8 +74,10 @@ public class TracerouteWithPing {
     public static boolean STOP = false;
 
     public static synchronized void StopPing(boolean b) {
-      if(p != null)
+      if(p != null){
          Runtime.getRuntime().exec("kill -INT " + pid)
+         p = null;
+        }
   }
 
     public TracerouteWithPing(FirstFragment context) {
