@@ -64,7 +64,8 @@ public class TracerouteWithPing {
     private String ipToPing;
     private float elapsedTime;
     private FirstFragment context;
-
+    private static Process p = null;
+    private static int pid   = -1;
     // timeout handling
     private static final int TIMEOUT = 30000;
     private Handler handlerTimeout;
@@ -73,8 +74,9 @@ public class TracerouteWithPing {
     public static boolean STOP = false;
 
     public static synchronized void StopPing(boolean b) {
-        STOP = b;
-    }
+      if(p != null)
+         Runtime.getRuntime().exec("kill -INT " + pid)
+  }
 
     public TracerouteWithPing(FirstFragment context) {
         this.context = context;
@@ -193,11 +195,9 @@ public class TracerouteWithPing {
         }
 
         @SuppressLint("NewApi")
-        private void launchPing() throws Exception {
+        private static void launchPing() throws Exception {
 
-            Process p = null;
-            BufferedReader stdInput = null;
-            int pid;
+            BufferedReader stdInput = null
             String[] command = url.split(" ");
 
             if (!command[0].equals("ping") && !command[0].equals("su ping") && !command[0].equals("su ping6") && !command[0].equals("ping6")
@@ -219,13 +219,14 @@ public class TracerouteWithPing {
 
             }
 
-            if (p != null)
+            if (p != null){
                 stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             //getting process id
             Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);
             pid = (int) f.get(p);
+}
 
             // Construct the response from ping
             String s;
@@ -241,11 +242,7 @@ public class TracerouteWithPing {
                     }
                 });
 
-                if (STOP) {
-                    Runtime.getRuntime().exec("kill -INT " + pid);
-
-
-                }
+                
             }
 
             p.waitFor();
