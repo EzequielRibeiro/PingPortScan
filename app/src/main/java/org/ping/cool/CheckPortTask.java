@@ -5,6 +5,7 @@
 
 package org.ping.cool;
 
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.StrictMode;
@@ -28,7 +29,7 @@ import static org.ping.cool.utils.logger.Logger.PutLogConsole;
 
 public class CheckPortTask extends AsyncTask<Void, Void, Void> {
 
-    public static final String VERSION = "v0.0.1";
+    public static String VERSION = "v0.0.1";
     public static final String SEPARATOR = Color.WHITE_BOLD.getColor() + "-------------------------------------------------------------" + Color.RESET.getColor();
     private FragmentSecondBinding binding;
     private SecondFragment context;
@@ -38,6 +39,12 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
         this.binding = binding;
         this.args = args;
         this.context = context;
+        try {
+            PackageInfo pInfo = context.getActivity().getPackageManager().getPackageInfo(context.getActivity().getPackageName(), 0);
+            VERSION = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -82,57 +89,64 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("portscanner", header, options, FOOTER, true);
-            PutLogConsole(context, binding.editTextTextLog, e.getLocalizedMessage()+'\n'+options+FOOTER);
+            PutLogConsole(context, binding.editTextTextLog, e.getLocalizedMessage() + '\n' + options + FOOTER);
             // System.exit(1);
         }
 
         // Check data validity
-        if (cmd != null)
-            if (checkIp(cmd.getOptionValue("host").trim())) {
-                try {
-                    final InetAddress inetAddress = InetAddress.getByName(cmd.getOptionValue("host").trim());
-                    Logger.log("The host is reachable (" + inetAddress.getHostAddress() + ")!", Color.GREEN);
-                    PutLogConsole(context, binding.editTextTextLog, "\nThe host is reachable (" + inetAddress.getHostAddress() + ")!");
-                    PortScanner portScanner = new PortScanner(inetAddress.getHostAddress());
+        if (cmd != null) {
+            try {
+                if (checkIp(cmd.getOptionValue("host").trim())) {
+                    try {
+                        final InetAddress inetAddress = InetAddress.getByName(cmd.getOptionValue("host").trim());
+                        Logger.log("The host is reachable (" + inetAddress.getHostAddress() + ")!", Color.GREEN);
+                        PutLogConsole(context, binding.editTextTextLog, "\nThe host is reachable (" + inetAddress.getHostAddress() + ")!");
+                        PortScanner portScanner = new PortScanner(inetAddress.getHostAddress());
 
-                    if (cmd.getOptionValue("threads") != null) {
-                        int threads = Integer.parseInt(cmd.getOptionValue("threads").replace("h ", "").trim());
-                        portScanner.setThreads(threads);
-                    }
-
-                    if (cmd.getOptionValue("timeout") != null) {
-                        int timeout = Integer.parseInt(cmd.getOptionValue("timeout").replace("h ", "").trim());
-                        portScanner.setTimeout(timeout);
-                    }
-
-                    if (cmd.getOptionValue("ports") != null)
-                        if (cmd.getOptionValue("ports").trim().contains("-")) {
-                            int portFrom = Integer.parseInt(cmd.getOptionValue("ports").trim().split("-")[0]);
-                            int portTo = Integer.parseInt(cmd.getOptionValue("ports").trim().split("-")[1]);
-                            if (portFrom < portTo) {
-                                portScanner.setPortFrom(portFrom);
-                                portScanner.setPortTo(portTo);
-                            } else if (portFrom > portTo) {
-                                portScanner.setPortFrom(portTo);
-                                portScanner.setPortTo(portFrom);
-                            } else {
-                                portScanner.setPortFrom(portFrom);
-                                portScanner.setPortTo(-1);
-                            }
-                        } else {
-                            portScanner.setPortFrom(Integer.parseInt(cmd.getOptionValue("ports").trim()));
-                            portScanner.setPortTo(-1); //-1 indicates that there is no end
+                        if (cmd.getOptionValue("threads") != null) {
+                            int threads = Integer.parseInt(cmd.getOptionValue("threads").replace("h ", "").trim());
+                            portScanner.setThreads(threads);
                         }
 
-                    // Loading of known ports
-                    WellKnownPort.load(context,binding.editTextTextLog);
-                    // Start scan
-                    portScanner.start(context,binding.editTextTextLog, binding.listViewPort);
-                } catch (UnknownHostException | NumberFormatException e) {
-                    e.printStackTrace();
-                    PutLogConsole(context, binding.editTextTextLog, '\n'+"Error: "+e.getLocalizedMessage());
+                        if (cmd.getOptionValue("timeout") != null) {
+                            int timeout = Integer.parseInt(cmd.getOptionValue("timeout").replace("h ", "").trim());
+                            portScanner.setTimeout(timeout);
+                        }
+
+                        if (cmd.getOptionValue("ports") != null)
+                            if (cmd.getOptionValue("ports").trim().contains("-")) {
+                                int portFrom = Integer.parseInt(cmd.getOptionValue("ports").trim().split("-")[0]);
+                                int portTo = Integer.parseInt(cmd.getOptionValue("ports").trim().split("-")[1]);
+                                if (portFrom < portTo) {
+                                    portScanner.setPortFrom(portFrom);
+                                    portScanner.setPortTo(portTo);
+                                } else if (portFrom > portTo) {
+                                    portScanner.setPortFrom(portTo);
+                                    portScanner.setPortTo(portFrom);
+                                } else {
+                                    portScanner.setPortFrom(portFrom);
+                                    portScanner.setPortTo(-1);
+                                }
+                            } else {
+                                portScanner.setPortFrom(Integer.parseInt(cmd.getOptionValue("ports").trim()));
+                                portScanner.setPortTo(-1); //-1 indicates that there is no end
+                            }
+
+                        // Loading of known ports
+                        WellKnownPort.load(context, binding.editTextTextLog);
+                        // Start scan
+                        portScanner.start(context, binding.editTextTextLog, binding.listViewPort);
+                    } catch (UnknownHostException | NumberFormatException e) {
+                        e.printStackTrace();
+                        PutLogConsole(context, binding.editTextTextLog, '\n' + "Error: " + e.getLocalizedMessage());
+                    }
                 }
+            } catch (IOException e) {
+                Logger.log("An error has occurred...", Color.RED);
+                PutLogConsole(context, binding.editTextTextLog, "\nAn error has occurred...");
+                e.printStackTrace();
             }
+        }
     }
 
     /**
@@ -143,7 +157,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
      * @return Authenticity of the ip passed down as an input to the function
      */
 
-    private boolean checkIp(String ip) {
+    private boolean checkIp(String ip) throws IOException {
         boolean isIPv4 = false;
 
         try {
@@ -155,10 +169,6 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
             Logger.log("Host unreachable...", Color.RED);
             PutLogConsole(context, binding.editTextTextLog, "\nHost unreachable...");
             return false;
-        } catch (IOException e) {
-            Logger.log("An error has occurred...", Color.RED);
-            PutLogConsole(context, binding.editTextTextLog, "\nAn error has occurred...");
-            e.printStackTrace();
         }
         return isIPv4;
     }

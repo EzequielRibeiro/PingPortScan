@@ -38,6 +38,7 @@
         android:layout_marginRight="8dp"
         android:text="Ping"
         android:textColor="@color/black_color"
+        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toStartOf="@+id/buttonTracert"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -122,6 +123,17 @@
         android:layout_height="wrap_content"
         android:text="Button"
         android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/buttonPing"
+        app:layout_constraintStart_toStartOf="@+id/buttonPing"
+        app:layout_constraintTop_toBottomOf="@+id/buttonPing" />
+
+    <Button
+        android:id="@+id/buttonExec"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Exec"
+        android:textColor="@color/black_color"
+        app:layout_constraintBottom_toTopOf="@id/progressBarPing"
         app:layout_constraintEnd_toEndOf="@+id/buttonPing"
         app:layout_constraintStart_toStartOf="@+id/buttonPing"
         app:layout_constraintTop_toBottomOf="@+id/buttonPing" />

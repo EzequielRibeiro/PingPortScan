@@ -164,7 +164,28 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\res\values\dimens.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\res\values\styles.xml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\build.gradle">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\gradle\wrapper\gradle-wrapper.properties">
           <value>
             <Attribute>
               <option name="separator" value=":" />

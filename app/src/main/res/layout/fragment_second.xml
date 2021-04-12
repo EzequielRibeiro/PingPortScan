@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_grey_color"
     tools:context=".SecondFragment">
 
     <TextView
@@ -125,10 +126,15 @@
                     android:id="@+id/editTextTextLog"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginRight="40dp"
+                    android:background="@color/light_grey_color"
+                    android:editable="false"
                     android:ems="10"
                     android:enabled="true"
                     android:hint="Event Log"
                     android:inputType="none"
+                    android:textColor="@color/black_color"
                     android:textIsSelectable="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -221,10 +227,10 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="@color/white_color"
-        app:rippleColor="@null"
         app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:rippleColor="@null"
         app:srcCompat="@android:drawable/ic_dialog_info" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

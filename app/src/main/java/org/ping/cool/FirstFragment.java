@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
@@ -54,7 +53,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public static final String tag = "TraceroutePing";
     public static final String INTENT_TRACE = "INTENT_TRACE";
-    private Button buttonTracert, buttonPing, buttonLocal, buttonWhois, buttonSecondFragment;
+    private Button buttonTracert, buttonPing,buttonExec, buttonLocal, buttonWhois, buttonSecondFragment;
     private FrameLayout frameLayout;
     private FloatingActionButton floatingActionButton;
     private EditText editTextTextConsole;
@@ -98,6 +97,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.buttonLocal = (Button) v.findViewById(R.id.buttonLocal);
         this.buttonWhois = (Button) v.findViewById(R.id.buttonWhois);
+        this.buttonExec  = (Button) v.findViewById(R.id.buttonExec);
         this.frameLayout = (FrameLayout) v.findViewById(R.id.frameLayout);
         this.parentFrameLayout = (ViewGroup) frameLayout.getParent();
         this.buttonSecondFragment = (Button) v.findViewById(R.id.buttonSecond);
@@ -152,7 +152,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         listViewLocal.setVisibility(View.INVISIBLE);
         listViewTracert.setVisibility(View.INVISIBLE);
 
-        //  editTextPing.setText("www.google.com");
+        floatingActionButton.setVisibility(View.GONE);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,6 +160,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 editTextTextConsole.setVisibility(View.INVISIBLE);
                 listViewLocal.setVisibility(View.INVISIBLE);
                 listViewTracert.setVisibility(View.INVISIBLE);
+                view.setVisibility(View.GONE);
 
             }
         });
@@ -253,6 +254,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         buttonPing.setEnabled(false);
                         buttonLocal.setEnabled(false);
                         buttonWhois.setEnabled(false);
+                        buttonExec.setEnabled(false);
                         buttonSecondFragment.setEnabled(false);
                         webView.setVisibility(View.INVISIBLE);
                         editTextTextConsole.setVisibility(View.INVISIBLE);
@@ -279,6 +281,15 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                 } else {
 
+                    String[] commad = autoCompleteTextViewUrl.getText().toString().split(" ");
+
+                    if(commad[0].equals("netstat") || commad[0].equals("ifconfig") || commad[0].equals("host")
+                            || commad[0].equals("arp") || commad[0].equals("su") || commad[0].equals("ip")
+                    || commad[0].equals("exec")){
+
+                        return;
+                    }
+
                     if (buttonPing.getText().equals("Ping")) {
 
                         webView.setVisibility(View.INVISIBLE);
@@ -301,6 +312,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         buttonTracert.setEnabled(false);
                         buttonLocal.setEnabled(false);
                         buttonWhois.setEnabled(false);
+                        buttonExec.setEnabled(false);
                         buttonSecondFragment.setEnabled(false);
 
                     } else {
@@ -312,6 +324,57 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 }
             }
         });
+
+        buttonExec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (autoCompleteTextViewUrl.getText().length() == 0) {
+                    Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
+                }else{
+
+
+                    String[] commad = autoCompleteTextViewUrl.getText().toString().split(" ");
+                    if(commad[0].equals("netstat") || commad[0].equals("ifconfig") || commad[0].equals("host")
+                            || commad[0].equals("arp") || commad[0].equals("su") || commad[0].equals("ip") || commad[0].equals("exec")){
+
+                    if (buttonExec.getText().equals("Exec")) {
+
+                        webView.setVisibility(View.INVISIBLE);
+                        listViewTracert.setVisibility(View.INVISIBLE);
+                        listViewLocal.setVisibility(View.INVISIBLE);
+                        editTextTextConsole.setVisibility(View.VISIBLE);
+
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
+
+                        if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
+                        }
+                        dbAdapter.close();
+
+                        startProgressBar();
+                        editTextTextConsole.setText("");
+                        tracerouteWithPing.executePing(autoCompleteTextViewUrl.getText().toString(), editTextTextConsole);
+                        TracerouteWithPing.StopPing(false);
+                        buttonExec.setText(getText(R.string.activity_buttonStop));
+                        buttonPing.setEnabled(false);
+                        buttonTracert.setEnabled(false);
+                        buttonLocal.setEnabled(false);
+                        buttonWhois.setEnabled(false);
+                        buttonSecondFragment.setEnabled(false);
+
+                    } else {
+                        TracerouteWithPing.StopPing(true);
+                        stopProgressBar();
+                    }
+                    return;
+                   }
+
+                }
+            }
+        });
+
+
     }
 
     public void refreshList(TracerouteContainer trace) {
@@ -432,6 +495,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         buttonPing.setEnabled(true);
         buttonTracert.setText("Tracert");
         buttonTracert.setEnabled(true);
+        buttonExec.setText("Exec");
+        buttonExec.setEnabled(true);
         buttonSecondFragment.setEnabled(true);
         buttonLocal.setText("Local");
         buttonLocal.setEnabled(true);

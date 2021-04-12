@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -96,12 +97,13 @@ public class SecondFragment extends Fragment {
       //  binding.editTextPortScan.setText("www.google.com");
         binding.webViewPort.loadUrl("file:///android_asset/port.html");
         ArrayList<String> listArgument = new ArrayList<>();
-
+        binding.fabSecondFragment.setVisibility(View.GONE);
 
         binding.fabSecondFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 binding.webViewPort.setVisibility(View.VISIBLE);
+                view.setVisibility(View.GONE);
 
             }
         });
@@ -121,6 +123,8 @@ public class SecondFragment extends Fragment {
                     if (!autoCompleteTextViewUrl.getText().toString().isEmpty() &&
                             !binding.editTextPort1.getText().toString().isEmpty()) {
 
+                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                        binding.buttonScanPort.setText("Stop");
                         DBAdapter dbAdapter = new DBAdapter(getActivity());
                         if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
                             mainActivity.refreshAutoCompleteTextView();
@@ -141,7 +145,6 @@ public class SecondFragment extends Fragment {
                         String args[] = new String[listArgument.size()];
                         args = listArgument.toArray(args);
 
-                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
                         new CheckPortTask(args, binding, SecondFragment.this).execute();
 
 
@@ -161,7 +164,6 @@ public class SecondFragment extends Fragment {
                 if (checkPortTask != null)
                     if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
                         checkPortTask.cancel(true);
-                        binding.buttonScanRangePort.setText("Scan");
                         stopProgressBar();
                         return;
                     }
@@ -171,6 +173,8 @@ public class SecondFragment extends Fragment {
                             !binding.editTextPort2.getText().toString().isEmpty() &&
                             !binding.editTextPort3.getText().toString().isEmpty()) {
 
+                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                        binding.buttonScanRangePort.setText("Stop");
                         DBAdapter dbAdapter = new DBAdapter(getActivity());
                         dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
                         dbAdapter.close();
@@ -189,8 +193,6 @@ public class SecondFragment extends Fragment {
                         String args[] = new String[listArgument.size()];
                         args = listArgument.toArray(args);
 
-                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
-                        binding.buttonScanRangePort.setText("Stop");
                         checkPortTask = new CheckPortTask(args, binding, SecondFragment.this);
                         checkPortTask.execute();
 
@@ -223,6 +225,8 @@ public class SecondFragment extends Fragment {
         binding.progressBarScan.setVisibility(View.GONE);
         binding.fabSecondFragment.setVisibility(View.VISIBLE);
         binding.buttonScanRangePort.setText("Scan");
+        binding.buttonScanPort.setText("Scan");
+
 
     }
 

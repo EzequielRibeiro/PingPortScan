@@ -84,15 +84,15 @@ public class TracerouteWithPing {
      * Launches the Traceroute
      *
      * @param editText
-     * @param url    The url to trace
-     * @param maxTtl The max time to live to set (ping param)
+     * @param url      The url to trace
+     * @param maxTtl   The max time to live to set (ping param)
      */
     public void executeTraceroute(EditText editText, String url, int maxTtl) {
         this.ttl = 1;
         this.finishedTasks = 0;
         this.urlToPing = url;
 
-        new ExecutePingAsyncTask(editText,maxTtl).execute();
+        new ExecutePingAsyncTask(editText, maxTtl).execute();
 
     }
 
@@ -197,19 +197,23 @@ public class TracerouteWithPing {
 
             Process p = null;
             BufferedReader stdInput = null;
-            String command = "ping ";
             int pid;
+            String[] command = url.split(" ");
 
-            if (!url.contains("ping ") && !url.contains("su ping ") && !url.contains("su ping6 ") && !url.contains("ping6 ")
-                    && !url.contains("netstat") && !url.contains("ifconfig") && !url.contains("host ")
-                    && !url.contains("arp ") && !url.contains("su ") && !url.contains("ip ")) {
+            if (!command[0].equals("ping") && !command[0].equals("su ping") && !command[0].equals("su ping6") && !command[0].equals("ping6")
+                    && !command[0].equals("netstat") && !command[0].equals("ifconfig") && !command[0].equals("host")
+                    && !command[0].equals("arp") && !command[0].equals("su") && !command[0].equals("ip")
+                    && !command[0].equals("exec")) {
 
                 p = Runtime.getRuntime().exec("ping " + url);
 
             } else {
 
-                if (url.contains("ping6 "))
+                if (url.contains("ping6"))
                     url = url.concat("%wlan0");
+                else if (url.contains("exec ")) {
+                    url = url.replace("exec ", "");
+                }
 
                 p = Runtime.getRuntime().exec(url);
 
@@ -272,7 +276,7 @@ public class TracerouteWithPing {
         private String ip;
         private EditText editTextTextConsole;
 
-        public ExecutePingAsyncTask(EditText editText,int maxTtl) {
+        public ExecutePingAsyncTask(EditText editText, int maxTtl) {
             this.editTextTextConsole = editText;
             this.maxTtl = maxTtl;
         }
@@ -413,14 +417,14 @@ public class TracerouteWithPing {
                             if (latestTrace != null && latestTrace.getIp().equals(ipToPing)) {
                                 if (ttl < maxTtl) {
                                     ttl = maxTtl;
-                                    new ExecutePingAsyncTask(editTextTextConsole,maxTtl).execute();
+                                    new ExecutePingAsyncTask(editTextTextConsole, maxTtl).execute();
                                 } else {
                                     context.stopProgressBar();
                                 }
                             } else {
                                 if (ttl < maxTtl) {
                                     ttl++;
-                                    new ExecutePingAsyncTask(editTextTextConsole,maxTtl).execute();
+                                    new ExecutePingAsyncTask(editTextTextConsole, maxTtl).execute();
                                 }
                             }
 //							context.refreshList(traces);

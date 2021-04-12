@@ -1,49 +1,49 @@
 package org.ping.cool;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+
+import com.amazon.device.ads.Ad;
+import com.amazon.device.ads.AdProperties;
+import com.amazon.device.ads.DefaultAdListener;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import org.ping.cool.Local.network.Discovery;
-import org.ping.cool.Local.network.Wireless;
-import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.databinding.ActivityMainBinding;
-import android.os.Handler;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,12 +56,16 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private List<UrlHistoric> urlHistoricList;
     private ArrayList<String> urlArray;
-
+    private AdRequest adRequest;
+    private com.amazon.device.ads.AdLayout amazonAdView;
+    private com.google.android.gms.ads.AdView admobAdView;
+    private com.amazon.device.ads.InterstitialAd interstitialAdAmazon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
+       // com.amazon.device.ads.AdRegistration.enableTesting(true);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -80,15 +84,48 @@ public class MainActivity extends AppCompatActivity {
         RequestConfiguration configuration =
                 new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
         MobileAds.setRequestConfiguration(configuration);
-        */
+         */
 
         refreshAutoCompleteTextView();
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adRequest = new AdRequest.Builder().build();
         binding.adView.loadAd(adRequest);
-        mInterstitialAd = new InterstitialAd(MainActivity.this);
-        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+
+        binding.adView.setAdListener(new AdListener() {
+
+            @Override
+            public void onAdLoaded() {
+                loadInterstitialAd();
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+                Log.i("Admob","failed code "+adError.getCode()+": "+adError.getMessage());
+                loadAdAmazon();
+
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+
     }
 
     public void refreshAutoCompleteTextView() {
@@ -112,13 +149,121 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void loadAdAmazon(){
+        binding.linearLayoutAd.removeView(binding.adView);
+        amazonAdView = new com.amazon.device.ads.AdLayout(this, com.amazon.device.ads.AdSize.SIZE_320x50);
+        admobAdView = new com.google.android.gms.ads.AdView(this);
+        admobAdView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
+        admobAdView.setAdUnitId(getString(R.string.amazon_ads_app_key));
+        binding.linearLayoutAd.addView(amazonAdView);
+        amazonAdView.loadAd(new com.amazon.device.ads.AdTargetingOptions());
+        amazonAdView.setListener(new com.amazon.device.ads.AdListener() {
+            @Override
+            public void onAdLoaded(Ad ad, AdProperties adProperties) {
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError adError) {
+                Log.i("AdAmazon","failed code "+adError.getCode()+": "+ adError.getMessage());
+            }
+
+            @Override
+            public void onAdExpanded(Ad ad) {
+
+            }
+
+            @Override
+            public void onAdCollapsed(Ad ad) {
+
+            }
+
+            @Override
+            public void onAdDismissed(Ad ad) {
+
+            }
+        });
+
+        interstitialAdAmazon = new  com.amazon.device.ads.InterstitialAd(MainActivity.this);
+        interstitialAdAmazon.loadAd();
+
+        interstitialAdAmazon.setListener(new DefaultAdListener(){
+            @Override
+            public void onAdLoaded(Ad ad, AdProperties adProperties)
+            {   }
+
+            @Override
+            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError error) {
+                super.onAdFailedToLoad(ad, error);
+                Log.i("AdAmazon","Interstitial fail code "+error.getCode()+": "+ error.getMessage());
+            }
+
+        });
+
+    }
+
+    private void loadInterstitialAd(){
+        InterstitialAd.load(this,getString(R.string.interstitial_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                // The mInterstitialAd reference will be null until
+                // an ad is loaded.
+                mInterstitialAd = interstitialAd;
+                Log.i("Admob", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                // Handle the error
+                Log.i("Admob","Interstitial fail code "+loadAdError.getCode()+": "+ loadAdError.getMessage());
+                mInterstitialAd = null;
+            }
+        });
+
+        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+            @Override
+            public void onAdDismissedFullScreenContent() {
+                // Called when fullscreen content is dismissed.
+                Log.d("AdAmazon", "The ad was dismissed.");
+            }
+
+            @Override
+            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                // Called when fullscreen content failed to show.
+                Log.d("AdAmazon", "The ad failed to show.");
+            }
+
+            @Override
+            public void onAdShowedFullScreenContent() {
+                // Called when fullscreen content is shown.
+                // Make sure to set your reference to null so you don't
+                // show it a second time.
+                mInterstitialAd = null;
+                Log.d("AdAmazon", "The ad was shown.");
+            }
+        });
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if(amazonAdView != null)
+            amazonAdView.loadAd(new com.amazon.device.ads.AdTargetingOptions());
+        if(interstitialAdAmazon != null)
+            interstitialAdAmazon.loadAd();
+
+    }
+
     @Override
     public void onBackPressed(){
 
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(MainActivity.this);
         } else {
-            Log.d("TAG", "The interstitial wasn't loaded yet.");
+            Log.d("Admob", "The interstitial ad wasn't ready yet.");
+
+            if(interstitialAdAmazon != null)
+                interstitialAdAmazon.showAd();
         }
         super.onBackPressed();
     }
