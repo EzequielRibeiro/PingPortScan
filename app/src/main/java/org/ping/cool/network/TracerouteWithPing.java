@@ -159,6 +159,7 @@ public class TracerouteWithPing {
 
     private class ExecutePing extends AsyncTask<Void, Void, String> {
 
+        private String[] command;
         private String url;
         private EditText editTextTextConsole;
 
@@ -176,15 +177,14 @@ public class TracerouteWithPing {
                 context.getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
                         String msg = e.getMessage();
                         if (msg == null) {
-                            msg = "";
+                            msg = " ";
                         }
                         context.stopProgressBar();
                         editTextTextConsole.setText(Html.fromHtml(
                                 "<p>Wrong arguments or host not found: <p><font color='red'>" + url + "</font></p>" +
-                                        msg));
+                                        "<p>"+msg+"</p>"));
                     }
                 });
 
@@ -202,7 +202,8 @@ public class TracerouteWithPing {
         private void launchPing() throws Exception {
 
             BufferedReader stdInput = null;
-            String[] command = url.split(" ");
+            BufferedReader stdError = null;
+            command = url.split(" ");
 
             if (!command[0].equals("ping") && !command[0].equals("su ping") && !command[0].equals("su ping6") && !command[0].equals("ping6")
                     && !command[0].equals("netstat") && !command[0].equals("ifconfig") && !command[0].equals("host")
@@ -214,9 +215,7 @@ public class TracerouteWithPing {
 
             } else {
 
-                if (url.contains("ping6"))
-                    url = url.concat("%wlan0");
-                else if (url.contains("exec ")) {
+                if (url.contains("exec ")) {
                     url = url.replace("exec ", "");
                 }
 
@@ -226,6 +225,7 @@ public class TracerouteWithPing {
 
             if (p != null){
                 stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             //getting process id
             Field f = p.getClass().getDeclaredField("pid");
@@ -249,13 +249,18 @@ public class TracerouteWithPing {
                     public void run() {
                         editTextTextConsole.append(finalS);
                         editTextTextConsole.setSelection(editTextTextConsole.getText().length());
+
                     }
                 });
-
-                
             }
+
+            while((s = stdError.readLine()) != null){
+                final String s2 = s.concat("\n");
+                Log.e("Ping",s2);
+            }
+
             if(p != null)
-               p.waitFor();
+               p.destroy();
             context.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
