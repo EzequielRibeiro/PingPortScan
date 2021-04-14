@@ -344,10 +344,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         else
                             args.append(" "+c);
 
-                    if (command.equals("netstat") || command.equals("ifconfig") || command.equals("host")
-                            || command.equals("arp") || command.equals("su") || command.equals("ip") ||
-                            command.equals("exec") || command.equals("curl")) {
-
                         if (buttonExec.getText().equals("Exec")) {
 
                             webView.setVisibility(View.INVISIBLE);
@@ -376,8 +372,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                             stopProgressBar();
                         }
                         return;
-                    }
-
                 }
             }
         });
