@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
@@ -122,6 +123,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
     }
 
@@ -135,6 +137,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
      * initView, init the main view components (action, adapter...)
      */
     private void initView() {
+
+        //text
+      //  editTextTextConsole.setText("www.google.com");
 
         traces = new ArrayList<TracerouteContainer>();
         traceListAdapter = new TraceListAdapter(getActivity());
@@ -304,7 +309,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                             DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                            if (dbAdapter.insertUrl(command + args.toString(), "") > 0) {
+                            if (dbAdapter.insertUrl(args.toString(), "") > 0) {
                                 mainActivity.refreshAutoCompleteTextView();
                             }
                             dbAdapter.close();
@@ -330,6 +335,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         buttonExec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //test
+              //  editTextTextConsole.setText("curl ifconfig.me");
 
                 if (autoCompleteTextViewUrl.getText().length() == 0) {
                     Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
@@ -360,7 +367,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                             startProgressBar();
                             editTextTextConsole.setText("");
-                            traceroutePingCommand.executePingCommand(command +" ",args,editTextTextConsole);
+                            traceroutePingCommand.executePingCommand(command +" ",args.toString(),editTextTextConsole);
                             buttonExec.setText(getText(R.string.activity_buttonStop));
                             buttonPing.setEnabled(false);
                             buttonTracert.setEnabled(false);

@@ -266,8 +266,9 @@ Log.e("Command",command+args);
 
                     res += s + "\n";
 
+                  if(args.contains("-a"))
                     if ((command.contains("ping") || command.contains("ping6"))
-                            && args.contains("-a") && (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING))
+                         && (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING)))
                         playBeep();
 
                     sendMsgToConsole(s+"\n",editTextTextConsole,context.getActivity());
