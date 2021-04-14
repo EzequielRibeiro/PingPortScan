@@ -286,16 +286,14 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                     StringBuilder args = new StringBuilder();
                     String command = "ping ";
-                //remove first space and get command and args
-               for (String c : autoCompleteTextViewUrl.getText().toString().split(" ")) {
 
-                        if (!c.equals(" ")) {
+                //remove first space and get command and args
+               for (String c : autoCompleteTextViewUrl.getText().toString().split(" +")) 
                             if(!c.equals("ping") && !c.equals("ping6"))
                                 args.append(c+" ");
                             else if(c.equals("ping6"))
                                 command = "ping6 ";
-                        }
-                    }
+                    
 
                       if (buttonPing.getText().equals("Ping")) {
 
@@ -337,11 +335,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    String[] com = autoCompleteTextViewUrl.getText().toString().split(" ");
-                    String command = "";
+                    String[] com = autoCompleteTextViewUrl.getText().toString().split(" +");
+                    String command = null;
 
                     for (String c : com) {
-                        if (c != " ") {
+                        if (command == null) {
                             command = c;
                             break;
                         }
