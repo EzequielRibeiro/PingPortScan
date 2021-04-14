@@ -337,14 +337,13 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                     String[] com = autoCompleteTextViewUrl.getText().toString().split(" +");
                     String command = null;
+                    StringBuilder args = new StringBuilder();
 
-                    for (String c : com) {
-                        if (command == null) {
+                    for (String c : com) 
+                        if (command == null) 
                             command = c;
-                            break;
-                        }
-
-                    }
+                        else
+                            args.append(" "+c);
 
                     if (command.equals("netstat") || command.equals("ifconfig") || command.equals("host")
                             || command.equals("arp") || command.equals("su") || command.equals("ip") ||
@@ -359,14 +358,14 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                             DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                            if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                            if (dbAdapter.insertUrl(command + args, "") > 0) {
                                 mainActivity.refreshAutoCompleteTextView();
                             }
                             dbAdapter.close();
 
                             startProgressBar();
                             editTextTextConsole.setText("");
-                            traceroutePingCommand.executePingCommand(autoCompleteTextViewUrl.getText().toString(), " ",editTextTextConsole);
+                            traceroutePingCommand.executePingCommand(command,args,editTextTextConsole);
                             buttonExec.setText(getText(R.string.activity_buttonStop));
                             buttonPing.setEnabled(false);
                             buttonTracert.setEnabled(false);
