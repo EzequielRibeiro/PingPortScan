@@ -27,7 +27,7 @@ border: 1px solid #4CAF50
     </tr>
     <tr>
         <td>Whois</td>
-        <td>WHOIS is used to look up information about a domain name WWW.</td>
+        <td>WHOIS is used to look up information about a domain name www/ip.</td>
     </tr>
     <tr>
         <td>Tracert</td>
@@ -43,7 +43,7 @@ border: 1px solid #4CAF50
     </tr>
     <tr>
         <td>Exec</td>
-        <td>This button allows you to execute the commands: netstat, ip, arp, su, ifconfig, arp and host.
+        <td>This button allows you to execute the commands: netstat, ip, arp, su, curl, ifconfig, arp and host.
         <strong>Attention ! These commands may have errors because they do not exist on the device or may require a device rooted.</strong>
         </td>
     </tr>
@@ -59,25 +59,29 @@ border: 1px solid #4CAF50
     </tr>
     <td><strong>ifconfig</strong></td>
     <td>The ifconfig command is used for displaying current network configuration information:
-        <strong>ifconfig -a</strong></td>
+        <strong>ifconfig -a, ifconfig wlan0</strong></td>
     </tr>
     <td><strong>ip</strong></td>
     <td>The ip command is a Linux net-tool for system and network administrators:
-        <strong>ip link show</strong></td>
+        <strong>ip link show, ip a</strong></td>
     </tr>
     <td><strong>netstat</strong></td>
     <td>Displays device connections
         <strong>netstat -a</strong></td>
     </tr>
 
+    <td><strong>curl</strong></td>
+    <td>The curl command allows you to download as well as upload data:
+        <strong>Showing your public ip: curl ifconfig.me</strong></td>
+    </tr>
+
     <td><strong>su</strong></td>
     <td>This command is used only on rooted devices:
-        <strong>su ping -i 0.1 hostname</strong></td>
+        <strong>su ping -i 0.1 hostname/ip</strong></td>
     </tr>
 
     </tbody>
 </table>
-
 
 
 <p><strong>The commonly used options arguments for Ping are:</strong></p>

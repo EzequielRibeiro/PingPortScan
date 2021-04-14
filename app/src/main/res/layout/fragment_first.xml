@@ -108,6 +108,7 @@
             android:inputType="none"
             android:overScrollMode="always"
             android:selectAllOnFocus="false"
+            android:textColor="@color/black_color"
             android:textIsSelectable="true" />
 
         <WebView

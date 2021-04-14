@@ -20,7 +20,6 @@ along with TraceroutePing.  If not, see <http://www.gnu.org/licenses/>.
 package org.ping.cool.network;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -29,17 +28,21 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.text.Html;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
+
 import org.ping.cool.FirstFragment;
 import org.ping.cool.R;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.URLEncoder;
 
 
 /**
@@ -47,7 +50,7 @@ import java.net.InetAddress;
  *
  * @author Olivier Goutay
  */
-public class TracerouteWithPing {
+public class TraceroutePingCommand {
 
     private static final String PING = "PING";
     private static final String FROM_PING = "From";
@@ -65,7 +68,7 @@ public class TracerouteWithPing {
     private float elapsedTime;
     private static FirstFragment context;
     private static Process p = null;
-    private static int pid   = -1;
+    private static int pid = -1;
     // timeout handling
     private static final int TIMEOUT = 30000;
     private Handler handlerTimeout;
@@ -73,20 +76,40 @@ public class TracerouteWithPing {
     private SoundPool soundPool;
 
     public static synchronized void StopPing() {
-      if(p != null){
-          try {
-              Runtime.getRuntime().exec("kill -INT " + pid);
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
-          p = null;
-        }
-  }
+        if (p != null) {
+            try {
+                Runtime.getRuntime().exec("kill -INT " + pid);
+                p.waitFor();
+                p.destroy();
 
-    public TracerouteWithPing(FirstFragment context) {
+            } catch (IOException | InterruptedException e) {
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public TraceroutePingCommand(FirstFragment context) {
         this.context = context;
         loadSoundBeep();
     }
+
+    public static void sendMsgToConsole(String msg, EditText editTextTextConsole, FragmentActivity context) {
+
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                editTextTextConsole.append(msg);
+                editTextTextConsole.setSelection(editTextTextConsole.getText().length());
+                /* editTextTextConsole.append(Html.fromHtml(
+                                "<p>Wrong arguments or host not found: <p><font color='red'>" + url + "</font></p>" +
+                                        "<p>"+msg1+"</p>"));*/
+
+            }
+        });
+
+    }
+
 
     /**
      * Launches the Traceroute
@@ -103,8 +126,8 @@ public class TracerouteWithPing {
 
     }
 
-    public void executePing(String url, EditText editTextTextConsole) {
-         new ExecutePing(url, editTextTextConsole).execute();
+    public void executePingCommand(String command, String args, EditText editTextTextConsole) {
+        new ExecuteCommand(command,args, editTextTextConsole).execute();
     }
 
     /**
@@ -157,34 +180,36 @@ public class TracerouteWithPing {
         }
     }
 
-    private class ExecutePing extends AsyncTask<Void, Void, String> {
+    private class ExecuteCommand extends AsyncTask<Void, Void, String> {
 
-        private String[] command;
-        private String url;
+        private String command,args;
         private EditText editTextTextConsole;
 
-        public ExecutePing(String url, EditText editTextTextConsole) {
-            this.url = url;
+        public ExecuteCommand(String command,String args, EditText editTextTextConsole) {
+            this.command = command;
+            this.args    = args;
             this.editTextTextConsole = editTextTextConsole;
-            context.startProgressBar();
         }
 
         @Override
         protected String doInBackground(Void... voids) {
+
+            context.startProgressBar();
+
             try {
-                launchPing();
-            } catch (Exception e) {
+                launchCommand();
+            } catch (IllegalArgumentException e) {
                 context.getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String msg = e.getMessage();
-                        if (msg == null) {
-                            msg = " ";
-                        }
+                        String msg1 = e.getMessage();
+
+                        if (msg1 == null)
+                            msg1 = "";
+
+                        sendMsgToConsole(msg1,editTextTextConsole,context.getActivity());
                         context.stopProgressBar();
-                        editTextTextConsole.setText(Html.fromHtml(
-                                "<p>Wrong arguments or host not found: <p><font color='red'>" + url + "</font></p>" +
-                                        "<p>"+msg+"</p>"));
+
                     }
                 });
 
@@ -195,81 +220,89 @@ public class TracerouteWithPing {
 
         @Override
         protected void onPostExecute(String result) {
-
+             context.stopProgressBar();
         }
 
+
+
         @SuppressLint("NewApi")
-        private void launchPing() throws Exception {
+        private void launchCommand() {
 
             BufferedReader stdInput = null;
             BufferedReader stdError = null;
-            command = url.split(" ");
 
-            if (!command[0].equals("ping") && !command[0].equals("su ping") && !command[0].equals("su ping6") && !command[0].equals("ping6")
-                    && !command[0].equals("netstat") && !command[0].equals("ifconfig") && !command[0].equals("host")
-                    && !command[0].equals("arp") && !command[0].equals("su") && !command[0].equals("ip")
-                    && !command[0].equals("exec")) {
+              if (command.contains("exec ")) {
+                    command = command.replace("exec ", "");
+               }
 
-                url = "ping ".concat(url);
-                p = Runtime.getRuntime().exec(url);
-
-            } else {
-
-                if (url.contains("exec ")) {
-                    url = url.replace("exec ", "");
-                }
-
-                p = Runtime.getRuntime().exec(url);
-
+            try {
+                p = Runtime.getRuntime().exec(command+args);
+Log.e("Command",command+args);
+            } catch (Exception e) {
+                sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
+                return;
             }
 
-            if (p != null){
+            if (p != null) {
                 stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-            //getting process id
-            Field f = p.getClass().getDeclaredField("pid");
-            f.setAccessible(true);
-            pid = (int) f.get(p);
-}
+                try {
+                    //getting process id
+                    Field f = p.getClass().getDeclaredField("pid");
+                    f.setAccessible(true);
+                    pid = (int) f.get(p);
+                } catch (IllegalAccessException | NoSuchFieldException e) {
+                    sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
+                    return;
+                }
+            }
 
             // Construct the response from ping
             String s;
             String res = "";
-            while ((s = stdInput.readLine()) != null) {
-                res += s + "\n";
-                final String finalS = s.replace(url + ":", "") + "\n";
+            try {
+                while ((s = stdInput.readLine()) != null) {
 
-                if((url.contains("ping") || url.contains("ping6"))
-                        && url.contains("-a") && finalS.contains("icmp_seq") )
-                     playBeep();
+                    res += s + "\n";
 
-                context.getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        editTextTextConsole.append(finalS);
-                        editTextTextConsole.setSelection(editTextTextConsole.getText().length());
+                    if ((command.contains("ping") || command.contains("ping6"))
+                            && args.contains("-a") && res.contains("icmp_seq"))
+                        playBeep();
 
-                    }
-                });
-            }
+                    sendMsgToConsole(s+"\n",editTextTextConsole,context.getActivity());
 
-            while((s = stdError.readLine()) != null){
-                final String s2 = s.concat("\n");
-                Log.e("Ping",s2);
-            }
-
-            if(p != null)
-               p.destroy();
-            context.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    context.stopProgressBar();
                 }
-            });
+
+                while ((s = stdError.readLine()) != null) {
+                    final String s1 = s.concat("\n");
+                    sendMsgToConsole(s1,editTextTextConsole,context.getActivity());
+                    Log.e("Process","error");
+                }
+
+                if (p != null) {
+                    p.getOutputStream().close();
+                    p.getInputStream().close();
+                    p.getErrorStream().close();
+                    p.destroy();
+                }
+
+            } catch (IOException e) {
+                sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
+                return;
+            }
+
+            try {
+                stdInput.close();
+                stdError.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
 
             if (res.equals("")) {
-
                 throw new IllegalArgumentException();
             }
 
@@ -278,14 +311,14 @@ public class TracerouteWithPing {
     }
 
     int idSound;
-    public void playBeep(){
+    public void playBeep() {
 
         soundPool.play(
                 idSound, 1, 1, 0, 0, 1);
 
     }
 
-    private void loadSoundBeep(){
+    private void loadSoundBeep() {
 
         if (Build.VERSION.SDK_INT
                 >= Build.VERSION_CODES.LOLLIPOP) {
@@ -307,8 +340,7 @@ public class TracerouteWithPing {
                     .setAudioAttributes(
                             audioAttributes)
                     .build();
-        }
-        else {
+        } else {
             soundPool
                     = new SoundPool(
                     1,
@@ -438,8 +470,8 @@ public class TracerouteWithPing {
                 }
 
             }
-            if(p != null)
-               p.destroy();
+            if (p != null)
+                p.destroy();
 
             if (res.equals("")) {
                 throw new IllegalArgumentException();
