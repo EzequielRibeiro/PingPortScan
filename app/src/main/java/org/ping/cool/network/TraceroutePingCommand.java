@@ -267,7 +267,7 @@ Log.e("Command",command+args);
                     res += s + "\n";
 
                     if ((command.contains("ping") || command.contains("ping6"))
-                            && args.contains("-a") && res.contains("icmp_seq"))
+                            && args.contains("-a") && (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING))
                         playBeep();
 
                     sendMsgToConsole(s+"\n",editTextTextConsole,context.getActivity());
