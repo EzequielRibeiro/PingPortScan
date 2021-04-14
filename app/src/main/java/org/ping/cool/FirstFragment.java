@@ -335,11 +335,10 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    String[] com = autoCompleteTextViewUrl.getText().toString().split(" +");
                     String command = null;
                     StringBuilder args = new StringBuilder();
 
-                    for (String c : com) 
+                    for (String c : autoCompleteTextViewUrl.getText().toString().split(" +")) 
                         if (command == null) 
                             command = c;
                         else
@@ -358,14 +357,14 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                             DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                            if (dbAdapter.insertUrl(command + args, "") > 0) {
+                            if (dbAdapter.insertUrl(command +" "+ args, "") > 0) {
                                 mainActivity.refreshAutoCompleteTextView();
                             }
                             dbAdapter.close();
 
                             startProgressBar();
                             editTextTextConsole.setText("");
-                            traceroutePingCommand.executePingCommand(command,args,editTextTextConsole);
+                            traceroutePingCommand.executePingCommand(command +" ",args,editTextTextConsole);
                             buttonExec.setText(getText(R.string.activity_buttonStop));
                             buttonPing.setEnabled(false);
                             buttonTracert.setEnabled(false);
