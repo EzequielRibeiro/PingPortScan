@@ -237,7 +237,7 @@ public class TraceroutePingCommand {
 
             try {
                 p = Runtime.getRuntime().exec(command+args);
-Log.e("Command",command+args);
+
             } catch (Exception e) {
                 sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
                 return;
