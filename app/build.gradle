@@ -20,8 +20,8 @@ android {
         applicationId "org.ping.cool"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 13
-        versionName "1.1"
+        versionCode 14
+        versionName "1.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -60,6 +60,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:20.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'commons-net:commons-net:3.3'
+    implementation 'com.startapp:inapp-sdk:4.8.+'
     implementation files('../amazon-ads-6.0.0.jar')
     //implementation 'com.amazon.android:mobile-ads:6.0.0'
     //noinspection GradleDynamicVersion

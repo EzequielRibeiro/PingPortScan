@@ -34,6 +34,7 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-0822808376839371~2943518809"/>
+        <meta-data android:name="com.startapp.sdk.APPLICATION_ID" android:value="@string/startapp_app_id" />
 
     </application>
 

@@ -87,11 +87,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
         View v = inflater.inflate(R.layout.fragment_first, container, false);
 
-        if (getActivity() instanceof MainActivity) {
-            mainActivity = (MainActivity) getActivity();
-        }
 
-        this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
         this.buttonTracert = (Button) v.findViewById(R.id.buttonTracert);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.buttonLocal = (Button) v.findViewById(R.id.buttonLocal);
@@ -124,6 +120,13 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+        if (getActivity() instanceof MainActivity) {
+            mainActivity = (MainActivity) getActivity();
+        }
+
+        this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
+       // this.autoCompleteTextViewUrl.setText("www.google.com");
 
     }
 
@@ -170,7 +173,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         buttonWhois.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 if (!autoCompleteTextViewUrl.getText().toString().isEmpty()) {
 

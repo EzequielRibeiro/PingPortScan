@@ -1,5 +1,6 @@
 package org.ping.cool;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,9 +16,9 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.amazon.device.ads.Ad;
+import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdProperties;
 import com.amazon.device.ads.DefaultAdListener;
-import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -27,6 +28,11 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.startapp.sdk.ads.banner.Banner;
+import com.startapp.sdk.ads.banner.BannerListener;
+import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.StartAppSDK;
+import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -35,16 +41,20 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
 import org.ping.cool.databinding.ActivityMainBinding;
+
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,15 +74,21 @@ public class MainActivity extends AppCompatActivity {
     private com.amazon.device.ads.AdLayout amazonAdView;
     private com.google.android.gms.ads.AdView admobAdView;
     private com.amazon.device.ads.InterstitialAd interstitialAdAmazon;
+    private com.startapp.sdk.ads.banner.Banner startAppBanner;
+    private StartAppAd startAppAd = new StartAppAd(this);
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
-       // com.amazon.device.ads.AdRegistration.enableTesting(true);
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        //The Return Ad is a new ad unit which is displayed once the user returns to your application
+        // after a certain period of time
+        StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
+        StartAppAd.disableSplash();
+        com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
+        // com.amazon.device.ads.AdRegistration.enableTesting(true);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -107,8 +123,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
                 // Code to be executed when an ad request fails.
-                Log.i("Admob","failed code "+adError.getCode()+": "+adError.getMessage());
-                loadAdAmazon();
+                Log.i("Admob", "failed code " + adError.getCode() + ": " + adError.getMessage());
+                binding.linearLayoutAd.removeView(binding.adView);
+                loadAdStartApp();
 
             }
 
@@ -130,10 +147,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
-
 
 
     public void refreshAutoCompleteTextView() {
@@ -142,11 +156,11 @@ public class MainActivity extends AppCompatActivity {
         urlHistoricList = dbAdapter.getAllValuesGlyphs();
         dbAdapter.close();
 
-        if(urlHistoricList.size() > 0) {
+        if (urlHistoricList.size() > 0) {
 
             urlArray = new ArrayList<>();
 
-            for(UrlHistoric u : urlHistoricList){
+            for (UrlHistoric u : urlHistoricList) {
                 urlArray.add(u.getText());
             }
 
@@ -157,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadAdAmazon(){
-        binding.linearLayoutAd.removeView(binding.adView);
+    private void loadAdAmazon() {
+
         amazonAdView = new com.amazon.device.ads.AdLayout(this, com.amazon.device.ads.AdSize.SIZE_320x50);
         admobAdView = new com.google.android.gms.ads.AdView(this);
         admobAdView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
@@ -173,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError adError) {
-                Log.i("AdAmazon","failed code "+adError.getCode()+": "+ adError.getMessage());
+                Log.i("AdAmazon", "failed code " + adError.getCode() + ": " + adError.getMessage());
             }
 
             @Override
@@ -191,27 +205,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        interstitialAdAmazon = new  com.amazon.device.ads.InterstitialAd(MainActivity.this);
-        interstitialAdAmazon.loadAd();
-
-        interstitialAdAmazon.setListener(new DefaultAdListener(){
-            @Override
-            public void onAdLoaded(Ad ad, AdProperties adProperties)
-            {   }
-
-            @Override
-            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError error) {
-                super.onAdFailedToLoad(ad, error);
-                Log.i("AdAmazon","Interstitial fail code "+error.getCode()+": "+ error.getMessage());
-            }
-
-        });
-
     }
 
-    private void loadInterstitialAd(){
-        InterstitialAd.load(this,getString(R.string.interstitial_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
+    private void loadInterstitialAd() {
+        InterstitialAd.load(this, getString(R.string.interstitial_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
             @Override
             public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                 // The mInterstitialAd reference will be null until
@@ -223,58 +220,109 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 // Handle the error
-                Log.i("Admob","Interstitial fail code "+loadAdError.getCode()+": "+ loadAdError.getMessage());
+                Log.i("Admob", "Interstitial fail code " + loadAdError.getCode() + ": " + loadAdError.getMessage());
                 mInterstitialAd = null;
             }
         });
 
-        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
-            @Override
-            public void onAdDismissedFullScreenContent() {
-                // Called when fullscreen content is dismissed.
-                Log.d("AdAmazon", "The ad was dismissed.");
-            }
-
-            @Override
-            public void onAdFailedToShowFullScreenContent(AdError adError) {
-                // Called when fullscreen content failed to show.
-                Log.d("AdAmazon", "The ad failed to show.");
-            }
-
-            @Override
-            public void onAdShowedFullScreenContent() {
-                // Called when fullscreen content is shown.
-                // Make sure to set your reference to null so you don't
-                // show it a second time.
-                mInterstitialAd = null;
-                Log.d("AdAmazon", "The ad was shown.");
-            }
-        });
     }
 
+    private void loadAdStartApp() {
+
+        startAppBanner = new Banner(MainActivity.this, new BannerListener() {
+            @Override
+            public void onReceiveAd(View view) {
+
+            }
+
+            @Override
+            public void onFailedToReceiveAd(View view) {
+
+                Log.i("StartApp", "Failed To ReceiveAd");
+                loadAdAmazon();
+
+            }
+
+            @Override
+            public void onImpression(View view) {
+                Log.i("StartApp", "ReceiveAd");
+
+            }
+
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        binding.linearLayoutAd.addView(startAppBanner);
+
+    }
+
+
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        if(amazonAdView != null)
-            amazonAdView.loadAd(new com.amazon.device.ads.AdTargetingOptions());
-        if(interstitialAdAmazon != null)
-            interstitialAdAmazon.loadAd();
 
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
 
         if (mInterstitialAd != null) {
             mInterstitialAd.show(MainActivity.this);
+
         } else {
             Log.d("Admob", "The interstitial ad wasn't ready yet.");
 
-            if(interstitialAdAmazon != null)
-                interstitialAdAmazon.showAd();
+            startAppAd.showAd(new AdDisplayListener() {
+                @Override
+                public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+                    showInterstitialAdAmazon();
+
+                }
+            });
+
         }
+        startAppAd.onBackPressed();
         super.onBackPressed();
     }
+
+    private void showInterstitialAdAmazon() {
+        interstitialAdAmazon = new com.amazon.device.ads.InterstitialAd(MainActivity.this);
+        interstitialAdAmazon.loadAd();
+
+        interstitialAdAmazon.setListener(new DefaultAdListener() {
+            @Override
+            public void onAdLoaded(Ad ad, AdProperties adProperties) {
+                interstitialAdAmazon.showAd();
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError error) {
+                super.onAdFailedToLoad(ad, error);
+                Log.i("AdAmazon", "Interstitial fail code " + error.getCode() + ": " + error.getMessage());
+            }
+
+        });
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -292,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_privacy) {
-           Intent intent = new Intent(getBaseContext(), PrivacyPolicyHelp.class);
+            Intent intent = new Intent(getBaseContext(), PrivacyPolicyHelp.class);
             startActivity(intent);
             return true;
         }
@@ -317,10 +365,10 @@ public class MainActivity extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private void about(){
+    private void about() {
 
         TextView message = new TextView(MainActivity.this);
-        message.setPadding(10,0,0,0);
+        message.setPadding(10, 0, 0, 0);
         String version = "v";
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -329,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        String msg = getString(R.string.app_name) +" "+version+"\nDeveloper: Ezequiel A. Ribeiro"+"\nContact: https://ezequielportfolio.wordpress.com/contato/";
+        String msg = getString(R.string.app_name) + " " + version + "\nDeveloper: Ezequiel A. Ribeiro" + "\nContact: https://ezequielportfolio.wordpress.com/contato/";
         final SpannableString s = new SpannableString(msg);
         Linkify.addLinks(s, Linkify.ALL);
 

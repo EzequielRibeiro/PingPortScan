@@ -22,4 +22,5 @@
     <style name="Theme.PingCool.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.PingCool.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>
