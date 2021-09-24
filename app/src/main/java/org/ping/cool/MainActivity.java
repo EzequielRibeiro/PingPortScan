@@ -296,9 +296,9 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-
+            startAppAd.onBackPressed();
         }
-        startAppAd.onBackPressed();
+        
         super.onBackPressed();
     }
 
