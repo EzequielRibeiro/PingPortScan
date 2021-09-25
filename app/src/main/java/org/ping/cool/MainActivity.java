@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
         interstitialAdAmazon.setListener(new DefaultAdListener() {
             @Override
             public void onAdLoaded(Ad ad, AdProperties adProperties) {
-                interstitialAdAmazon.showAd();
+                
 
             }
 
@@ -324,6 +324,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        interstitialAdAmazon.showAd();
 
     }
 
