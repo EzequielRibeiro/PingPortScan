@@ -233,6 +233,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceiveAd(View view) {
 
+               binding.linearLayoutAd.addView(startAppBanner);
+
             }
 
             @Override
@@ -254,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        binding.linearLayoutAd.addView(startAppBanner);
+        
 
     }
 
