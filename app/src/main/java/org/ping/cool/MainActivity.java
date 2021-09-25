@@ -172,11 +172,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadAdAmazon() {
-
+        Log.i("Amazon","AmazonAd Banner");
         amazonAdView = new com.amazon.device.ads.AdLayout(this, com.amazon.device.ads.AdSize.SIZE_320x50);
         admobAdView = new com.google.android.gms.ads.AdView(this);
         admobAdView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
         admobAdView.setAdUnitId(getString(R.string.amazon_ads_app_key));
+
+        if(startAppBanner != null)
+            binding.linearLayoutAd.removeView(startAppBanner);
+
         binding.linearLayoutAd.addView(amazonAdView);
         amazonAdView.loadAd(new com.amazon.device.ads.AdTargetingOptions());
         amazonAdView.setListener(new com.amazon.device.ads.AdListener() {
@@ -228,13 +232,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadAdStartApp() {
-
+        Log.i("StartApp","loadAdStartapp");
         startAppBanner = new Banner(MainActivity.this, new BannerListener() {
             @Override
             public void onReceiveAd(View view) {
-
-               binding.linearLayoutAd.addView(startAppBanner);
-
+                Log.i("StartApp", "onReceived");
             }
 
             @Override
@@ -256,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        
+        binding.linearLayoutAd.addView(startAppBanner);
 
     }
 
