@@ -637,6 +637,8 @@ public class TraceroutePingCommand {
      * @return true if there is a connectivity, false otherwise
      */
     public boolean hasConnectivity() {
+        if(context == null)
+            return false;
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getActivity().getSystemService(context.getActivity().CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();

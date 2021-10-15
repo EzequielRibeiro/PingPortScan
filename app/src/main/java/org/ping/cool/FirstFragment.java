@@ -491,37 +491,43 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     }
 
     public void startProgressBar() {
-        progressBarPing.setVisibility(View.VISIBLE);
-        autoCompleteTextViewUrl.setEnabled(false);
-        hideSoftwareKeyboard(autoCompleteTextViewUrl);
-        floatingActionButton.setVisibility(View.GONE);
-
-
-    }
-
-    public void stopProgressBar() {
-
-        progressBarPing.setVisibility(View.GONE);
-        buttonPing.setText("Ping");
-        buttonPing.setEnabled(true);
-        buttonTracert.setText("Tracert");
-        buttonTracert.setEnabled(true);
-        buttonExec.setText("Exec");
-        buttonExec.setEnabled(true);
-        buttonSecondFragment.setEnabled(true);
-        buttonLocal.setText("Local");
-        buttonLocal.setEnabled(true);
-        buttonWhois.setEnabled(true);
-        floatingActionButton.setVisibility(View.VISIBLE);
-        TraceroutePingCommand.StopPing();
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                autoCompleteTextViewUrl.setEnabled(true);
+
+                progressBarPing.setVisibility(View.VISIBLE);
+                autoCompleteTextViewUrl.setEnabled(false);
+                hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                floatingActionButton.setVisibility(View.GONE);
+
             }
         });
+     }
 
+    public void stopProgressBar() {
+
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBarPing.setVisibility(View.GONE);
+                buttonPing.setText("Ping");
+                buttonPing.setEnabled(true);
+                buttonTracert.setText("Tracert");
+                buttonTracert.setEnabled(true);
+                buttonExec.setText("Exec");
+                buttonExec.setEnabled(true);
+                buttonSecondFragment.setEnabled(true);
+                buttonLocal.setText("Local");
+                buttonLocal.setEnabled(true);
+                buttonWhois.setEnabled(true);
+                floatingActionButton.setVisibility(View.VISIBLE);
+                TraceroutePingCommand.StopPing();
+                autoCompleteTextViewUrl.setEnabled(true);
+
+            }
+        });
 
     }
 

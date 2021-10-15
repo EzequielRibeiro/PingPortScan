@@ -1,20 +1,15 @@
 package org.ping.cool;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
-
 import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdProperties;
@@ -383,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        String msg = getString(R.string.app_name) + " " + version + "\nDeveloper: Ezequiel A. Ribeiro" + "\nContact: https://ezequielportfolio.wordpress.com/contato/";
+        String msg = getString(R.string.app_name) + " " + version + "\nDeveloper: Ezequiel A. Ribeiro" + "\nContact: https://is.gd/supportcontact";
         final SpannableString s = new SpannableString(msg);
         Linkify.addLinks(s, Linkify.ALL);
 

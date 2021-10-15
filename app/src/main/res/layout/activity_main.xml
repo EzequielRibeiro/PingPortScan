@@ -71,6 +71,7 @@
         android:id="@+id/linearLayoutAd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white_color"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -21,5 +21,13 @@
     <string name="banner_ad_unit_id">ca-app-pub-0822808376839371/8383424039</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-0822808376839371/8856722474</string>
     <string name="startapp_app_id">208379788</string>
+    <string-array name="msgMem">
+        <item>The error has been reported. Thank you.</item>
+        <item>The error has been sent to the developer. Thank you</item>
+    </string-array>
+    <string name="msgCrash">Exception <b>\"%1$s\"</b> has been successfully caught!\n</string>
+    <string name="msgCrashCause">Exception <b>\"%1$s\"</b> (caused by <b>\"%2$s\"</b>) has been successfully caught!\n</string>
+
+
 
 </resources>
