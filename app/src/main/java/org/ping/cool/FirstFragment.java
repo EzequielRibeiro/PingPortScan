@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.amazon.device.ads.Ad;
+import com.amazon.device.ads.AdProperties;
+import com.amazon.device.ads.DefaultAdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
 
 import org.ping.cool.Local.network.Discovery;
 import org.ping.cool.Local.network.Wireless;
@@ -47,6 +57,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import static org.ping.cool.MainActivity.SHOWED;
 import static org.ping.cool.MainActivity.isOnline;
 
 public class FirstFragment extends Fragment implements MainAsyncResponse {
@@ -74,6 +85,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private List<Map<String, String>> hosts = new ArrayList<>();
     private List<TracerouteContainer> traces;
     private ListView listViewLocal, listViewTracert;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     public View onCreateView(
@@ -127,6 +139,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
         this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
        // this.autoCompleteTextViewUrl.setText("www.google.com");
+
+        loadInterstitialAd();
 
     }
 
@@ -328,6 +342,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                         } else {
                             stopProgressBar();
+
                         }
 
                 }
@@ -528,6 +543,10 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
             }
         });
+        if(SHOWED) {
+            startShowInterstitial();
+            SHOWED = false;
+        }
 
     }
 
@@ -597,6 +616,93 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onResume() {
         super.onResume();
         requireActivity().registerReceiver(this.receiver, this.intentFilter);
+    }
+
+
+    private void loadInterstitialAd() {
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        InterstitialAd.load(getContext(), getString(R.string.interstitial_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                // The mInterstitialAd reference will be null until
+                // an ad is loaded.
+                mInterstitialAd = interstitialAd;
+                Log.i("Admob", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                // Handle the error
+                Log.i("Admob", "Interstitial fail code " + loadAdError.getCode() + ": " + loadAdError.getMessage());
+                mInterstitialAd = null;
+            }
+        });
+
+    }
+
+    private void startShowInterstitial() {
+
+
+
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(getActivity());
+
+        } else {
+            Log.d("Admob", "The interstitial ad wasn't ready yet.");
+            StartAppAd startAppAd = new StartAppAd(getContext());
+            startAppAd.showAd(new AdDisplayListener() {
+                @Override
+                public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+                    showInterstitialAdAmazon();
+
+
+                }
+            });
+            startAppAd.showAd();
+
+        }
+
+
+    }
+
+    private void showInterstitialAdAmazon() {
+        com.amazon.device.ads.InterstitialAd interstitialAdAmazon = new com.amazon.device.ads.InterstitialAd(getContext());
+        interstitialAdAmazon.loadAd();
+
+        interstitialAdAmazon.setListener(new DefaultAdListener() {
+            @Override
+            public void onAdLoaded(Ad ad, AdProperties adProperties) {
+
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError error) {
+                super.onAdFailedToLoad(ad, error);
+                Log.i("AdAmazon", "Interstitial fail code " + error.getCode() + ": " + error.getMessage());
+            }
+
+        });
+
+        interstitialAdAmazon.showAd();
+
     }
 
 

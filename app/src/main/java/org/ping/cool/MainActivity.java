@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     public static AssetManager assetManager;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private InterstitialAd mInterstitialAd;
+    public  static boolean SHOWED = true;
     public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
     private ArrayAdapter<String> adapter;
     private List<UrlHistoric> urlHistoricList;
@@ -68,9 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private AdRequest adRequest;
     private com.amazon.device.ads.AdLayout amazonAdView;
     private com.google.android.gms.ads.AdView admobAdView;
-    private com.amazon.device.ads.InterstitialAd interstitialAdAmazon;
     private com.startapp.sdk.ads.banner.Banner startAppBanner;
-    private StartAppAd startAppAd = new StartAppAd(this);
+
 
 
     @Override
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAdLoaded() {
-                loadInterstitialAd();
+
             }
 
             @Override
@@ -166,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void loadAdAmazon() {
         Log.i("Amazon","AmazonAd Banner");
         amazonAdView = new com.amazon.device.ads.AdLayout(this, com.amazon.device.ads.AdSize.SIZE_320x50);
@@ -206,25 +206,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadInterstitialAd() {
-        InterstitialAd.load(this, getString(R.string.interstitial_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                // The mInterstitialAd reference will be null until
-                // an ad is loaded.
-                mInterstitialAd = interstitialAd;
-                Log.i("Admob", "onAdLoaded");
-            }
 
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                // Handle the error
-                Log.i("Admob", "Interstitial fail code " + loadAdError.getCode() + ": " + loadAdError.getMessage());
-                mInterstitialAd = null;
-            }
-        });
-
-    }
 
     private void loadAdStartApp() {
         Log.i("StartApp","loadAdStartapp");
@@ -258,71 +240,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
 
     @Override
     public void onBackPressed() {
-
-        if (mInterstitialAd != null) {
-            mInterstitialAd.show(MainActivity.this);
-
-        } else {
-            Log.d("Admob", "The interstitial ad wasn't ready yet.");
-
-            startAppAd.showAd(new AdDisplayListener() {
-                @Override
-                public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-                    showInterstitialAdAmazon();
-
-                }
-            });
-            startAppAd.onBackPressed();
-        }
-        
         super.onBackPressed();
     }
 
-    private void showInterstitialAdAmazon() {
-        interstitialAdAmazon = new com.amazon.device.ads.InterstitialAd(MainActivity.this);
-        interstitialAdAmazon.loadAd();
 
-        interstitialAdAmazon.setListener(new DefaultAdListener() {
-            @Override
-            public void onAdLoaded(Ad ad, AdProperties adProperties) {
-                
-
-            }
-
-            @Override
-            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError error) {
-                super.onAdFailedToLoad(ad, error);
-                Log.i("AdAmazon", "Interstitial fail code " + error.getCode() + ": " + error.getMessage());
-            }
-
-        });
-
-        interstitialAdAmazon.showAd();
-
-    }
 
 
     @Override
