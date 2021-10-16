@@ -233,8 +233,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     listViewTracert.setVisibility(View.INVISIBLE);
                     webView.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.INVISIBLE);
-                    wifi = new Wireless(getActivity());
-
                     setupHostDiscovery();
 
                 } else {
