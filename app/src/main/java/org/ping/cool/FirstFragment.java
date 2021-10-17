@@ -3,6 +3,7 @@ package org.ping.cool;
 import static org.ping.cool.MainActivity.SHOWED;
 import static org.ping.cool.MainActivity.isOnline;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -71,7 +72,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private TraceListAdapter traceListAdapter;
     private FragmentFirstBinding binding;
     private TraceroutePingCommand traceroutePingCommand;
-    private final int maxTtl = 40;
+    private final int maxTtl = 20;
     private MainActivity mainActivity;
     private Wireless wifi;
     private Discovery discovery = new Discovery();
@@ -79,9 +80,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter = new IntentFilter();
     private ArrayAdapter hostsAdapter;
-    private List<Map<String, String>> hosts = new ArrayList<>();
+    private List<Map<String, String>> hosts;
     private List<TracerouteContainer> traces;
-    private ListView listViewLocal, listViewTracert;
+    private ListView listViewLocal;
     private InterstitialAd mInterstitialAd;
 
     @Override
@@ -104,17 +105,14 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
-        listViewLocal = new ListView(getActivity());
-        listViewTracert = new ListView(getActivity());
+        this.listViewLocal = (ListView) v.findViewById(R.id.listViewFirstFragment);
 
         final int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             listViewLocal.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
-            listViewTracert.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
             editTextTextConsole.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
         } else {
             listViewLocal.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
-            listViewTracert.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
             editTextTextConsole.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
         }
         initView();
@@ -125,10 +123,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-
-
         loadInterstitialAd();
-
     }
 
     @Override
@@ -148,20 +143,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
      * initView, init the main view components (action, adapter...)
      */
     private void initView() {
-
-        traces = new ArrayList<TracerouteContainer>();
-        traceListAdapter = new TraceListAdapter(getActivity());
-        listViewTracert.setAdapter(traceListAdapter);
-        binding.frameLayout.addView(listViewTracert);
-
-
-        setupHostsAdapter();
         setupReceivers();
         webView.loadUrl("file:///android_asset/ping.html");
         webView.setVisibility(View.VISIBLE);
-        editTextTextConsole.setVisibility(View.INVISIBLE);
-        listViewLocal.setVisibility(View.INVISIBLE);
-        listViewTracert.setVisibility(View.INVISIBLE);
 
         floatingActionButton.setVisibility(View.GONE);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -169,8 +153,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             public void onClick(View view) {
                 webView.setVisibility(View.VISIBLE);
                 editTextTextConsole.setVisibility(View.INVISIBLE);
-                listViewLocal.setVisibility(View.INVISIBLE);
-                listViewTracert.setVisibility(View.INVISIBLE);
+                binding.listViewFirstFragment.setVisibility(View.GONE);
+              //  listViewLocal.setVisibility(View.INVISIBLE);
+              //  listViewTracert.setVisibility(View.INVISIBLE);
                 view.setVisibility(View.GONE);
 
             }
@@ -184,7 +169,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                     webView.setVisibility(View.INVISIBLE);
                     listViewLocal.setVisibility(View.INVISIBLE);
-                    listViewTracert.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.VISIBLE);
 
                     getActivity().runOnUiThread(new Runnable() {
@@ -221,10 +205,12 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     buttonPing.setEnabled(false);
                     buttonWhois.setEnabled(false);
                     buttonExec.setEnabled(false);
-                    listViewLocal.setVisibility(View.VISIBLE);
-                    listViewTracert.setVisibility(View.INVISIBLE);
+                    autoCompleteTextInput.setEnabled(false);
+                   // listViewLocal.setVisibility(View.VISIBLE);
                     webView.setVisibility(View.INVISIBLE);
+                  //  listViewTracert.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.INVISIBLE);
+                    listViewLocal.setVisibility(View.VISIBLE);
                     setupHostDiscovery();
 
                 } else {
@@ -261,9 +247,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                             mainActivity.refreshAutoCompleteTextView();
                         }
                         dbAdapter.close();
-
-                        traces.clear();
-                        traceListAdapter.notifyDataSetChanged();
                         startProgressBar();
                         buttonTracert.setText(getString(R.string.activity_buttonStop));
                         buttonPing.setEnabled(false);
@@ -273,8 +256,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         buttonSecondFragment.setEnabled(false);
                         webView.setVisibility(View.INVISIBLE);
                         editTextTextConsole.setVisibility(View.INVISIBLE);
-                        listViewLocal.setVisibility(View.INVISIBLE);
-                        listViewTracert.setVisibility(View.VISIBLE);
+                        traces = new ArrayList<TracerouteContainer>();
+                        traceListAdapter = new TraceListAdapter(getActivity());
+                        listViewLocal.setVisibility(View.VISIBLE);
+                        listViewLocal.setAdapter(traceListAdapter);
+
                         traceroutePingCommand.executeTraceroute(editTextTextConsole, autoCompleteTextInput.getText().toString(), maxTtl);
 
                     } else {
@@ -309,7 +295,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                       if (buttonPing.getText().equals("Ping")) {
 
                             webView.setVisibility(View.INVISIBLE);
-                            listViewTracert.setVisibility(View.INVISIBLE);
                             listViewLocal.setVisibility(View.INVISIBLE);
                             editTextTextConsole.setVisibility(View.VISIBLE);
 
@@ -361,7 +346,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         if (buttonExec.getText().equals("Exec")) {
 
                             webView.setVisibility(View.INVISIBLE);
-                            listViewTracert.setVisibility(View.INVISIBLE);
                             listViewLocal.setVisibility(View.INVISIBLE);
                             editTextTextConsole.setVisibility(View.VISIBLE);
 
@@ -531,6 +515,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 TraceroutePingCommand.StopPing();
                 autoCompleteTextInput.setEnabled(true);
 
+
             }
         });
         if(SHOWED) {
@@ -542,6 +527,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     private void setupHostsAdapter() {
 
+        hosts = new ArrayList<>();
         this.hostsAdapter = new ArrayAdapter<Map<String, String>>(getActivity(), android.R.layout.simple_list_item_2, android.R.id.text1, this.hosts) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -551,16 +537,19 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 text2.setTextColor(getResources().getColor(R.color.grey_color));
                 text1.setText(hosts.get(position).get("First Line"));
                 text2.setText(hosts.get(position).get("Second Line"));
+
                 return view;
             }
         };
-        listViewLocal.setAdapter(this.hostsAdapter);
-        frameLayout.addView(listViewLocal);
+        //listViewLocal.setAdapter(this.hostsAdapter);
+        //frameLayout.addView(listViewLocal);
+        listViewLocal.setAdapter(hostsAdapter);
 
     }
 
     private void setupHostDiscovery() {
 
+        setupHostsAdapter();
         hosts.clear();
         hostsAdapter.notifyDataSetChanged();
         discovery.scanHosts(wifi.getInternalWifiIpAddress(), FirstFragment.this);
@@ -698,6 +687,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     @Override
     public void processFinish(Map<String, String> output) {
+
         getActivity().runOnUiThread(new Runnable() {
 
             @Override
@@ -716,21 +706,17 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                             return left - right;
                         }
                     });
+
                     hostsAdapter.notifyDataSetChanged();
+                    stopProgressBar();
                 }
-                stopProgressBar();
+
             }
         });
     }
 
     @Override
     public void processFinish(int output) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                stopProgressBar();
-            }
-        });
 
     }
 

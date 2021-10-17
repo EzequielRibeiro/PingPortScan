@@ -20,12 +20,10 @@ public class ScanHostsAsyncTask extends AsyncTask<String, Void, Void> {
     private MainAsyncResponse delegate;
     private final int SCAN_THREADS = 8;
     private final int HOST_THREADS = 255;
-    private FirstFragment firstFragment;
 
     //Constructor to set the delegate
     public ScanHostsAsyncTask(FirstFragment firstFragment) {
         this.delegate = firstFragment;
-        this.firstFragment = firstFragment;
     }
 
     //Scans for active hosts on the network
