@@ -27,7 +27,7 @@
     </string-array>
     <string name="msgCrash">Exception <b>\"%1$s\"</b> has been successfully caught!\n</string>
     <string name="msgCrashCause">Exception <b>\"%1$s\"</b> (caused by <b>\"%2$s\"</b>) has been successfully caught!\n</string>
-
+    <string name="description">address entry</string>
 
 
 </resources>

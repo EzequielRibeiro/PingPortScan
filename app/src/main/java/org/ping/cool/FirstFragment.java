@@ -126,11 +126,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         super.onViewCreated(view, savedInstanceState);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        if ((MainActivity) getActivity()) instanceof MainActivity){
-            mainActivity = (MainActivity) getActivity();
-        }
-
-        this.autoCompleteTextInput = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextUrl);
 
         loadInterstitialAd();
 
@@ -140,6 +135,13 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void textInput(){
+        if (((MainActivity)getActivity()) instanceof MainActivity){
+            mainActivity = (MainActivity) getActivity();
+        }
+        this.autoCompleteTextInput = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextUrl);
     }
 
     /**
@@ -177,7 +179,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         buttonWhois.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                textInput();
                 if (!autoCompleteTextInput.getText().toString().isEmpty()) {
 
                     webView.setVisibility(View.INVISIBLE);
@@ -210,7 +212,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     return;
                 }
 
-
+                textInput();
                 if (buttonLocal.getText().toString().equals("Local")) {
                     startProgressBar();
                     buttonLocal.setText("Stop");
@@ -244,7 +246,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         buttonTracert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                textInput();
                 if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
                 } else if (!isOnline(getActivity().getApplicationContext())) {
@@ -285,7 +287,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         buttonPing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                textInput();
                 if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
                 } else if (!isOnline(getActivity().getApplicationContext())) {
@@ -342,7 +344,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             public void onClick(View v) {
                 //test
               //  editTextTextConsole.setText("curl ifconfig.me");
-
+                textInput();
                 if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
                 } else {

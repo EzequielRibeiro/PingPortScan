@@ -49,6 +49,7 @@
             android:paddingLeft="5dp"
             android:paddingBottom="3dp"
             android:singleLine="true"
+            android:description="@string/description"
             android:textColor="@color/black_color"
             android:textCursorDrawable="?attr/colorPrimaryDark"
             app:layout_constraintBottom_toTopOf="@+id/include2"
@@ -86,6 +87,8 @@
             app:adSize="BANNER"
             app:adUnitId="@string/banner_ad_unit_id"></com.google.android.gms.ads.AdView>
     </LinearLayout>
+
+
 
 
     <!--

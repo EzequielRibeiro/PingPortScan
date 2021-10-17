@@ -43,7 +43,7 @@ border: 1px solid #4CAF50
     </tr>
     <tr>
         <td>Exec</td>
-        <td>This button allows you to execute the commands: netstat, ip, arp, su, curl, ifconfig, arp and host.
+        <td>This button allows you to run basic Linux commands on your mobile: netstat,ls, cat, ip, arp, su, curl, ifconfig, arp and host.
         <strong>Attention ! These commands may have errors because they do not exist on the device or may require a device rooted.</strong>
         </td>
     </tr>
@@ -75,8 +75,13 @@ border: 1px solid #4CAF50
         <strong>Showing your public ip: curl ifconfig.me</strong></td>
     </tr>
 
+    <td><strong>cut</strong></td>
+    <td>The cut command lets you show the contents of a file::
+        <strong>cut /proc/net/arp</strong></td>
+    </tr>
+
     <td><strong>su</strong></td>
-    <td>This command is used only on rooted devices:
+    <td>The su command requests superuser permission. <font color ="red">This command is used only on rooted devices:</font>
         <strong>su ping -i 0.1 hostname/ip</strong></td>
     </tr>
 

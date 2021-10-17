@@ -30,7 +30,8 @@
         android:inputType="number"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonScanPort"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <EditText
         android:id="@+id/editTextPort3"
@@ -41,9 +42,11 @@
         android:ems="10"
         android:gravity="center"
         android:inputType="number"
+        android:minHeight="48dp"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toStartOf="@+id/buttonScanRangePort"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPort1" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextPort1"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <EditText
         android:id="@+id/editTextPort2"
@@ -54,15 +57,17 @@
         android:ems="10"
         android:gravity="center"
         android:inputType="number"
+        android:minHeight="48dp"
         android:textColor="@color/black_color"
         app:layout_constraintBottom_toBottomOf="@+id/editTextPort3"
         app:layout_constraintEnd_toStartOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="@+id/editTextPort3" />
+        app:layout_constraintTop_toTopOf="@+id/editTextPort3"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <Button
         android:id="@+id/buttonScanPort"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="45dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="Scan"
@@ -74,7 +79,7 @@
     <Button
         android:id="@+id/buttonScanRangePort"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="Scan"
@@ -135,7 +140,8 @@
                     android:hint="Event Log"
                     android:inputType="none"
                     android:textColor="@color/black_color"
-                    android:textIsSelectable="true" />
+                    android:textIsSelectable="true"
+                    tools:ignore="SpeakableTextPresentCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
@@ -167,10 +173,12 @@
         android:ems="10"
         android:gravity="center_horizontal|center_vertical"
         android:inputType="number"
+        android:minHeight="48dp"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="@+id/editTextPort3"
         app:layout_constraintStart_toStartOf="@+id/editTextPort3"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPort3" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextPort3"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <EditText
         android:id="@+id/editTextThreads"
@@ -179,10 +187,12 @@
         android:ems="10"
         android:gravity="center_horizontal|center_vertical"
         android:inputType="number"
+        android:minHeight="48dp"
         android:textColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="@+id/editTextPort2"
         app:layout_constraintStart_toStartOf="@+id/editTextPort2"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPort2" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextPort2"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
         android:id="@+id/textView3"
@@ -231,6 +241,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@null"
-        app:srcCompat="@android:drawable/ic_dialog_info" />
+        app:srcCompat="@android:drawable/ic_dialog_info"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
