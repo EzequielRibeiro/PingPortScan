@@ -126,7 +126,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         super.onViewCreated(view, savedInstanceState);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        if ( getActivity() instanceof MainActivity){
+        if ((MainActivity) getActivity()) instanceof MainActivity){
             mainActivity = (MainActivity) getActivity();
         }
 
