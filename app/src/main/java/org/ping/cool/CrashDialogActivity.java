@@ -1,5 +1,7 @@
 package org.ping.cool;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
@@ -69,7 +71,7 @@ public class CrashDialogActivity extends AppCompatActivity {
     private void finishApplication() {
         moveTaskToBack(true);
         finish();
-       // startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, MainActivity.class));
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 

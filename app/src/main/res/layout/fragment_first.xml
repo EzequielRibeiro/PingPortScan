@@ -87,7 +87,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@null"
-        app:srcCompat="@android:drawable/ic_dialog_info" />
+        app:srcCompat="@android:drawable/ic_dialog_info"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -109,7 +110,8 @@
             android:overScrollMode="always"
             android:selectAllOnFocus="false"
             android:textColor="@color/black_color"
-            android:textIsSelectable="true" />
+            android:textIsSelectable="true"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <WebView
             android:id="@+id/webView"

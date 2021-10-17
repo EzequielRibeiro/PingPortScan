@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -61,11 +59,20 @@ public class SecondFragment extends Fragment {
 
        */
 
+        /*OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Log.e("Pressed","pressed");
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);*/
+
+
         if ( getActivity() instanceof MainActivity){
             mainActivity = (MainActivity) getActivity();
         }
 
-        this.autoCompleteTextViewUrl = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
+        this.autoCompleteTextViewUrl = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextUrl);
         DBAdapter dbAdapter = new DBAdapter(getActivity());
         urlHistoricList = dbAdapter.getAllValuesGlyphs();
 
@@ -232,10 +239,24 @@ public class SecondFragment extends Fragment {
 
     }
 
+    private void stopTask(){
+        if(checkPortTask != null)
+            if(checkPortTask.getStatus() == AsyncTask.Status.RUNNING){
+                checkPortTask.cancel(true);
+            }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopTask();
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        stopTask();
     }
 
 

@@ -11,34 +11,22 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import com.amazon.device.ads.Ad;
-import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdProperties;
-import com.amazon.device.ads.DefaultAdListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.startapp.sdk.ads.banner.Banner;
 import com.startapp.sdk.ads.banner.BannerListener;
 import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.StartAppSDK;
-import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import org.ping.cool.databinding.ActivityMainBinding;
-
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -49,9 +37,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -160,8 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
             adapter = new ArrayAdapter<String>(this,
                     android.R.layout.simple_spinner_dropdown_item, urlArray);
-            adapter.getFilter().filter(binding.autoCompleteTextViewUrl.getText(), null);
-            binding.autoCompleteTextViewUrl.setAdapter(adapter);
+            adapter.getFilter().filter(binding.autoCompleteTextUrl.getText(), null);
+            binding.autoCompleteTextUrl.setAdapter(adapter);
         }
     }
 

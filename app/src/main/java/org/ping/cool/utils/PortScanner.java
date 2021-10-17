@@ -113,12 +113,17 @@ public class PortScanner {
                             e.printStackTrace();
                         }
                         adapter.notifyDataSetChanged();
-                        context.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                listView.setSelection(adapter.getCount());
-                            }
-                        });
+
+                      try {
+                          context.getActivity().runOnUiThread(new Runnable() {
+                              @Override
+                              public void run() {
+                                  listView.setSelection(adapter.getCount());
+                              }
+                          });
+                      }catch(NullPointerException e){
+                          e.printStackTrace();
+                      }
                     }
                 });
 

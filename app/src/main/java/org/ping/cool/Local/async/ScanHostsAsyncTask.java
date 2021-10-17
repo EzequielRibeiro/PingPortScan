@@ -65,13 +65,6 @@ public class ScanHostsAsyncTask extends AsyncTask<String, Void, Void> {
     protected void onPostExecute(Void unused) {
         super.onPostExecute(unused);
 
-        firstFragment.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // firstFragment.stopProgressBar();
-            }
-        });
-
     }
 
     //Scans the ARP table and updates the list with hosts on the network

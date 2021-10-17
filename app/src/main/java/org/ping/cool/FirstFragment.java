@@ -1,5 +1,8 @@
 package org.ping.cool;
 
+import static org.ping.cool.MainActivity.SHOWED;
+import static org.ping.cool.MainActivity.isOnline;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +35,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdProperties;
 import com.amazon.device.ads.DefaultAdListener;
@@ -43,22 +45,17 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
-
 import org.ping.cool.Local.network.Discovery;
 import org.ping.cool.Local.network.Wireless;
 import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.databinding.FragmentFirstBinding;
 import org.ping.cool.network.TracerouteContainer;
 import org.ping.cool.network.TraceroutePingCommand;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
-import static org.ping.cool.MainActivity.SHOWED;
-import static org.ping.cool.MainActivity.isOnline;
 
 public class FirstFragment extends Fragment implements MainAsyncResponse {
 
@@ -68,7 +65,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private FrameLayout frameLayout;
     private FloatingActionButton floatingActionButton;
     private EditText editTextTextConsole;
-    private AutoCompleteTextView autoCompleteTextViewUrl;
+    private AutoCompleteTextView autoCompleteTextInput;
     private WebView webView;
     private ProgressBar progressBarPing;
     private TraceListAdapter traceListAdapter;
@@ -94,12 +91,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     ) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
-        this.traceroutePingCommand = new TraceroutePingCommand(FirstFragment.this);
-
-
+        traceroutePingCommand = new TraceroutePingCommand(FirstFragment.this);
         View v = inflater.inflate(R.layout.fragment_first, container, false);
-
-
         this.buttonTracert = (Button) v.findViewById(R.id.buttonTracert);
         this.buttonPing = (Button) v.findViewById(R.id.buttonPing);
         this.buttonLocal = (Button) v.findViewById(R.id.buttonLocal);
@@ -133,12 +126,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         super.onViewCreated(view, savedInstanceState);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        if (getActivity() instanceof MainActivity) {
+        if ( getActivity() instanceof MainActivity){
             mainActivity = (MainActivity) getActivity();
         }
 
-        this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextViewUrl);
-       // this.autoCompleteTextViewUrl.setText("www.google.com");
+        this.autoCompleteTextInput = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextUrl);
 
         loadInterstitialAd();
 
@@ -155,13 +147,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
      */
     private void initView() {
 
-        //text
-      //  editTextTextConsole.setText("www.google.com");
-
         traces = new ArrayList<TracerouteContainer>();
         traceListAdapter = new TraceListAdapter(getActivity());
         listViewTracert.setAdapter(traceListAdapter);
-        frameLayout.addView(listViewTracert);
+        binding.frameLayout.addView(listViewTracert);
+
 
         setupHostsAdapter();
         setupReceivers();
@@ -188,7 +178,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             @Override
             public void onClick(View v) {
 
-                if (!autoCompleteTextViewUrl.getText().toString().isEmpty()) {
+                if (!autoCompleteTextInput.getText().toString().isEmpty()) {
 
                     webView.setVisibility(View.INVISIBLE);
                     listViewLocal.setVisibility(View.INVISIBLE);
@@ -198,7 +188,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            new WhoisTask(FirstFragment.this, editTextTextConsole, autoCompleteTextViewUrl.getText().toString()).execute();
+                            new WhoisTask(FirstFragment.this, editTextTextConsole, autoCompleteTextInput.getText().toString()).execute();
                         }
                     });
 
@@ -255,7 +245,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             @Override
             public void onClick(View v) {
 
-                if (autoCompleteTextViewUrl.getText().length() == 0) {
+                if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
                 } else if (!isOnline(getActivity().getApplicationContext())) {
                     Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
@@ -265,7 +255,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                         DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                        if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                        if (dbAdapter.insertUrl(autoCompleteTextInput.getText().toString(), "") > 0) {
                             mainActivity.refreshAutoCompleteTextView();
                         }
                         dbAdapter.close();
@@ -283,7 +273,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         editTextTextConsole.setVisibility(View.INVISIBLE);
                         listViewLocal.setVisibility(View.INVISIBLE);
                         listViewTracert.setVisibility(View.VISIBLE);
-                        traceroutePingCommand.executeTraceroute(editTextTextConsole, autoCompleteTextViewUrl.getText().toString(), maxTtl);
+                        traceroutePingCommand.executeTraceroute(editTextTextConsole, autoCompleteTextInput.getText().toString(), maxTtl);
 
                     } else {
                         stopProgressBar();
@@ -296,7 +286,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             @Override
             public void onClick(View v) {
 
-                if (autoCompleteTextViewUrl.getText().length() == 0) {
+                if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
                 } else if (!isOnline(getActivity().getApplicationContext())) {
                     Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
@@ -307,7 +297,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     String command = "ping ";
 
                 //remove first space and get command and args
-               for (String c : autoCompleteTextViewUrl.getText().toString().split(" +")) 
+               for (String c : autoCompleteTextInput.getText().toString().split(" +"))
                             if(!c.equals("ping") && !c.equals("ping6"))
                                 args.append(c+" ");
                             else if(c.equals("ping6"))
@@ -353,14 +343,14 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 //test
               //  editTextTextConsole.setText("curl ifconfig.me");
 
-                if (autoCompleteTextViewUrl.getText().length() == 0) {
+                if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
                 } else {
 
                     String command = null;
                     StringBuilder args = new StringBuilder();
 
-                    for (String c : autoCompleteTextViewUrl.getText().toString().split(" +")) 
+                    for (String c : autoCompleteTextInput.getText().toString().split(" +"))
                         if (command == null) 
                             command = c;
                         else
@@ -510,8 +500,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             public void run() {
 
                 progressBarPing.setVisibility(View.VISIBLE);
-                autoCompleteTextViewUrl.setEnabled(false);
-                hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                autoCompleteTextInput.setEnabled(false);
+                hideSoftwareKeyboard(autoCompleteTextInput);
                 floatingActionButton.setVisibility(View.GONE);
 
             }
@@ -537,7 +527,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 buttonWhois.setEnabled(true);
                 floatingActionButton.setVisibility(View.VISIBLE);
                 TraceroutePingCommand.StopPing();
-                autoCompleteTextViewUrl.setEnabled(true);
+                autoCompleteTextInput.setEnabled(true);
 
             }
         });

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -44,7 +45,14 @@ public class DBAdapter {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_URL, code);
         initialValues.put(KEY_COMMENTS, comments);
-        return db.insert(DATABASE_TABLE_URL, null, initialValues);
+        long i = 0;
+        try{
+            i = db.insert(DATABASE_TABLE_URL, null, initialValues);
+        }catch(SQLiteConstraintException e){
+            e.printStackTrace();
+            i = 1;
+        }
+        return i;
     }
 
     //delete
