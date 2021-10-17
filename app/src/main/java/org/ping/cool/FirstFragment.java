@@ -3,7 +3,7 @@ package org.ping.cool;
 import static org.ping.cool.MainActivity.SHOWED;
 import static org.ping.cool.MainActivity.isOnline;
 
-import android.annotation.SuppressLint;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,9 +36,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
-import com.amazon.device.ads.Ad;
+/*import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdProperties;
-import com.amazon.device.ads.DefaultAdListener;
+import com.amazon.device.ads.DefaultAdListener;*/
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -649,7 +649,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
                 @Override
                 public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-                    showInterstitialAdAmazon();
+                  //  showInterstitialAdAmazon();
 
 
                 }
@@ -661,7 +661,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     }
 
-    private void showInterstitialAdAmazon() {
+   /* private void showInterstitialAdAmazon() {
         com.amazon.device.ads.InterstitialAd interstitialAdAmazon = new com.amazon.device.ads.InterstitialAd(getContext());
         interstitialAdAmazon.loadAd();
 
@@ -682,7 +682,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
         interstitialAdAmazon.showAd();
 
-    }
+    }*/
 
 
     @Override

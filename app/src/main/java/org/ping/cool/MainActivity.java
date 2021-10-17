@@ -10,8 +10,9 @@ import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import com.amazon.device.ads.Ad;
-import com.amazon.device.ads.AdProperties;
+/*import com.amazon.device.ads.Ad;
+import com.amazon.device.ads.AdProperties;*/
+
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private List<UrlHistoric> urlHistoricList;
     private ArrayList<String> urlArray;
     private AdRequest adRequest;
-    private com.amazon.device.ads.AdLayout amazonAdView;
+  // private com.amazon.device.ads.AdLayout amazonAdView;
     private com.google.android.gms.ads.AdView admobAdView;
     private com.startapp.sdk.ads.banner.Banner startAppBanner;
 
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         // after a certain period of time
         StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
         StartAppAd.disableSplash();
-        com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
+       // com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
         // com.amazon.device.ads.AdRegistration.enableTesting(true);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void loadAdAmazon() {
+   /* private void loadAdAmazon() {
         Log.i("Amazon","AmazonAd Banner");
         amazonAdView = new com.amazon.device.ads.AdLayout(this, com.amazon.device.ads.AdSize.SIZE_320x50);
         admobAdView = new com.google.android.gms.ads.AdView(this);
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
+    }*/
 
 
 
@@ -206,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailedToReceiveAd(View view) {
 
                 Log.i("StartApp", "Failed To ReceiveAd");
-                loadAdAmazon();
+              //  loadAdAmazon();
 
             }
 
