@@ -40,29 +40,26 @@ public class DBAdapter {
     }
 
     //insert
-    public long insertUrl(String code, String comments) throws SQLException {
+    public long insertUrl(String url, String comments) throws SQLException {
 
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(KEY_URL, code);
-        initialValues.put(KEY_COMMENTS, comments);
-        long i = 0;
-        try{
-            i = db.insert(DATABASE_TABLE_URL, null, initialValues);
-        }catch(SQLiteConstraintException e){
-            e.printStackTrace();
-            i = 1;
+        if(getCount(url) > 0){
+            return 1;
         }
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(KEY_URL, url);
+        initialValues.put(KEY_COMMENTS, comments);
+        long i = db.insert(DATABASE_TABLE_URL, null, initialValues);
         return i;
     }
 
-    //delete
+
     public boolean deleteUrl(long id) throws SQLException {
 
         return db.delete(DATABASE_TABLE_URL, "id=" + id, null) > 0;
 
     }
 
-    //delete
+
     public boolean deleteAllUrl() throws SQLException {
 
         return db.delete(DATABASE_TABLE_URL, null, null) > 0;
@@ -102,13 +99,13 @@ public class DBAdapter {
 
     }
 
-    public int getCount(){
+    public int getCount(String url){
         Cursor cursor;
         int count = 0;
 
-        cursor = db.rawQuery("select count("+KEY_URL+") from "+ DATABASE_TABLE_URL,null);
+        cursor = db.rawQuery("SELECT "+ KEY_URL +" FROM "+DATABASE_TABLE_URL+ " WHERE "+KEY_URL+" = ?", new String[] {url});
         if(cursor.moveToFirst())
-            count = cursor.getInt(0);
+            count = cursor.getCount();
         cursor.close();
 
         return count;

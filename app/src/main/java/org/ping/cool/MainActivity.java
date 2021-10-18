@@ -1,6 +1,8 @@
 package org.ping.cool;
 
 
+import static org.ping.cool.ApplicationException.SHOWED;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +23,8 @@ import com.startapp.sdk.ads.banner.Banner;
 import com.startapp.sdk.ads.banner.BannerListener;
 import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.StartAppSDK;
+import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -37,6 +41,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +52,13 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     public static AssetManager assetManager;
     private FirebaseAnalytics mFirebaseAnalytics;
-    public  static boolean SHOWED = true;
+
     public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
     private ArrayAdapter<String> adapter;
     private List<UrlHistoric> urlHistoricList;
     private ArrayList<String> urlArray;
     private AdRequest adRequest;
   // private com.amazon.device.ads.AdLayout amazonAdView;
-    private com.google.android.gms.ads.AdView admobAdView;
     private com.startapp.sdk.ads.banner.Banner startAppBanner;
 
 
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         // after a certain period of time
         StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
         StartAppAd.disableSplash();
+     //   StartAppSDK.setTestAdsEnabled(true);
        // com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
         // com.amazon.device.ads.AdRegistration.enableTesting(true);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -201,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceiveAd(View view) {
                 Log.i("StartApp", "onReceived");
+
             }
 
             @Override
@@ -209,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("StartApp", "Failed To ReceiveAd");
               //  loadAdAmazon();
 
+                binding.linearLayoutAd.removeAllViews();
             }
 
             @Override
@@ -226,15 +233,45 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void startShowInterstitial() {
+
+        if(!SHOWED) {
+            SHOWED = true;
+            StartAppAd startAppAd ;
+            startAppAd = new StartAppAd(getApplicationContext());
+            startAppAd.showAd(new AdDisplayListener() {
+                @Override
+                public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
+
+                }
+
+                @Override
+                public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+                    //  showInterstitialAdAmazon();
+                    SHOWED = false;
+                }
+            });
+
+        }
+
+    }
 
 
     @Override
     public void onBackPressed() {
+        startShowInterstitial();
         super.onBackPressed();
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

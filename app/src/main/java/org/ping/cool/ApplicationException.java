@@ -14,6 +14,7 @@ public class ApplicationException extends Application {
 
 
     private static final String LOG_TAG = "CrashCatch";
+    public  static boolean SHOWED = false;
 
     @Override
     public void onCreate() {

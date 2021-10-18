@@ -1,6 +1,6 @@
 package org.ping.cool;
 
-import static org.ping.cool.MainActivity.SHOWED;
+import static org.ping.cool.ApplicationException.SHOWED;
 import static org.ping.cool.MainActivity.isOnline;
 
 
@@ -39,7 +39,9 @@ import androidx.navigation.fragment.NavHostFragment;
 /*import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdProperties;
 import com.amazon.device.ads.DefaultAdListener;*/
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
@@ -495,8 +497,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
      }
 
     public void stopProgressBar() {
-
-
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -518,10 +518,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
             }
         });
-        if(SHOWED) {
-            startShowInterstitial();
-            SHOWED = false;
-        }
+        startShowInterstitial();
 
     }
 
@@ -598,6 +595,34 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     }
 
 
+    private void interstitialAdCallback(@NonNull InterstitialAd interstitialAd) {
+        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+            @Override
+            public void onAdDismissedFullScreenContent() {
+                // Called when fullscreen content is dismissed.
+                Log.d("TAG", "The ad was dismissed.");
+
+            }
+
+            @Override
+            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                // Called when fullscreen content failed to show.
+                Log.d("TAG", "The ad failed to show.");
+
+            }
+
+            @Override
+            public void onAdShowedFullScreenContent() {
+                // Called when fullscreen content is shown.
+                // Make sure to set your reference to null so you don't
+                // show it a second time.
+                mInterstitialAd = null;
+
+                Log.d("TAG", "The ad was shown.");
+            }
+        });
+    }
+
     private void loadInterstitialAd() {
 
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -609,6 +634,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 // an ad is loaded.
                 mInterstitialAd = interstitialAd;
                 Log.i("Admob", "onAdLoaded");
+                interstitialAdCallback(interstitialAd);
             }
 
             @Override
@@ -616,6 +642,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 // Handle the error
                 Log.i("Admob", "Interstitial fail code " + loadAdError.getCode() + ": " + loadAdError.getMessage());
                 mInterstitialAd = null;
+
+
             }
         });
 
@@ -624,38 +652,12 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private void startShowInterstitial() {
 
 
-
         if (mInterstitialAd != null) {
             mInterstitialAd.show(getActivity());
-
-        } else {
+            SHOWED = true;
+       }else{
+            SHOWED = false;
             Log.d("Admob", "The interstitial ad wasn't ready yet.");
-            StartAppAd startAppAd = new StartAppAd(getContext());
-            startAppAd.showAd(new AdDisplayListener() {
-                @Override
-                public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-                  //  showInterstitialAdAmazon();
-
-
-                }
-            });
-            startAppAd.showAd();
-
         }
 
 
