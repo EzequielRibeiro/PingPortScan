@@ -63,8 +63,8 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'commons-net:commons-net:3.6'
     implementation 'com.startapp:inapp-sdk:4.8.11'
-   // implementation files('../amazon-ads-6.0.0.jar')
-    //noinspection GradleDynamicVersion
+    implementation 'com.google.android.play:core:1.10.2'
+    implementation 'com.google.android.play:core-ktx:1.8.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

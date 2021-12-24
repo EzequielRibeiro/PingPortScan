@@ -10,18 +10,27 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.review.model.ReviewErrorCode;
+import com.google.android.play.core.tasks.OnCompleteListener;
+import com.google.android.play.core.tasks.OnFailureListener;
+import com.google.android.play.core.tasks.RuntimeExecutionException;
+import com.google.android.play.core.tasks.Task;
 import com.startapp.sdk.ads.banner.Banner;
 import com.startapp.sdk.ads.banner.BannerListener;
 import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.StartAppSDK;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -150,6 +159,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
+
+        if (id == R.id.action_rate) {
+            rateApp();
+            return true;
+        }
+
         if (id == R.id.action_about) {
             about();
             return true;
@@ -170,6 +185,69 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("MissingPermission") NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
+
+    private void rateAppOnPlayStore(){
+        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+    private void rateApp() {
+
+
+        final ReviewManager reviewManager = ReviewManagerFactory.create(MainActivity.this);
+        //reviewManager = new FakeReviewManager(this);
+        Task<ReviewInfo> request = reviewManager.requestReviewFlow();
+
+        request.addOnCompleteListener(new OnCompleteListener<ReviewInfo>() {
+            @Override
+            public void onComplete(@NonNull Task<ReviewInfo> task) {
+
+                if (task.isSuccessful()) {
+                    ReviewInfo reviewInfo = task.getResult();
+                    Task<Void> flow = reviewManager.launchReviewFlow(MainActivity.this, reviewInfo);
+                    flow.addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.i("Rate Flow", "Complete");
+                        }
+                    });
+
+                    flow.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            rateAppOnPlayStore();
+                            Log.i("Rate Flow", "Fail");
+                            e.printStackTrace();
+                        }
+                    });
+
+                } else {
+                    try {
+                        @ReviewErrorCode int reviewErrorCode = ((RuntimeExecutionException) task.getException()).getErrorCode();
+                        Log.e("Rate Task Fail", "code: " + reviewErrorCode);
+                        rateAppOnPlayStore();
+                    }catch (NullPointerException | ClassCastException e){
+                        rateAppOnPlayStore();
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Log.e("Rate Request", "Fail");
+                rateAppOnPlayStore();
+            }
+        });
+
+    }
+
 
     private void about() {
 
