@@ -1,32 +1,30 @@
 package org.ping.cool;
 
-
-import static org.ping.cool.ApplicationException.SHOWED;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-/*import com.amazon.device.ads.Ad;
-import com.amazon.device.ads.AdProperties;*/
-
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.startapp.sdk.ads.banner.Banner;
 import com.startapp.sdk.ads.banner.BannerListener;
 import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.StartAppSDK;
-import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -41,27 +39,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     public static AssetManager assetManager;
-    private FirebaseAnalytics mFirebaseAnalytics;
+    private boolean showAd = true;
+    private SharedPreferences sharedPrefs;
 
     public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
     private ArrayAdapter<String> adapter;
     private List<UrlHistoric> urlHistoricList;
     private ArrayList<String> urlArray;
-    private AdRequest adRequest;
-  // private com.amazon.device.ads.AdLayout amazonAdView;
-    private com.startapp.sdk.ads.banner.Banner startAppBanner;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +66,9 @@ public class MainActivity extends AppCompatActivity {
         // after a certain period of time
         StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
         StartAppAd.disableSplash();
-     //   StartAppSDK.setTestAdsEnabled(true);
-       // com.amazon.device.ads.AdRegistration.setAppKey(getString(R.string.amazon_ads_app_key));
-        // com.amazon.device.ads.AdRegistration.enableTesting(true);
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        sharedPrefs = getSharedPreferences("pingcool", MODE_PRIVATE);
+        showAd = sharedPrefs.getBoolean("showAd",true);
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -86,57 +80,30 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
         assetManager = getAssets();
-        /*
-        List<String> testDeviceIds = Arrays.asList("DB530A1BBBDBFE8567328113528A19EF");
-        RequestConfiguration configuration =
-                new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
-        MobileAds.setRequestConfiguration(configuration);
-         */
 
         refreshAutoCompleteTextView();
 
-        adRequest = new AdRequest.Builder().build();
-        binding.adView.loadAd(adRequest);
-
-
-        binding.adView.setAdListener(new AdListener() {
-
-            @Override
-            public void onAdLoaded() {
-
-            }
-
-            @Override
-            public void onAdFailedToLoad(LoadAdError adError) {
-                // Code to be executed when an ad request fails.
-                Log.i("Admob", "failed code " + adError.getCode() + ": " + adError.getMessage());
-                binding.linearLayoutAd.removeView(binding.adView);
-                loadAdStartApp();
-
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-
-            @Override
-            public void onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-            }
-        });
 
     }
 
 
-    public void refreshAutoCompleteTextView() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (showAd) {
+            loadAdMob();
+            sharedPrefs.edit().putBoolean("showAd", false).apply();
+
+        } else {
+            loadAdStart();
+            sharedPrefs.edit().putBoolean("showAd", true).apply();
+        }
+
+
+    }
+
+     public void refreshAutoCompleteTextView() {
 
         DBAdapter dbAdapter = new DBAdapter(this);
         urlHistoricList = dbAdapter.getAllValuesGlyphs();
@@ -158,118 +125,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-   /* private void loadAdAmazon() {
-        Log.i("Amazon","AmazonAd Banner");
-        amazonAdView = new com.amazon.device.ads.AdLayout(this, com.amazon.device.ads.AdSize.SIZE_320x50);
-        admobAdView = new com.google.android.gms.ads.AdView(this);
-        admobAdView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
-        admobAdView.setAdUnitId(getString(R.string.amazon_ads_app_key));
-
-        if(startAppBanner != null)
-            binding.linearLayoutAd.removeView(startAppBanner);
-
-        binding.linearLayoutAd.addView(amazonAdView);
-        amazonAdView.loadAd(new com.amazon.device.ads.AdTargetingOptions());
-        amazonAdView.setListener(new com.amazon.device.ads.AdListener() {
-            @Override
-            public void onAdLoaded(Ad ad, AdProperties adProperties) {
-
-            }
-
-            @Override
-            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError adError) {
-                Log.i("AdAmazon", "failed code " + adError.getCode() + ": " + adError.getMessage());
-            }
-
-            @Override
-            public void onAdExpanded(Ad ad) {
-
-            }
-
-            @Override
-            public void onAdCollapsed(Ad ad) {
-
-            }
-
-            @Override
-            public void onAdDismissed(Ad ad) {
-
-            }
-        });
-    }*/
-
-
-
-    private void loadAdStartApp() {
-        Log.i("StartApp","loadAdStartapp");
-        startAppBanner = new Banner(MainActivity.this, new BannerListener() {
-            @Override
-            public void onReceiveAd(View view) {
-                Log.i("StartApp", "onReceived");
-
-            }
-
-            @Override
-            public void onFailedToReceiveAd(View view) {
-
-                Log.i("StartApp", "Failed To ReceiveAd");
-              //  loadAdAmazon();
-
-                binding.linearLayoutAd.removeAllViews();
-            }
-
-            @Override
-            public void onImpression(View view) {
-                Log.i("StartApp", "ReceiveAd");
-
-            }
-
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-        binding.linearLayoutAd.addView(startAppBanner);
-
-    }
-
-    private void startShowInterstitial() {
-
-        if(!SHOWED) {
-            SHOWED = true;
-            StartAppAd startAppAd ;
-            startAppAd = new StartAppAd(getApplicationContext());
-            startAppAd.showAd(new AdDisplayListener() {
-                @Override
-                public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
-
-                }
-
-                @Override
-                public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-                    //  showInterstitialAdAmazon();
-                    SHOWED = false;
-                }
-            });
-
-        }
-
-    }
-
-
     @Override
     public void onBackPressed() {
-        startShowInterstitial();
         super.onBackPressed();
     }
 
@@ -310,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static boolean isOnline(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        @SuppressLint("MissingPermission") NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
@@ -347,6 +204,90 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+    private void loadAdStart() {
+
+        Banner startAppBanner = new Banner(this);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.linearLayoutAd.getLayoutParams();
+        params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+
+        startAppBanner.setBannerListener(new BannerListener() {
+
+            @Override
+            public void onReceiveAd(View banner) {
+
+            }
+
+            @Override
+            public void onFailedToReceiveAd(View view) {
+                binding.linearLayoutAd.removeView(startAppBanner);
+                binding.linearLayoutAd.setLayoutParams(params);
+                loadAdMob();
+            }
+
+            @Override
+            public void onImpression(View view) {
+
+            }
+
+            @Override
+            public void onClick(View view) {
+
+            }
+
+        });
+        binding.linearLayoutAd.removeAllViews();
+        binding.linearLayoutAd.addView(startAppBanner);
+
+    }
+
+    private void loadAdMob() {
+        /*List<String> testDeviceIds = Arrays.asList("DB530A1BBBDBFE8567328113528A19EF");
+        RequestConfiguration configuration =
+                new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
+        MobileAds.setRequestConfiguration(configuration);*/
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        AdView adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.banner_ad_unit_id));
+        adView.setAdSize(AdSize.BANNER);
+        adView.loadAd(adRequest);
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                binding.linearLayoutAd.removeAllViews();
+                binding.linearLayoutAd.addView(adView);
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                loadAdStart();
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+
+
+    }
+
+
 
 
 }

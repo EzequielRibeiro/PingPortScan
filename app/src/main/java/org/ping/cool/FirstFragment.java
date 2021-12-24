@@ -1,8 +1,6 @@
 package org.ping.cool;
 
-import static org.ping.cool.ApplicationException.SHOWED;
 import static org.ping.cool.MainActivity.isOnline;
-
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -86,6 +84,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private List<TracerouteContainer> traces;
     private ListView listViewLocal;
     private InterstitialAd mInterstitialAd;
+    private static boolean firstShowAd = true;
 
     @Override
     public View onCreateView(
@@ -125,7 +124,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        loadInterstitialAd();
+        loadAdInter();
     }
 
     @Override
@@ -518,7 +517,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
             }
         });
-        startShowInterstitial();
+        showInterstitial();
 
     }
 
@@ -595,97 +594,63 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     }
 
 
-    private void interstitialAdCallback(@NonNull InterstitialAd interstitialAd) {
-        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
-            @Override
-            public void onAdDismissedFullScreenContent() {
-                // Called when fullscreen content is dismissed.
-                Log.d("TAG", "The ad was dismissed.");
-
-            }
-
-            @Override
-            public void onAdFailedToShowFullScreenContent(AdError adError) {
-                // Called when fullscreen content failed to show.
-                Log.d("TAG", "The ad failed to show.");
-
-            }
-
-            @Override
-            public void onAdShowedFullScreenContent() {
-                // Called when fullscreen content is shown.
-                // Make sure to set your reference to null so you don't
-                // show it a second time.
-                mInterstitialAd = null;
-
-                Log.d("TAG", "The ad was shown.");
-            }
-        });
-    }
-
-    private void loadInterstitialAd() {
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-
-        InterstitialAd.load(getContext(), getString(R.string.interstitial_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                // The mInterstitialAd reference will be null until
-                // an ad is loaded.
-                mInterstitialAd = interstitialAd;
-                Log.i("Admob", "onAdLoaded");
-                interstitialAdCallback(interstitialAd);
-            }
-
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                // Handle the error
-                Log.i("Admob", "Interstitial fail code " + loadAdError.getCode() + ": " + loadAdError.getMessage());
-                mInterstitialAd = null;
-
-
-            }
-        });
-
-    }
-
     private void startShowInterstitial() {
 
+        StartAppAd startAppAd ;
+        startAppAd = new StartAppAd(getActivity());
+        startAppAd.showAd(new AdDisplayListener() {
+            @Override
+            public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
+
+            }
+
+            @Override
+            public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+                firstShowAd = false;
+            }
+
+            @Override
+            public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
+
+            }
+
+            @Override
+            public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
+                firstShowAd = true;
+            }
+        });
+
+    }
+
+    public void loadAdInter() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        String id = getString(R.string.interstitial_ad_unit_id);
+
+
+        mInterstitialAd.load(getActivity(), id, adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        mInterstitialAd = interstitialAd;
+
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        mInterstitialAd = null;
+
+                    }
+                });
+    }
+
+    public void showInterstitial(){
 
         if (mInterstitialAd != null) {
             mInterstitialAd.show(getActivity());
-            SHOWED = true;
-       }else{
-            SHOWED = false;
-            Log.d("Admob", "The interstitial ad wasn't ready yet.");
+        }else if(firstShowAd){
+            startShowInterstitial();
         }
-
-
     }
-
-   /* private void showInterstitialAdAmazon() {
-        com.amazon.device.ads.InterstitialAd interstitialAdAmazon = new com.amazon.device.ads.InterstitialAd(getContext());
-        interstitialAdAmazon.loadAd();
-
-        interstitialAdAmazon.setListener(new DefaultAdListener() {
-            @Override
-            public void onAdLoaded(Ad ad, AdProperties adProperties) {
-
-
-            }
-
-            @Override
-            public void onAdFailedToLoad(Ad ad, com.amazon.device.ads.AdError error) {
-                super.onAdFailedToLoad(ad, error);
-                Log.i("AdAmazon", "Interstitial fail code " + error.getCode() + ": " + error.getMessage());
-            }
-
-        });
-
-        interstitialAdAmazon.showAd();
-
-    }*/
-
 
     @Override
     public void processFinish(Map<String, String> output) {
