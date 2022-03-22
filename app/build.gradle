@@ -15,15 +15,15 @@ android {
             keyPassword '123456'
         }
     }
-    compileSdkVersion 31
+    compileSdkVersion 32
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "org.ping.cool"
         minSdkVersion 19
-        targetSdkVersion 31
-        versionCode 20
-        versionName "1.4"
+        targetSdkVersion 32
+        versionCode 21
+        versionName "1.41"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,22 +48,22 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    implementation 'androidx.navigation:navigation-fragment:2.3.5'
-    implementation 'androidx.navigation:navigation-ui:2.3.5'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.navigation:navigation-fragment:2.4.1'
+    implementation 'androidx.navigation:navigation-ui:2.4.1'
     implementation 'commons-cli:commons-cli:1.4'
     implementation platform('com.google.firebase:firebase-bom:26.7.0')
-    implementation 'com.google.android.gms:play-services-ads:20.5.0'
-    implementation 'com.google.firebase:firebase-analytics:20.0.2'
-    implementation 'com.google.firebase:firebase-inappmessaging-display:20.1.1'
-    implementation 'com.google.android.gms:play-services-measurement-api:20.0.2'
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.6'
+    implementation 'com.google.android.gms:play-services-ads:20.6.0'
+    implementation 'com.google.firebase:firebase-analytics:20.1.1'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:20.1.2'
+    implementation 'com.google.android.gms:play-services-measurement-api:20.1.1'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'commons-net:commons-net:3.6'
     implementation 'com.startapp:inapp-sdk:4.8.11'
-    implementation 'com.google.android.play:core:1.10.2'
+    implementation 'com.google.android.play:core:1.10.3'
     implementation 'com.google.android.play:core-ktx:1.8.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

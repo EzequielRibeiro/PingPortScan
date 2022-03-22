@@ -57,6 +57,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class FirstFragment extends Fragment implements MainAsyncResponse {
 
@@ -646,9 +647,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void showInterstitial(){
 
         if (mInterstitialAd != null) {
-            mInterstitialAd.show(getActivity());
+            mInterstitialAd.show(requireActivity());
         }else if(firstShowAd){
-            startShowInterstitial();
+         //   startShowInterstitial();
         }
     }
 
