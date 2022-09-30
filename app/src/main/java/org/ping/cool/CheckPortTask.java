@@ -9,11 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.util.Log;
-import android.view.View;
-
-import androidx.fragment.app.Fragment;
-
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.commons.cli.*;
 import org.ping.cool.databinding.FragmentSecondBinding;
 import org.ping.cool.utils.PortScanner;
@@ -95,8 +91,10 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
 
         // Check data validity
         if (cmd != null) {
+
             try {
                 if (checkIp(cmd.getOptionValue("host").trim())) {
+
                     try {
                         final InetAddress inetAddress = InetAddress.getByName(cmd.getOptionValue("host").trim());
                         Logger.log("The host is reachable (" + inetAddress.getHostAddress() + ")!", Color.GREEN);
@@ -157,20 +155,25 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
      * @return Authenticity of the ip passed down as an input to the function
      */
 
-    private boolean checkIp(String ip) throws IOException {
-        boolean isIPv4 = false;
 
-        try {
-            final InetAddress inetAddress = InetAddress.getByName(ip);
-            isIPv4 = (inetAddress.getHostAddress().equals(ip) || inetAddress.getHostName().equals(ip))
-                    && inetAddress instanceof Inet4Address;
 
-        } catch (final UnknownHostException e) {
-            Logger.log("Host unreachable...", Color.RED);
-            PutLogConsole(context, binding.editTextTextLog, "\nHost unreachable...");
-            return false;
+    private boolean checkIp(String host) throws IOException {
+
+        String ip;
+        final InetAddress inetAddress = InetAddress.getByName(host);
+        ip = inetAddress.getHostAddress();
+        InetAddressValidator validator = InetAddressValidator.getInstance();
+
+        if (validator.isValidInet4Address(ip)) {
+            return true;
         }
-        return isIPv4;
+
+        if (validator.isValidInet6Address(ip)) {
+              return true;
+         }
+
+        return false;
+
     }
 
     public static boolean isHostAvailable(final String host, final int port, final int timeout) {

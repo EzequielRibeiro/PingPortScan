@@ -46,12 +46,17 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
+
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.ping.cool.Local.network.Discovery;
 import org.ping.cool.Local.network.Wireless;
 import org.ping.cool.Local.response.MainAsyncResponse;
 import org.ping.cool.databinding.FragmentFirstBinding;
 import org.ping.cool.network.TracerouteContainer;
 import org.ping.cool.network.TraceroutePingCommand;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,6 +91,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private ListView listViewLocal;
     private InterstitialAd mInterstitialAd;
     private static boolean firstShowAd = true;
+
 
     @Override
     public View onCreateView(
@@ -282,9 +288,24 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
 
                 } else {
+                    String command = "ping ";
+                    String ip = "127.0.0.1";
+                    InetAddress inetAddress;
+                    try {
+                        inetAddress = InetAddress.getByName(String.valueOf(autoCompleteTextInput.getText()));
+                        ip = inetAddress.getHostAddress();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+
+                    InetAddressValidator validator = InetAddressValidator.getInstance();
+
+                    if (validator.isValidInet6Address(ip)) {
+                        command = "ping6 ";
+                    }
 
                     StringBuilder args = new StringBuilder();
-                    String command = "ping ";
+
 
                 //remove first space and get command and args
                for (String c : autoCompleteTextInput.getText().toString().split(" +"))

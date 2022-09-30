@@ -17,6 +17,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
@@ -39,15 +42,20 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import org.ping.cool.databinding.ActivityMainBinding;
+
+import android.os.StrictMode;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,11 +69,13 @@ public class MainActivity extends AppCompatActivity {
     public static AssetManager assetManager;
     private boolean showAd = true;
     private SharedPreferences sharedPrefs;
-
     public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
     private ArrayAdapter<String> adapter;
     private List<UrlHistoric> urlHistoricList;
     private ArrayList<String> urlArray;
+    private NavController navController;
+    private MaterialAlertDialogBuilder materialAlertDialogBuilder;
+    private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,13 +94,22 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
         assetManager = getAssets();
 
         refreshAutoCompleteTextView();
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        /*List<String> testDeviceIds = Arrays.asList("EDA6CBEC34D7AE15BA471460139D49DA");
+        RequestConfiguration configuration =
+                new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
+        MobileAds.setRequestConfiguration(configuration);*/
+
 
 
     }
@@ -108,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
             loadAdStart();
             sharedPrefs.edit().putBoolean("showAd", true).apply();
         }
-
+        loadAdMobExit();
 
     }
 
@@ -134,9 +153,85 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void loadAdMobExit() {
+
+        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivity.this,R.style.Base_Theme_Material3_Dark_Dialog);
+        materialAlertDialogBuilder.setTitle(R.string.app_name);
+        materialAlertDialogBuilder.setIcon(R.mipmap.ic_launcher_foreground);
+        materialAlertDialogBuilder.setMessage("Close the application ?");
+        materialAlertDialogBuilder.setCancelable(false);
+        materialAlertDialogBuilder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //System.exit(1);
+                        finishAffinity();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        materialAlertDialogBuilder = null;
+                        adView = null;
+                        loadAdMobExit();
+                    }
+                });
+
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView = new AdView(this);
+            adView.setAdUnitId(getString(R.string.ad_banner_exit_id));
+            adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+            adView.loadAd(adRequest);
+            adView.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    materialAlertDialogBuilder.setView(adView);
+                }
+
+                @Override
+                public void onAdFailedToLoad(LoadAdError adError) {
+                    //  loadAdStart();
+                }
+
+                @Override
+                public void onAdOpened() {
+                    // Code to be executed when an ad opens an overlay that
+                    // covers the screen.
+                }
+
+                @Override
+                public void onAdClicked() {
+                    // Code to be executed when the user clicks on an ad.
+                }
+
+                @Override
+                public void onAdClosed() {
+                    // Code to be executed when the user is about to return
+                    // to the app after tapping on an ad.
+                }
+            });
+
+
+
+        }
+
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+
+       if (navController.getCurrentDestination().getId() == R.id.FirstFragment) {
+            if (materialAlertDialogBuilder != null) {
+                try {
+
+                      materialAlertDialogBuilder.show();
+
+                }catch (IllegalStateException e){
+                    e.printStackTrace();
+
+                }
+            }
+        } else
+            super.onBackPressed();
+
     }
 
     @Override

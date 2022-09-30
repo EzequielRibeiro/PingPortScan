@@ -18,6 +18,7 @@
     <string name="first_fragment_label">Ping Network</string>
     <string name="previous">Previous</string>
     <string name="amazon_ads_app_key">0abdd1337ad344ffaa80d6c6bd649348</string>
+    <string name="ad_banner_exit_id">ca-app-pub-0822808376839371/8928788864</string>
     <string name="banner_ad_unit_id">ca-app-pub-0822808376839371/8383424039</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-0822808376839371/8856722474</string>
     <string name="startapp_app_id">208379788</string>
@@ -29,6 +30,7 @@
     <string name="msgCrashCause">Exception <b>\"%1$s\"</b> (caused by <b>\"%2$s\"</b>) has been successfully caught!\n</string>
     <string name="description">address entry</string>
     <string name="port_range">Port\n1 - 65535</string>
+
 
 
 </resources>

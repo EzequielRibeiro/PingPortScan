@@ -31,6 +31,7 @@
         <item name="android:layout_margin">5dp</item>
     </style>
 
+    <style name="StyleAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert" />
 
 
 </resources>
