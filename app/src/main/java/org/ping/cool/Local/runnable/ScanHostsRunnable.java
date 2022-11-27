@@ -1,9 +1,11 @@
 package org.ping.cool.Local.runnable;
 
 
+import static org.ping.cool.Local.async.ScanHostsAsyncTask.TAG;
+
+import android.util.Log;
 
 import org.ping.cool.Local.response.MainAsyncResponse;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;

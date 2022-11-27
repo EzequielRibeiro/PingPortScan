@@ -15,15 +15,15 @@ android {
             keyPassword '123456'
         }
     }
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "org.ping.cool"
         minSdkVersion 19
-        targetSdkVersion 32
-        versionCode 22
-        versionName "1.22"
+        targetSdkVersion 33
+        versionCode 23
+        versionName "1.23"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

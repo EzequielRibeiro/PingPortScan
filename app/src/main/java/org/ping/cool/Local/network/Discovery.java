@@ -2,6 +2,7 @@ package org.ping.cool.Local.network;
 
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.ping.cool.FirstFragment;
 import org.ping.cool.Local.async.ScanHostsAsyncTask;

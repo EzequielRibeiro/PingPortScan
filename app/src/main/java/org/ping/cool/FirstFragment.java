@@ -554,7 +554,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 TextView text2 = (TextView) view.findViewById(android.R.id.text2);
                 text2.setTextColor(getResources().getColor(R.color.grey_color));
                 text1.setText(hosts.get(position).get("First Line"));
-                text2.setText(hosts.get(position).get("Second Line"));
+                text2.setText(hosts.get(position).get("Second Line").replace("[]",""));
 
                 return view;
             }
