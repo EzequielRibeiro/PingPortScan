@@ -496,7 +496,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
      * @param currentEditText The current selected edittext
      */
     public void hideSoftwareKeyboard(EditText currentEditText) {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm.isActive()) {
             imm.hideSoftInputFromWindow(currentEditText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
@@ -504,7 +504,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public void startProgressBar() {
 
-        getActivity().runOnUiThread(new Runnable() {
+        requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 

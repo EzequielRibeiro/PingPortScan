@@ -393,9 +393,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailedToReceiveAd(View view) {
-                binding.linearLayoutAd.removeView(startAppBanner);
-                binding.linearLayoutAd.setLayoutParams(params);
-                loadAdMob();
+
+                binding.linearLayoutAd.removeAllViews();
+
             }
 
             @Override
@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        binding.linearLayoutAd.removeAllViews();
+
         binding.linearLayoutAd.addView(startAppBanner);
 
     }
@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
         AdRequest adRequest = new AdRequest.Builder().build();
         AdView adView = new AdView(this);
         adView.setAdUnitId(getString(R.string.banner_ad_unit_id));
-        adView.setAdSize(AdSize.BANNER);
+        adView.setAdSize(AdSize.LARGE_BANNER);
         adView.loadAd(adRequest);
         adView.setAdListener(new AdListener() {
             @Override
@@ -431,10 +431,12 @@ public class MainActivity extends AppCompatActivity {
                 binding.linearLayoutAd.removeAllViews();
                 binding.linearLayoutAd.addView(adView);
 
+
             }
 
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
+                binding.linearLayoutAd.removeAllViews();
                 loadAdStart();
             }
 
