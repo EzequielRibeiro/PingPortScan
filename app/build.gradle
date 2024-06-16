@@ -20,10 +20,10 @@ android {
 
     defaultConfig {
         applicationId "org.ping.cool"
-        minSdkVersion 31
+        minSdkVersion 21
         targetSdkVersion 34
-        versionCode 25
-        versionName "1.25"
+        versionCode 26
+        versionName "1.26"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,7 +31,12 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            firebaseCrashlytics {
+                mappingFileUploadEnabled true
+            }
+
         }
     }
     compileOptions {
@@ -46,28 +51,27 @@ android {
         checkReleaseBuilds false
     }
     namespace 'org.ping.cool'
+
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation 'com.google.android.play:review:2.0.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment:2.7.7'
     implementation 'androidx.navigation:navigation-ui:2.7.7'
-    implementation 'commons-cli:commons-cli:1.4'
-    implementation platform('com.google.firebase:firebase-bom:26.7.0')
-    implementation 'com.google.android.gms:play-services-ads:23.0.0'
-    implementation 'com.google.firebase:firebase-analytics:21.5.1'
-    implementation 'com.google.firebase:firebase-inappmessaging-display:20.4.0'
-    implementation 'com.google.android.gms:play-services-measurement-api:21.5.1'
-    implementation 'com.google.firebase:firebase-crashlytics:18.6.2'
+    implementation 'commons-cli:commons-cli:1.8.0'
+    implementation 'com.google.android.gms:play-services-ads:23.1.0'
+    implementation 'com.google.firebase:firebase-analytics:22.0.1'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:21.0.0'
+    implementation 'com.google.android.gms:play-services-measurement-api:22.0.1'
+    implementation 'com.google.firebase:firebase-crashlytics:19.0.1'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'commons-net:commons-net:3.6'
-    implementation 'com.startapp:inapp-sdk:4.10.12'
-    implementation 'commons-validator:commons-validator:1.7'
-    implementation 'com.google.android.play:core:1.10.3'
-    implementation 'com.google.android.play:core-ktx:1.8.1'
-    testImplementation 'junit:junit:4.+'
+    implementation 'commons-net:commons-net:3.11.1'
+    implementation 'commons-validator:commons-validator:1.9.0'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 

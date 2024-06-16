@@ -21,6 +21,9 @@
     <string name="ad_banner_exit_id">ca-app-pub-0822808376839371/8928788864</string>
     <string name="banner_ad_unit_id">ca-app-pub-0822808376839371/8383424039</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-0822808376839371/8856722474</string>
+    <string name="ad_unit_id">ca-app-pub-0822808376839371~2943518809</string>
+
+
     <string name="startapp_app_id">208379788</string>
     <string-array name="msgMem">
         <item>The error has been reported. Thank you.</item>

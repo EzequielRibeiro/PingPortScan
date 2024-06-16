@@ -2,6 +2,7 @@ package org.ping.cool;
 
 import static org.ping.cool.MainActivity.isOnline;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,19 +35,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
-/*import com.amazon.device.ads.Ad;
-import com.amazon.device.ads.AdProperties;
-import com.amazon.device.ads.DefaultAdListener;*/
-import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.startapp.sdk.adsbase.StartAppAd;
-import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
-
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.ping.cool.Local.network.Discovery;
 import org.ping.cool.Local.network.Wireless;
@@ -117,11 +110,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
         final int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            listViewLocal.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
+            listViewLocal.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.layout_border));
             editTextTextConsole.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
         } else {
-            listViewLocal.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
-            editTextTextConsole.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.layout_border));
+            listViewLocal.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.layout_border));
+            editTextTextConsole.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.layout_border));
         }
         initView();
         return v;
@@ -130,7 +123,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        requireActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         loadAdInter();
     }
 
@@ -179,7 +172,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     listViewLocal.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.VISIBLE);
 
-                    getActivity().runOnUiThread(new Runnable() {
+                    requireActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             new WhoisTask(FirstFragment.this, editTextTextConsole, autoCompleteTextInput.getText().toString()).execute();
@@ -279,12 +272,13 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         });
 
         buttonPing.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SuspiciousIndentation")
             @Override
             public void onClick(View v) {
                 textInput();
                 if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
-                } else if (!isOnline(getActivity().getApplicationContext())) {
+                } else if (!isOnline(requireActivity().getApplicationContext())) {
                     Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
 
                 } else {
@@ -295,7 +289,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         inetAddress = InetAddress.getByName(String.valueOf(autoCompleteTextInput.getText()));
                         ip = inetAddress.getHostAddress();
                     } catch (UnknownHostException e) {
-                        e.printStackTrace();
+                        System.err.println(e);
                     }
 
                     InetAddressValidator validator = InetAddressValidator.getInstance();
@@ -402,7 +396,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
     public void refreshList(TracerouteContainer trace) {
         final TracerouteContainer fTrace = trace;
-        getActivity().runOnUiThread(new Runnable() {
+        requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 traces.add(fTrace);
@@ -613,35 +607,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     public void onResume() {
         super.onResume();
         requireActivity().registerReceiver(this.receiver, this.intentFilter);
-    }
-
-
-    private void startShowInterstitial() {
-
-        StartAppAd startAppAd ;
-        startAppAd = new StartAppAd(getActivity());
-        startAppAd.showAd(new AdDisplayListener() {
-            @Override
-            public void adHidden(com.startapp.sdk.adsbase.Ad ad) {
-
-            }
-
-            @Override
-            public void adDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-                firstShowAd = false;
-            }
-
-            @Override
-            public void adClicked(com.startapp.sdk.adsbase.Ad ad) {
-
-            }
-
-            @Override
-            public void adNotDisplayed(com.startapp.sdk.adsbase.Ad ad) {
-                firstShowAd = true;
-            }
-        });
-
     }
 
     public void loadAdInter() {

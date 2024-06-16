@@ -18,48 +18,35 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.review.model.ReviewErrorCode;
-import com.google.android.play.core.tasks.OnCompleteListener;
-import com.google.android.play.core.tasks.OnFailureListener;
-import com.google.android.play.core.tasks.RuntimeExecutionException;
-import com.google.android.play.core.tasks.Task;
-import com.startapp.sdk.ads.banner.Banner;
-import com.startapp.sdk.ads.banner.BannerListener;
-import com.startapp.sdk.adsbase.StartAppAd;
-import com.startapp.sdk.adsbase.StartAppSDK;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import org.ping.cool.databinding.ActivityMainBinding;
-
 import android.os.StrictMode;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -67,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     public static AssetManager assetManager;
-    private boolean showAd = true;
     private SharedPreferences sharedPrefs;
     public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
     private ArrayAdapter<String> adapter;
@@ -81,12 +67,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //The Return Ad is a new ad unit which is displayed once the user returns to your application
-        // after a certain period of time
-        StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
-        StartAppAd.disableSplash();
+        new Thread(
+                () -> {
+                    // Initialize the Google Mobile Ads SDK on a background thread.
+                    MobileAds.initialize(this, initializationStatus -> {});
+                })
+                .start();
+
         sharedPrefs = getSharedPreferences("pingcool", MODE_PRIVATE);
-        showAd = sharedPrefs.getBoolean("showAd",true);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -111,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.setRequestConfiguration(configuration);*/
 
 
+      rateApp();
 
     }
 
@@ -119,15 +108,60 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (showAd) {
-            loadAdMob();
-            sharedPrefs.edit().putBoolean("showAd", false).apply();
-
-        } else {
-            loadAdStart();
-            sharedPrefs.edit().putBoolean("showAd", true).apply();
-        }
+        loadAdMob();
         loadAdMobExit();
+
+    }
+
+    private void rateApp() {
+
+        final ReviewManager reviewManager = ReviewManagerFactory.create(MainActivity.this);
+        //reviewManager = new FakeReviewManager(this);
+        Task<ReviewInfo> request = reviewManager.requestReviewFlow();
+
+        request.addOnCompleteListener(new OnCompleteListener<ReviewInfo>() {
+            @Override
+            public void onComplete(@NonNull Task<ReviewInfo> task) {
+
+                if (task.isSuccessful()) {
+                    ReviewInfo reviewInfo = task.getResult();
+                    Task<Void> flow = reviewManager.launchReviewFlow(MainActivity.this, reviewInfo);
+
+                    flow.addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.i("Rate Flow", "Result: "+task.isComplete());
+                        }
+                    });
+
+                    flow.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.i("Rate Flow", "Fail");
+                            System.err.println(e);
+                        }
+                    });
+
+                } else {
+                    try {
+                        String reviewErrorCode = Objects.requireNonNull(task.getException()).getMessage();
+                        Log.d("Rate Task Fail", "cause: " + reviewErrorCode);
+
+                    } catch (NullPointerException | ClassCastException e) {
+                        System.err.println(e);
+
+                    }
+                }
+            }
+
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                System.err.println(e);
+                Log.d("Rate Request", "Fail");
+
+            }
+        });
 
     }
 
@@ -256,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_rate) {
-            rateApp();
+            rateAppOnPlayStore();
             return true;
         }
 
@@ -289,60 +323,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
         }
     }
-
-    private void rateApp() {
-
-
-        final ReviewManager reviewManager = ReviewManagerFactory.create(MainActivity.this);
-        //reviewManager = new FakeReviewManager(this);
-        Task<ReviewInfo> request = reviewManager.requestReviewFlow();
-
-        request.addOnCompleteListener(new OnCompleteListener<ReviewInfo>() {
-            @Override
-            public void onComplete(@NonNull Task<ReviewInfo> task) {
-
-                if (task.isSuccessful()) {
-                    ReviewInfo reviewInfo = task.getResult();
-                    Task<Void> flow = reviewManager.launchReviewFlow(MainActivity.this, reviewInfo);
-                    flow.addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Log.i("Rate Flow", "Complete");
-                        }
-                    });
-
-                    flow.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            rateAppOnPlayStore();
-                            Log.i("Rate Flow", "Fail");
-                            e.printStackTrace();
-                        }
-                    });
-
-                } else {
-                    try {
-                        @ReviewErrorCode int reviewErrorCode = ((RuntimeExecutionException) task.getException()).getErrorCode();
-                        Log.e("Rate Task Fail", "code: " + reviewErrorCode);
-                        rateAppOnPlayStore();
-                    }catch (NullPointerException | ClassCastException e){
-                        rateAppOnPlayStore();
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Log.e("Rate Request", "Fail");
-                rateAppOnPlayStore();
-            }
-        });
-
-    }
-
 
     private void about() {
 
@@ -378,42 +358,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void loadAdStart() {
-
-        Banner startAppBanner = new Banner(this);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.linearLayoutAd.getLayoutParams();
-        params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
-
-        startAppBanner.setBannerListener(new BannerListener() {
-
-            @Override
-            public void onReceiveAd(View banner) {
-
-            }
-
-            @Override
-            public void onFailedToReceiveAd(View view) {
-
-                binding.linearLayoutAd.removeAllViews();
-
-            }
-
-            @Override
-            public void onImpression(View view) {
-
-            }
-
-            @Override
-            public void onClick(View view) {
-
-            }
-
-        });
-
-        binding.linearLayoutAd.addView(startAppBanner);
-
-    }
-
     private void loadAdMob() {
         /*List<String> testDeviceIds = Arrays.asList("DB530A1BBBDBFE8567328113528A19EF");
         RequestConfiguration configuration =
@@ -437,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
                 binding.linearLayoutAd.removeAllViews();
-                loadAdStart();
+
             }
 
             @Override
