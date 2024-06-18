@@ -1,6 +1,7 @@
 package org.ping.cool;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.appupdate.AppUpdateOptions;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
@@ -98,9 +105,49 @@ public class MainActivity extends AppCompatActivity {
 
 
       rateApp();
+      checkUpdate(MainActivity.this);
 
     }
 
+    private void checkUpdate(Context context){
+
+        Activity activity = (Activity) context;
+
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(context);
+
+// Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        appUpdateInfoTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                System.out.println("checkUpdate" + e.getMessage());
+
+            }
+        });
+
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                appUpdateManager.startUpdateFlow(appUpdateInfo, activity, new AppUpdateOptions() {
+                    @Override
+                    public int appUpdateType() {
+                        return AppUpdateType.IMMEDIATE;
+                    }
+
+                    @Override
+                    public boolean allowAssetPackDeletion() {
+                        return false;
+                    }
+                });
+            }else{
+                System.out.println("App is updated");
+
+            }
+        });
+
+    }
 
     @Override
     protected void onResume() {
