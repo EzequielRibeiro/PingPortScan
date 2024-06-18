@@ -19,6 +19,7 @@ import org.ping.cool.utils.logger.Logger;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Objects;
 
 import static org.ping.cool.MainActivity.FOOTER;
 import static org.ping.cool.utils.logger.Logger.PutLogConsole;
@@ -39,7 +40,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
             PackageInfo pInfo = context.getActivity().getPackageManager().getPackageInfo(context.getActivity().getPackageName(), 0);
             VERSION = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            System.out.println(e.getLocalizedMessage());
         }
 
     }
@@ -135,14 +136,14 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
                         // Start scan
                         portScanner.start(context, binding.editTextTextLog, binding.listViewPort);
                     } catch (UnknownHostException | NumberFormatException e) {
-                        e.printStackTrace();
+                        System.out.println(e.getLocalizedMessage());
                         PutLogConsole(context, binding.editTextTextLog, '\n' + "Error: " + e.getLocalizedMessage());
                     }
                 }
             } catch (IOException e) {
                 Logger.log("An error has occurred...", Color.RED);
                 PutLogConsole(context, binding.editTextTextLog, "\nAn error has occurred...");
-                e.printStackTrace();
+                System.out.println(e.getLocalizedMessage());
             }
         }
     }
@@ -183,7 +184,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
             socket.connect(inetSocketAddress, timeout);
             return true;
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getLocalizedMessage());
             return false;
         }
 
@@ -208,7 +209,7 @@ public class CheckPortTask extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void unused) {
         super.onPostExecute(unused);
 
-        context.getActivity().runOnUiThread(new Runnable() {
+        context.requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 context.stopProgressBar();

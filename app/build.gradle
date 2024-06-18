@@ -22,8 +22,8 @@ android {
         applicationId "org.ping.cool"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 26
-        versionName "1.26"
+        versionCode 28
+        versionName "1.28"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

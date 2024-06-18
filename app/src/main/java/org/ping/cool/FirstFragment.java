@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,11 +36,13 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
+
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.ping.cool.Local.network.Discovery;
 import org.ping.cool.Local.network.Wireless;
@@ -56,6 +59,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class FirstFragment extends Fragment implements MainAsyncResponse {
 
@@ -85,6 +90,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private InterstitialAd mInterstitialAd;
     private static boolean firstShowAd = true;
 
+    private Executor executor = Executors.newSingleThreadExecutor();
+    private Handler handler = new Handler(Looper.getMainLooper());
+
 
     @Override
     public View onCreateView(
@@ -105,6 +113,10 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         this.floatingActionButton = (FloatingActionButton) v.findViewById(R.id.fabFirstFragment);
         this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
+        this.editTextTextConsole.setKeyListener(null);
+      //  this.editTextTextConsole.setEnabled(false);
+        this.editTextTextConsole.setSelected(true);
+
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
         this.listViewLocal = (ListView) v.findViewById(R.id.listViewFirstFragment);
 
@@ -133,11 +145,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         binding = null;
     }
 
-    private void textInput(){
-        if (((MainActivity)getActivity()) instanceof MainActivity){
+    private void textInput() {
+        if (((MainActivity) getActivity()) instanceof MainActivity) {
             mainActivity = (MainActivity) getActivity();
         }
-        this.autoCompleteTextInput = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextUrl);
+        this.autoCompleteTextInput = mainActivity.findViewById(R.id.autoCompleteTextUrl);
     }
 
     /**
@@ -155,8 +167,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 webView.setVisibility(View.VISIBLE);
                 editTextTextConsole.setVisibility(View.INVISIBLE);
                 binding.listViewFirstFragment.setVisibility(View.GONE);
-              //  listViewLocal.setVisibility(View.INVISIBLE);
-              //  listViewTracert.setVisibility(View.INVISIBLE);
+                //  listViewLocal.setVisibility(View.INVISIBLE);
+                //  listViewTracert.setVisibility(View.INVISIBLE);
                 view.setVisibility(View.GONE);
 
             }
@@ -207,9 +219,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     buttonWhois.setEnabled(false);
                     buttonExec.setEnabled(false);
                     autoCompleteTextInput.setEnabled(false);
-                   // listViewLocal.setVisibility(View.VISIBLE);
+                    // listViewLocal.setVisibility(View.VISIBLE);
                     webView.setVisibility(View.INVISIBLE);
-                  //  listViewTracert.setVisibility(View.INVISIBLE);
+                    //  listViewTracert.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.INVISIBLE);
                     listViewLocal.setVisibility(View.VISIBLE);
                     setupHostDiscovery();
@@ -285,11 +297,17 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     String command = "ping ";
                     String ip = "127.0.0.1";
                     InetAddress inetAddress;
+
+                    autoCompleteTextInput.setText(autoCompleteTextInput.getText().toString().replaceAll("\\s+$", ""));
+
                     try {
-                        inetAddress = InetAddress.getByName(String.valueOf(autoCompleteTextInput.getText()));
+                        String [] values = autoCompleteTextInput.getText().toString().split(" ");
+                        inetAddress = InetAddress.getByName(values[values.length-1]);
                         ip = inetAddress.getHostAddress();
                     } catch (UnknownHostException e) {
-                        System.err.println(e);
+                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                        System.err.println(e.getMessage());
+                        return;
                     }
 
                     InetAddressValidator validator = InetAddressValidator.getInstance();
@@ -301,51 +319,52 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     StringBuilder args = new StringBuilder();
 
 
-                //remove first space and get command and args
-               for (String c : autoCompleteTextInput.getText().toString().split(" +"))
-                            if(!c.equals("ping") && !c.equals("ping6"))
-                                args.append(c+" ");
-                            else if(c.equals("ping6"))
-                                command = "ping6 ";
-                    
+                    //remove first space and get command and args
+                    for (String c : autoCompleteTextInput.getText().toString().split(" +"))
+                        if(!c.equals("ping") && !c.equals("ping6"))
+                            args.append(c+" ");
+                        else if(c.equals("ping6"))
+                            command = "ping6 ";
 
-                      if (buttonPing.getText().equals("Ping")) {
 
-                            webView.setVisibility(View.INVISIBLE);
-                            listViewLocal.setVisibility(View.INVISIBLE);
-                            editTextTextConsole.setVisibility(View.VISIBLE);
+                    if (buttonPing.getText().equals("Ping")) {
 
-                            DBAdapter dbAdapter = new DBAdapter(getActivity());
+                        webView.setVisibility(View.INVISIBLE);
+                        listViewLocal.setVisibility(View.INVISIBLE);
+                        editTextTextConsole.setVisibility(View.VISIBLE);
 
-                            if (dbAdapter.insertUrl(args.toString(), "") > 0) {
-                                mainActivity.refreshAutoCompleteTextView();
-                            }
-                            dbAdapter.close();
-                            startProgressBar();
-                            editTextTextConsole.setText("");
-                            traceroutePingCommand.executePingCommand(command,args.toString(), editTextTextConsole);
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                            buttonPing.setText(getText(R.string.activity_buttonStop));
-                            buttonTracert.setEnabled(false);
-                            buttonLocal.setEnabled(false);
-                            buttonWhois.setEnabled(false);
-                            buttonExec.setEnabled(false);
-                            buttonSecondFragment.setEnabled(false);
-
-                        } else {
-                            stopProgressBar();
-
+                        if (dbAdapter.insertUrl(args.toString(), "") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
                         }
+                        dbAdapter.close();
+                        startProgressBar();
+                        editTextTextConsole.setText("");
+                        traceroutePingCommand.executePingCommand(command,args.toString(), editTextTextConsole);
+
+                        buttonPing.setText(getText(R.string.activity_buttonStop));
+                        buttonTracert.setEnabled(false);
+                        buttonLocal.setEnabled(false);
+                        buttonWhois.setEnabled(false);
+                        buttonExec.setEnabled(false);
+                        buttonSecondFragment.setEnabled(false);
+
+                    } else {
+                        stopProgressBar();
+
+                    }
 
                 }
             }
         });
 
+
         buttonExec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //test
-              //  editTextTextConsole.setText("curl ifconfig.me");
+                //  editTextTextConsole.setText("curl ifconfig.me");
                 textInput();
                 if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), "Type a command", Toast.LENGTH_SHORT).show();
@@ -355,38 +374,38 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     StringBuilder args = new StringBuilder();
 
                     for (String c : autoCompleteTextInput.getText().toString().split(" +"))
-                        if (command == null) 
+                        if (command == null)
                             command = c;
                         else
-                            args.append(" "+c);
+                            args.append(" " + c);
 
-                        if (buttonExec.getText().equals("Exec")) {
+                    if (buttonExec.getText().equals("Exec")) {
 
-                            webView.setVisibility(View.INVISIBLE);
-                            listViewLocal.setVisibility(View.INVISIBLE);
-                            editTextTextConsole.setVisibility(View.VISIBLE);
+                        webView.setVisibility(View.INVISIBLE);
+                        listViewLocal.setVisibility(View.INVISIBLE);
+                        editTextTextConsole.setVisibility(View.VISIBLE);
 
-                            DBAdapter dbAdapter = new DBAdapter(getActivity());
+                        DBAdapter dbAdapter = new DBAdapter(getActivity());
 
-                            if (dbAdapter.insertUrl(command +" "+ args, "") > 0) {
-                                mainActivity.refreshAutoCompleteTextView();
-                            }
-                            dbAdapter.close();
-
-                            startProgressBar();
-                            editTextTextConsole.setText("");
-                            traceroutePingCommand.executePingCommand(command +" ",args.toString(),editTextTextConsole);
-                            buttonExec.setText(getText(R.string.activity_buttonStop));
-                            buttonPing.setEnabled(false);
-                            buttonTracert.setEnabled(false);
-                            buttonLocal.setEnabled(false);
-                            buttonWhois.setEnabled(false);
-                            buttonSecondFragment.setEnabled(false);
-
-                        } else {
-                            stopProgressBar();
+                        if (dbAdapter.insertUrl(command + " " + args, "") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
                         }
-                        return;
+                        dbAdapter.close();
+
+                        startProgressBar();
+                        editTextTextConsole.setText("");
+                        traceroutePingCommand.executePingCommand(command + " ", args.toString(), editTextTextConsole);
+                        buttonExec.setText(getText(R.string.activity_buttonStop));
+                        buttonPing.setEnabled(false);
+                        buttonTracert.setEnabled(false);
+                        buttonLocal.setEnabled(false);
+                        buttonWhois.setEnabled(false);
+                        buttonSecondFragment.setEnabled(false);
+
+                    } else {
+                        stopProgressBar();
+                    }
+                    return;
                 }
             }
         });
@@ -509,7 +528,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
 
             }
         });
-     }
+    }
 
     public void stopProgressBar() {
         getActivity().runOnUiThread(new Runnable() {
@@ -548,7 +567,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 TextView text2 = (TextView) view.findViewById(android.R.id.text2);
                 text2.setTextColor(getResources().getColor(R.color.grey_color));
                 text1.setText(hosts.get(position).get("First Line"));
-                text2.setText(hosts.get(position).get("Second Line").replace("[]",""));
+                text2.setText(hosts.get(position).get("Second Line").replace("[]", ""));
 
                 return view;
             }
@@ -630,12 +649,12 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 });
     }
 
-    public void showInterstitial(){
+    public void showInterstitial() {
 
         if (mInterstitialAd != null) {
             mInterstitialAd.show(requireActivity());
-        }else if(firstShowAd){
-         //   startShowInterstitial();
+        } else if (firstShowAd) {
+            //   startShowInterstitial();
         }
     }
 

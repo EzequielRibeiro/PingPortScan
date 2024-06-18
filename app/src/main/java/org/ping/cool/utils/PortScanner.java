@@ -17,7 +17,9 @@ import org.ping.cool.utils.logger.Color;
 import org.ping.cool.utils.logger.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 import static org.ping.cool.CheckPortTask.SEPARATOR;
@@ -28,6 +30,8 @@ import static org.ping.cool.utils.logger.Logger.PutLogConsole;
  * to the server and to check the ports.
  */
 public class PortScanner {
+
+
     /**
      * Server's IP address that needs to be tested.
      */
@@ -64,7 +68,7 @@ public class PortScanner {
     private List<Future<Port>> ports;
 
     public PortScanner(String ip) {
-        this.ip = ip;
+        setIp(ip);
     }
 
     /**
@@ -74,24 +78,25 @@ public class PortScanner {
      * @param editTextTextLog
      */
     public void start(SecondFragment context, EditText editTextTextLog, ListView listView) {
-        Logger.log("Start scanning " + this.ip + "...", Color.CYAN);
-        PutLogConsole(context, editTextTextLog, "\nStart scanning " + this.ip + ".....");
-
-        ExecutorService executorService = Executors.newFixedThreadPool(this.threads);
+        Logger.log("Start scanning " + getIp() + "...", Color.CYAN);
+        PutLogConsole(context, editTextTextLog, "\nStart scanning " + getIp() + ".....");
+        StringBuilder stringBuffer = new StringBuilder();
+        int openPorts = 0;
+        ExecutorService executorService = Executors.newFixedThreadPool(getThreads());
         ports = new ArrayList<>();
 
         // Adding ports to the list that are verified.
         if (this.portTo != -1)
-            for (int i = this.portFrom; i <= this.portTo; i++)
-                ports.add(Port.scan(executorService, this.ip, i, this.timeout));
+            for (int i = getPortFrom(); i <= getPortTo(); i++)
+                ports.add(Port.scan(executorService, getIp(), i, getTimeout()));
         else
-            ports.add(Port.scan(executorService, this.ip, this.portFrom, this.timeout));
+            ports.add(Port.scan(executorService, getIp(), getPortFrom(), getTimeout()));
 
         try {
             // This for loop verifies that all Threads have completed their task and load list
             ArrayList<Port> arrayOfPorts = new ArrayList<Port>();
             PortAdapter adapter = new PortAdapter(context.getContext(), arrayOfPorts);
-            context.getActivity().runOnUiThread(new Runnable() {
+            context.requireActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     listView.setAdapter(adapter);
@@ -101,56 +106,57 @@ public class PortScanner {
             for (Future<Port> port : ports) {
                 port.get();
 
-                context.getActivity().runOnUiThread(new Runnable() {
+                if (port.get().isOpen()) {
+                    openPorts++;
+                    stringBuffer.append(port.get().getPort()).append(" ");
+                }
+
+                context.requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             arrayOfPorts.add(port.get());
+                            Collections.sort(arrayOfPorts);
+                            adapter.notifyDataSetChanged();
+                            listView.setSelection(adapter.getCount());
 
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+
+                        } catch (ExecutionException | InterruptedException e) {
+                            System.err.println(e.getMessage());
                         }
-                        adapter.notifyDataSetChanged();
 
-                      try {
-                          context.getActivity().runOnUiThread(new Runnable() {
-                              @Override
-                              public void run() {
-                                  listView.setSelection(adapter.getCount());
-                              }
-                          });
-                      }catch(NullPointerException e){
-                          e.printStackTrace();
-                      }
                     }
+
+
                 });
 
+
             }
+            context.requireActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listView.smoothScrollToPosition(adapter.getCount());
+                }
+            });
+
 
             executorService.shutdown();
-            StringBuffer stringBuffer = new StringBuffer();
-            // This for loop counts the number of open ports
-            int openPorts = 0;
-            for (final Future<Port> f : ports) {
-
-                if (f.get().isOpen()) {
-                    openPorts++;
-                    stringBuffer.append(f.get().getPort() + " ");
-                }
-            }
-
-
-            Log.e("Port", "there are " + openPorts);
 
             Logger.log(Color.CYAN.getColor() + "There are " + Color.YELLOW.getColor() + openPorts + Color.CYAN.getColor() + " open ports on host " + Color.YELLOW.getColor() + ip);
-            PutLogConsole(context, editTextTextLog, "\nThere are " + openPorts + " open ports on host " + stringBuffer.toString());
+            PutLogConsole(context, editTextTextLog, "\nThere are " + openPorts + " open ports on host " + stringBuffer);
             Logger.log(SEPARATOR);
         } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
+            System.err.println(ex.getMessage());
             PutLogConsole(context, editTextTextLog, "\nscanning canceled !");
         }
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public int getThreads() {

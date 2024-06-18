@@ -7,6 +7,7 @@ import org.ping.cool.utils.logger.Logger;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -23,7 +24,7 @@ import java.util.concurrent.Future;
 /**
  * This class is used to handle the scanned ports.
  */
-public class Port {
+public class Port implements Comparable<Port> {
 
   /**
    * Scanned port
@@ -36,12 +37,12 @@ public class Port {
    */
   private boolean isOpen;
   private String portService;
-
   private String portProtocol;
+  private String statePort = "close";
 
   public Port(int port,String protocol ,String service,boolean isOpen) {
     this.port = port;
-    this.isOpen = isOpen;
+    setOpen(isOpen);
     setPortProtocol(protocol);
     setPortService(service);
 
@@ -96,6 +97,11 @@ public class Port {
 
   public void setOpen(boolean open) {
     isOpen = open;
+    if(open){
+      setStatePort("open");
+    }else{
+      setStatePort("close");
+    }
   }
 
   public String getPortService() {
@@ -113,5 +119,18 @@ public class Port {
   public void setPortProtocol(String portProtocol) {
     this.portProtocol = portProtocol;
   }
+  public String getStatePort() {
+    return statePort;
+  }
 
+  public void setStatePort(String statePort) {
+    this.statePort = statePort;
+  }
+  @Override
+  public int compareTo(Port o) {
+
+    if (getStatePort() == null || o.getStatePort() == null)
+      return 0;
+    return getStatePort().compareTo(o.getStatePort());
+  }
 }

@@ -41,6 +41,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
@@ -54,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     public static AssetManager assetManager;
-    private SharedPreferences sharedPrefs;
     public final static String FOOTER = "\nYou can report bugs through e-mail: aplicativoparamobile@gmail.com\nSoftware created by Ezequiel A. Ribeiro.\n";
     private ArrayAdapter<String> adapter;
     private List<UrlHistoric> urlHistoricList;
@@ -73,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
                     MobileAds.initialize(this, initializationStatus -> {});
                 })
                 .start();
-
-        sharedPrefs = getSharedPreferences("pingcool", MODE_PRIVATE);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("Rate Task Fail", "cause: " + reviewErrorCode);
 
                     } catch (NullPointerException | ClassCastException e) {
-                        System.err.println(e);
+                        System.err.println(e.getMessage());
 
                     }
                 }
@@ -157,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                System.err.println(e);
+                System.err.println(e.getMessage());
                 Log.d("Rate Request", "Fail");
 
             }
@@ -171,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         urlHistoricList = dbAdapter.getAllValuesGlyphs();
         dbAdapter.close();
 
-        if (urlHistoricList.size() > 0) {
+        if (!urlHistoricList.isEmpty()) {
 
             urlArray = new ArrayList<>();
 
@@ -189,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadAdMobExit() {
 
-        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivity.this,R.style.Base_Theme_Material3_Dark_Dialog);
+        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.Base_Theme_MaterialComponents_Light_Dialog_Alert);
         materialAlertDialogBuilder.setTitle(R.string.app_name);
         materialAlertDialogBuilder.setIcon(R.mipmap.ic_launcher_foreground);
         materialAlertDialogBuilder.setMessage("Close the application ?");
@@ -259,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                       materialAlertDialogBuilder.show();
 
                 }catch (IllegalStateException e){
-                    e.printStackTrace();
+                    System.err.println(e);
 
                 }
             }
@@ -311,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static boolean isOnline(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        @SuppressLint("MissingPermission") NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
@@ -372,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
+                binding.linearLayoutAd.setVisibility(View.VISIBLE);
                 binding.linearLayoutAd.removeAllViews();
                 binding.linearLayoutAd.addView(adView);
 
@@ -380,8 +379,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
-                binding.linearLayoutAd.removeAllViews();
-
+                binding.linearLayoutAd.setVisibility(View.GONE);
             }
 
             @Override

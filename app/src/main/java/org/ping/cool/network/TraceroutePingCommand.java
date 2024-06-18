@@ -43,6 +43,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URLEncoder;
+import java.util.Objects;
 
 
 /**
@@ -99,8 +100,17 @@ public class TraceroutePingCommand {
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                editTextTextConsole.append(msg);
-                editTextTextConsole.setSelection(editTextTextConsole.getText().length());
+
+                editTextTextConsole.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        editTextTextConsole.append(msg);
+                        editTextTextConsole.setSelection(editTextTextConsole.getText().length());
+
+                    }
+                });
+
+
                 /* editTextTextConsole.append(Html.fromHtml(
                                 "<p>Wrong arguments or host not found: <p><font color='red'>" + url + "</font></p>" +
                                         "<p>"+msg1+"</p>"));*/
@@ -199,7 +209,7 @@ public class TraceroutePingCommand {
             try {
                 launchCommand();
             } catch (IllegalArgumentException e) {
-                context.getActivity().runOnUiThread(new Runnable() {
+                context.requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String msg1 = e.getMessage();
@@ -207,13 +217,12 @@ public class TraceroutePingCommand {
                         if (msg1 == null)
                             msg1 = "";
 
-                        sendMsgToConsole(msg1,editTextTextConsole,context.getActivity());
+                        sendMsgToConsole(msg1,editTextTextConsole, context.requireActivity());
                         context.stopProgressBar();
 
                     }
                 });
-
-                e.printStackTrace();
+               System.out.println(e.getMessage());
             }
             return null;
         }
@@ -239,7 +248,7 @@ public class TraceroutePingCommand {
                 p = Runtime.getRuntime().exec(command+args);
 
             } catch (Exception e) {
-                sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
+                sendMsgToConsole(e.getMessage(),editTextTextConsole, context.requireActivity());
                 return;
             }
 
@@ -253,7 +262,7 @@ public class TraceroutePingCommand {
                     f.setAccessible(true);
                     pid = (int) f.get(p);
                 } catch (IllegalAccessException | NoSuchFieldException e) {
-                    sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
+                    sendMsgToConsole(e.getMessage(),editTextTextConsole, context.requireActivity());
                     return;
                 }
             }
@@ -262,22 +271,25 @@ public class TraceroutePingCommand {
             String s;
             String res = "";
             try {
-                while ((s = stdInput.readLine()) != null) {
+                while (true) {
+                    assert stdInput != null;
+                    if ((s = stdInput.readLine()) == null) break;
 
                     res += s + "\n";
 
-                  if(args.contains("-a"))
-                    if ((command.contains("ping") || command.contains("ping6"))
-                         && (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING)))
-                        playBeep();
+                  if(args.contains("-a")) {
+                      if ((command.contains("ping") || command.contains("ping6"))
+                              && (s.contains(FROM_PING) || s.contains(SMALL_FROM_PING)))
+                          playBeep();
+                  }
 
-                    sendMsgToConsole(s+"\n",editTextTextConsole,context.getActivity());
+                    sendMsgToConsole(s+"\n",editTextTextConsole,context.requireActivity());
 
                 }
 
                 while ((s = stdError.readLine()) != null) {
                     final String s1 = s.concat("\n");
-                    sendMsgToConsole(s1,editTextTextConsole,context.getActivity());
+                    sendMsgToConsole(s1,editTextTextConsole,context.requireActivity());
                     Log.e("Process","error");
                 }
 
@@ -289,7 +301,7 @@ public class TraceroutePingCommand {
                 }
 
             } catch (IOException e) {
-                sendMsgToConsole(e.getMessage(),editTextTextConsole,context.getActivity());
+                sendMsgToConsole(e.getMessage(),editTextTextConsole,context.requireActivity());
                 return;
             }
 
@@ -297,14 +309,11 @@ public class TraceroutePingCommand {
                 stdInput.close();
                 stdError.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             }
 
-
-
-
             if (res.equals("")) {
-                throw new IllegalArgumentException();
+                sendMsgToConsole("empty response",editTextTextConsole, context.requireActivity());
             }
 
         }
@@ -321,33 +330,24 @@ public class TraceroutePingCommand {
 
     private void loadSoundBeep() {
 
-        if (Build.VERSION.SDK_INT
-                >= Build.VERSION_CODES.LOLLIPOP) {
-            AudioAttributes
-                    audioAttributes
-                    = new AudioAttributes
-                    .Builder()
-                    .setUsage(
-                            AudioAttributes
-                                    .USAGE_ASSISTANCE_SONIFICATION)
-                    .setContentType(
-                            AudioAttributes
-                                    .CONTENT_TYPE_SONIFICATION)
-                    .build();
-            soundPool
-                    = new SoundPool
-                    .Builder()
-                    .setMaxStreams(1)
-                    .setAudioAttributes(
-                            audioAttributes)
-                    .build();
-        } else {
-            soundPool
-                    = new SoundPool(
-                    1,
-                    AudioManager.STREAM_MUSIC,
-                    0);
-        }
+        AudioAttributes
+                audioAttributes
+                = new AudioAttributes
+                .Builder()
+                .setUsage(
+                        AudioAttributes
+                                .USAGE_ASSISTANCE_SONIFICATION)
+                .setContentType(
+                        AudioAttributes
+                                .CONTENT_TYPE_SONIFICATION)
+                .build();
+        soundPool
+                = new SoundPool
+                .Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(
+                        audioAttributes)
+                .build();
 
         idSound = soundPool
                 .load(
@@ -415,7 +415,7 @@ public class TraceroutePingCommand {
                     }
                     return res;
                 } catch (final Exception e) {
-                    context.getActivity().runOnUiThread(new Runnable() {
+                    context.requireActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             onException(e);
@@ -475,7 +475,7 @@ public class TraceroutePingCommand {
                 p.destroy();
 
             if (res.equals("")) {
-                throw new IllegalArgumentException();
+                sendMsgToConsole("empty response",editTextTextConsole, context.requireActivity());
             }
 
             // Store the wanted ip adress to compare with ping result
@@ -517,7 +517,7 @@ public class TraceroutePingCommand {
                     }
                     finishedTasks++;
                 } catch (final Exception e) {
-                    context.getActivity().runOnUiThread(new Runnable() {
+                    context.requireActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             onException(e);

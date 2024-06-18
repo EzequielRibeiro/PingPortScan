@@ -12,7 +12,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.AppCompat.ActionBar.TabBar"
+        android:theme="@style/Theme.AppCompat.Light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -31,31 +31,21 @@
         android:id="@+id/input_layout_url"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_margin="5dp"
-        android:gravity="center"
-        app:boxBackgroundColor="@color/white_color"
-        app:hintTextColor="#009688"
-        app:layout_constraintBottom_toTopOf="@+id/include2"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextUrl"
+            style="@android:style/Widget.AutoCompleteTextView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="bottom"
+            android:layout_height="50dp"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:hint="@string/placeholder"
-            android:paddingLeft="5dp"
-            android:paddingBottom="3dp"
-            android:singleLine="true"
-            android:description="@string/description"
-            android:textColor="@color/black_color"
-            android:textCursorDrawable="?attr/colorPrimaryDark"
-            app:layout_constraintBottom_toTopOf="@+id/include2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+            android:textAppearance="@style/TextAppearance.AppTheme.TextInputLayout.HintTextAlt"
+            android:textSize="20sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <include
@@ -63,10 +53,11 @@
         layout="@layout/content_main"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@id/linearLayoutAd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_url" />
+        app:layout_constraintTop_toBottomOf="@id/input_layout_url" />
 
     <LinearLayout
         android:id="@+id/linearLayoutAd"
@@ -77,8 +68,7 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/include2">
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"

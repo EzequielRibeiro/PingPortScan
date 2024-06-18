@@ -1,6 +1,7 @@
 package org.ping.cool;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import org.ping.cool.databinding.FragmentSecondBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.ping.cool.MainActivity.isOnline;
 import static org.ping.cool.utils.logger.Logger.PutLogConsole;
@@ -33,6 +35,8 @@ public class SecondFragment extends Fragment {
     private AutoCompleteTextView autoCompleteTextViewUrl;
     private List<UrlHistoric> urlHistoricList;
     private ArrayAdapter<String> adapter;
+    private SharedPreferences sharedPreferences;
+    private String timeout, threads;
 
     @Override
     public View onCreateView(
@@ -40,6 +44,17 @@ public class SecondFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         binding = FragmentSecondBinding.inflate(inflater, container, false);
+        sharedPreferences = requireActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        if (!sharedPreferences.contains("timeout")) {
+            sharedPreferences.edit().putString("timeout", "1000").apply();
+        }
+        if (!sharedPreferences.contains("threads")) {
+            sharedPreferences.edit().putString("threads", "32").apply();
+        }
+        timeout = sharedPreferences.getString("timeout", "1000");
+        threads = sharedPreferences.getString("threads", "32");
+
         initView();
         return binding.getRoot();
 
@@ -68,7 +83,7 @@ public class SecondFragment extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);*/
 
 
-        if ( getActivity() instanceof MainActivity){
+        if (getActivity() instanceof MainActivity) {
             mainActivity = (MainActivity) getActivity();
         }
 
@@ -76,10 +91,10 @@ public class SecondFragment extends Fragment {
         DBAdapter dbAdapter = new DBAdapter(getActivity());
         urlHistoricList = dbAdapter.getAllValuesGlyphs();
 
-        if(urlHistoricList.size() > 0) {
+        if (urlHistoricList.size() > 0) {
             String[] urlArray = new String[urlHistoricList.size()];
             int i = 0;
-            for(UrlHistoric u : urlHistoricList){
+            for (UrlHistoric u : urlHistoricList) {
                 urlArray[i] = u.getText();
                 i++;
             }
@@ -103,10 +118,13 @@ public class SecondFragment extends Fragment {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-      //  binding.editTextPortScan.setText("www.google.com");
+        //  binding.editTextPortScan.setText("www.google.com");
         binding.webViewPort.loadUrl("file:///android_asset/port.html");
         ArrayList<String> listArgument = new ArrayList<>();
         binding.fabSecondFragment.setVisibility(View.GONE);
+
+        binding.editTextTimeout.setText(timeout);
+        binding.editTextThreads.setText(threads);
 
         binding.fabSecondFragment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,58 +136,17 @@ public class SecondFragment extends Fragment {
         });
 
 
-        binding.buttonScanPort.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                listArgument.clear();
-                if (checkPortTask != null)
-                    if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
-                         return;
-                    }
-
-                if (isOnline(getActivity().getApplicationContext())) {
-                    if (!autoCompleteTextViewUrl.getText().toString().isEmpty() &&
-                            !binding.editTextPort1.getText().toString().isEmpty()) {
-
-                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
-                        binding.buttonScanPort.setText("Stop");
-                        DBAdapter dbAdapter = new DBAdapter(getActivity());
-                        if(dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"") > 0) {
-                            mainActivity.refreshAutoCompleteTextView();
-                        }
-                        dbAdapter.close();
-
-                        binding.webViewPort.setVisibility(View.GONE);
-                        listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
-
-                        if (!binding.editTextTimeout.getText().toString().isEmpty())
-                            listArgument.add("-t " + binding.editTextTimeout.getText().toString());
-
-                        if (!binding.editTextThreads.getText().toString().isEmpty())
-                            listArgument.add("-th " + binding.editTextThreads.getText().toString());
-
-                        listArgument.add("-p " + binding.editTextPort1.getText().toString());
-
-                        String args[] = new String[listArgument.size()];
-                        args = listArgument.toArray(args);
-
-                        new CheckPortTask(args, binding, SecondFragment.this).execute();
-
-
-                    } else {
-                        Toast.makeText(getActivity(), "type anything", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
         binding.buttonScanRangePort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listArgument.clear();
+
+                if (!binding.editTextTimeout.getText().toString().isEmpty())
+                    sharedPreferences.edit().putString("timeout", binding.editTextTimeout.getText().toString()).apply();
+
+                if (!binding.editTextThreads.getText().toString().isEmpty())
+                    sharedPreferences.edit().putString("threads", binding.editTextThreads.getText().toString()).apply();
+
+
                 if (checkPortTask != null)
                     if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
                         checkPortTask.cancel(true);
@@ -177,25 +154,41 @@ public class SecondFragment extends Fragment {
                         return;
                     }
 
-                if (isOnline(getActivity().getApplicationContext())) {
-                    if (!autoCompleteTextViewUrl.getText().toString().isEmpty() &&
-                            !binding.editTextPort2.getText().toString().isEmpty() &&
+                if (autoCompleteTextViewUrl.getText().toString().isEmpty()) {
+                    Toast.makeText(getActivity(), "Enter a target to scan", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (binding.editTextPort2.getText().toString().isEmpty() &&
+                        binding.editTextPort3.getText().toString().isEmpty()) {
+                    Toast.makeText(getActivity(), "Enter number ports to scan", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (isOnline(requireActivity().getApplicationContext())) {
+
+                    hideSoftwareKeyboard(autoCompleteTextViewUrl);
+                    binding.buttonScanRangePort.setText("Stop");
+                    DBAdapter dbAdapter = new DBAdapter(getActivity());
+                    if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                        mainActivity.refreshAutoCompleteTextView();
+                    }
+                    dbAdapter.close();
+
+                    listArgument.clear();
+
+                    binding.webViewPort.setVisibility(View.GONE);
+                    listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
+
+                    if (!binding.editTextTimeout.getText().toString().isEmpty())
+                        listArgument.add("-t " + binding.editTextTimeout.getText().toString());
+
+                    if (!binding.editTextThreads.getText().toString().isEmpty())
+                        listArgument.add("-th " + binding.editTextThreads.getText().toString());
+
+
+                    if (!binding.editTextPort2.getText().toString().isEmpty() &&
                             !binding.editTextPort3.getText().toString().isEmpty()) {
-
-                        hideSoftwareKeyboard(autoCompleteTextViewUrl);
-                        binding.buttonScanRangePort.setText("Stop");
-                        DBAdapter dbAdapter = new DBAdapter(getActivity());
-                        dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(),"");
-                        dbAdapter.close();
-
-                        binding.webViewPort.setVisibility(View.GONE);
-                        listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
-
-                        if (!binding.editTextTimeout.getText().toString().isEmpty())
-                            listArgument.add("-t " + binding.editTextTimeout.getText().toString());
-
-                        if (!binding.editTextThreads.getText().toString().isEmpty())
-                            listArgument.add("-th " + binding.editTextThreads.getText().toString());
 
                         listArgument.add("-p " + binding.editTextPort2.getText().toString() + "-" + binding.editTextPort3.getText().toString());
 
@@ -205,11 +198,25 @@ public class SecondFragment extends Fragment {
                         checkPortTask = new CheckPortTask(args, binding, SecondFragment.this);
                         checkPortTask.execute();
 
-                    } else {
-                        Toast.makeText(getActivity(), "type anything", Toast.LENGTH_LONG).show();
+                    } else if (!binding.editTextPort2.getText().toString().isEmpty() &&
+                            binding.editTextPort3.getText().toString().isEmpty()) {
+                        listArgument.add("-p " + binding.editTextPort2.getText().toString());
+
+                        String args[] = new String[listArgument.size()];
+                        args = listArgument.toArray(args);
+
+                        new CheckPortTask(args, binding, SecondFragment.this).execute();
+                    } else if (binding.editTextPort2.getText().toString().isEmpty() &&
+                            !binding.editTextPort3.getText().toString().isEmpty()) {
+                        listArgument.add("-p " + binding.editTextPort3.getText().toString());
+
+                        String args[] = new String[listArgument.size()];
+                        args = listArgument.toArray(args);
+
+                        new CheckPortTask(args, binding, SecondFragment.this).execute();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Without internet connection", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -228,20 +235,19 @@ public class SecondFragment extends Fragment {
         binding.progressBarScan.setVisibility(View.VISIBLE);
         binding.webViewPort.setVisibility(View.GONE);
         binding.fabSecondFragment.setVisibility(View.GONE);
- }
+    }
 
     public void stopProgressBar() {
         binding.progressBarScan.setVisibility(View.GONE);
         binding.fabSecondFragment.setVisibility(View.VISIBLE);
         binding.buttonScanRangePort.setText("Scan");
-        binding.buttonScanPort.setText("Scan");
 
 
     }
 
-    private void stopTask(){
-        if(checkPortTask != null)
-            if(checkPortTask.getStatus() == AsyncTask.Status.RUNNING){
+    private void stopTask() {
+        if (checkPortTask != null)
+            if (checkPortTask.getStatus() == AsyncTask.Status.RUNNING) {
                 checkPortTask.cancel(true);
             }
     }
