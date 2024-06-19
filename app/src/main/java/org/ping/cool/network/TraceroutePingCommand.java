@@ -283,7 +283,11 @@ public class TraceroutePingCommand {
                           playBeep();
                   }
 
-                    sendMsgToConsole(s+"\n",editTextTextConsole,context.requireActivity());
+                  try {
+                      sendMsgToConsole(s + "\n", editTextTextConsole, context.requireActivity());
+                  }catch (Exception e){
+                      System.err.println(e.getMessage());
+                  }
 
                 }
 

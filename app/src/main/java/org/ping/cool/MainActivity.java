@@ -254,11 +254,12 @@ public class MainActivity extends AppCompatActivity {
                         loadAdMobExit();
                     }
                 });
-
+            AdSize adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 320);
             AdRequest adRequest = new AdRequest.Builder().build();
             adView = new AdView(this);
             adView.setAdUnitId(getString(R.string.ad_banner_exit_id));
-            adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+           // adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+            adView.setAdSize(adSize);
             adView.loadAd(adRequest);
             adView.setAdListener(new AdListener() {
                 @Override
@@ -378,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             version += pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
 
         String msg = getString(R.string.app_name) + " " + version + "\nDeveloper: Ezequiel A. Ribeiro" + "\nContact: https://is.gd/supportcontact";
@@ -408,11 +409,12 @@ public class MainActivity extends AppCompatActivity {
         RequestConfiguration configuration =
                 new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
         MobileAds.setRequestConfiguration(configuration);*/
-
+       // AdSize adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 200);
         AdRequest adRequest = new AdRequest.Builder().build();
         AdView adView = new AdView(this);
         adView.setAdUnitId(getString(R.string.banner_ad_unit_id));
         adView.setAdSize(AdSize.LARGE_BANNER);
+      //  adView.setAdSize(adSize);
         adView.loadAd(adRequest);
         adView.setAdListener(new AdListener() {
             @Override

@@ -114,7 +114,6 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
         this.webView = (WebView) v.findViewById(R.id.webView);
         this.editTextTextConsole = (EditText) v.findViewById(R.id.editTextTextConsole);
         this.editTextTextConsole.setKeyListener(null);
-      //  this.editTextTextConsole.setEnabled(false);
         this.editTextTextConsole.setSelected(true);
 
         this.progressBarPing = (ProgressBar) v.findViewById(R.id.progressBarPing);
@@ -150,6 +149,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             mainActivity = (MainActivity) getActivity();
         }
         this.autoCompleteTextInput = mainActivity.findViewById(R.id.autoCompleteTextUrl);
+
     }
 
     /**
@@ -213,6 +213,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 if (buttonLocal.getText().toString().equals("Local")) {
                     startProgressBar();
                     buttonLocal.setText("Stop");
+                //    buttonLocal.setTextColor(R.color.red_color);
                     buttonTracert.setEnabled(false);
                     buttonSecondFragment.setEnabled(false);
                     buttonPing.setEnabled(false);
@@ -262,6 +263,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         dbAdapter.close();
                         startProgressBar();
                         buttonTracert.setText(getString(R.string.activity_buttonStop));
+                     //   buttonTracert.setTextColor(R.color.red_color);
                         buttonPing.setEnabled(false);
                         buttonLocal.setEnabled(false);
                         buttonWhois.setEnabled(false);
@@ -344,6 +346,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         traceroutePingCommand.executePingCommand(command,args.toString(), editTextTextConsole);
 
                         buttonPing.setText(getText(R.string.activity_buttonStop));
+                     //   buttonPing.setTextColor(R.color.red_color);
                         buttonTracert.setEnabled(false);
                         buttonLocal.setEnabled(false);
                         buttonWhois.setEnabled(false);
@@ -396,6 +399,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                         editTextTextConsole.setText("");
                         traceroutePingCommand.executePingCommand(command + " ", args.toString(), editTextTextConsole);
                         buttonExec.setText(getText(R.string.activity_buttonStop));
+                      //  buttonExec.setTextColor(R.color.red_color);
                         buttonPing.setEnabled(false);
                         buttonTracert.setEnabled(false);
                         buttonLocal.setEnabled(false);
@@ -531,20 +535,32 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     }
 
     public void stopProgressBar() {
-        getActivity().runOnUiThread(new Runnable() {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressBarPing.setVisibility(View.GONE);
+
                 buttonPing.setText("Ping");
                 buttonPing.setEnabled(true);
+             //   buttonPing.setTextColor(R.color.white_color);
+
                 buttonTracert.setText("Tracert");
                 buttonTracert.setEnabled(true);
+              //  buttonTracert.setTextColor(R.color.white_color);
+
                 buttonExec.setText("Exec");
                 buttonExec.setEnabled(true);
+             //   buttonExec.setTextColor(R.color.white_color);
+
                 buttonSecondFragment.setEnabled(true);
+
                 buttonLocal.setText("Local");
                 buttonLocal.setEnabled(true);
+            //    buttonLocal.setTextColor(R.color.white_color);
+
                 buttonWhois.setEnabled(true);
+              //  buttonWhois.setTextColor(R.color.white_color);
+
                 floatingActionButton.setVisibility(View.VISIBLE);
                 TraceroutePingCommand.StopPing();
                 autoCompleteTextInput.setEnabled(true);

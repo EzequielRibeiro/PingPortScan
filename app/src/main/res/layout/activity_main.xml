@@ -32,19 +32,24 @@
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_marginTop="8dp"
+        app:hintTextColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextUrl"
-            style="@android:style/Widget.AutoCompleteTextView"
+            style="@style/AppBaseTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginStart="@dimen/activity_vertical_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:dropDownSelector="@android:drawable/list_selector_background"
             android:hint="@string/placeholder"
             android:textAppearance="@style/TextAppearance.AppTheme.TextInputLayout.HintTextAlt"
+            android:textColor="@color/black_color"
+            android:textColorHint="@color/black_color"
+            android:textColorLink="@color/purple_error_color"
             android:textSize="20sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,12 +75,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.gms.ads.AdView
+        <!--<com.google.android.gms.ads.AdView
             android:id="@+id/adView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:adSize="LARGE_BANNER"
-            app:adUnitId="@string/banner_ad_unit_id"></com.google.android.gms.ads.AdView>
+            app:adUnitId="@string/banner_ad_unit_id"></com.google.android.gms.ads.AdView>-->
     </LinearLayout>
 
 

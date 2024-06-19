@@ -46,6 +46,12 @@ public class SecondFragment extends Fragment {
         binding = FragmentSecondBinding.inflate(inflater, container, false);
         sharedPreferences = requireActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
 
+        if (getActivity() instanceof MainActivity) {
+            mainActivity = (MainActivity) getActivity();
+        }
+
+        this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextUrl);
+
         if (!sharedPreferences.contains("timeout")) {
             sharedPreferences.edit().putString("timeout", "1000").apply();
         }
@@ -62,52 +68,39 @@ public class SecondFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-      /*
-        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(SecondFragment.this)
-                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
-            }
-        });
 
-       */
+        Objects.requireNonNull(getActivity()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        /*OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Log.e("Pressed","pressed");
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);*/
-
-
-        if (getActivity() instanceof MainActivity) {
-            mainActivity = (MainActivity) getActivity();
-        }
-
-        this.autoCompleteTextViewUrl = (AutoCompleteTextView) mainActivity.findViewById(R.id.autoCompleteTextUrl);
         DBAdapter dbAdapter = new DBAdapter(getActivity());
         urlHistoricList = dbAdapter.getAllValuesGlyphs();
 
-        if (urlHistoricList.size() > 0) {
+        if (!urlHistoricList.isEmpty()) {
             String[] urlArray = new String[urlHistoricList.size()];
             int i = 0;
             for (UrlHistoric u : urlHistoricList) {
                 urlArray[i] = u.getText();
                 i++;
             }
-
-            adapter = new ArrayAdapter<String>(getContext(),
+            adapter = new ArrayAdapter<String>(Objects.requireNonNull(getContext()),
                     android.R.layout.simple_spinner_dropdown_item, urlArray);
-            autoCompleteTextViewUrl.setAdapter(adapter);
+
+            try {
+                autoCompleteTextViewUrl.setAdapter(adapter);
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+            }
         }
         dbAdapter.close();
 
 
     }
+    private void textInput() {
+        if (((MainActivity) getActivity()) instanceof MainActivity) {
+            mainActivity = (MainActivity) getActivity();
+        }
+        this.autoCompleteTextViewUrl = mainActivity.findViewById(R.id.autoCompleteTextUrl);
 
+    }
 
     private void initView() {
 
@@ -116,7 +109,7 @@ public class SecondFragment extends Fragment {
                     .getPackageInfo(this.getActivity().getPackageName(), 0).versionName);
             PutLogConsole(SecondFragment.this, binding.editTextTextLog, "\nChecking parameters...");
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         //  binding.editTextPortScan.setText("www.google.com");
         binding.webViewPort.loadUrl("file:///android_asset/port.html");
@@ -139,7 +132,7 @@ public class SecondFragment extends Fragment {
         binding.buttonScanRangePort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                   textInput();
                 if (!binding.editTextTimeout.getText().toString().isEmpty())
                     sharedPreferences.edit().putString("timeout", binding.editTextTimeout.getText().toString()).apply();
 
@@ -154,10 +147,11 @@ public class SecondFragment extends Fragment {
                         return;
                     }
 
-                if (autoCompleteTextViewUrl.getText().toString().isEmpty()) {
-                    Toast.makeText(getActivity(), "Enter a target to scan", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                if (autoCompleteTextViewUrl != null)
+                    if (autoCompleteTextViewUrl.getText().toString().isEmpty()) {
+                        Toast.makeText(getActivity(), "Enter a target to scan", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
                 if (binding.editTextPort2.getText().toString().isEmpty() &&
                         binding.editTextPort3.getText().toString().isEmpty()) {
@@ -169,16 +163,19 @@ public class SecondFragment extends Fragment {
 
                     hideSoftwareKeyboard(autoCompleteTextViewUrl);
                     binding.buttonScanRangePort.setText("Stop");
+                    //  binding.buttonScanRangePort.setTextColor(R.color.red_color);
                     DBAdapter dbAdapter = new DBAdapter(getActivity());
-                    if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
-                        mainActivity.refreshAutoCompleteTextView();
-                    }
+                    if (autoCompleteTextViewUrl != null)
+                        if (dbAdapter.insertUrl(autoCompleteTextViewUrl.getText().toString(), "") > 0) {
+                            mainActivity.refreshAutoCompleteTextView();
+                        }
                     dbAdapter.close();
 
                     listArgument.clear();
 
                     binding.webViewPort.setVisibility(View.GONE);
-                    listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
+                    if (autoCompleteTextViewUrl != null)
+                        listArgument.add("-h " + autoCompleteTextViewUrl.getText().toString());
 
                     if (!binding.editTextTimeout.getText().toString().isEmpty())
                         listArgument.add("-t " + binding.editTextTimeout.getText().toString());
@@ -225,9 +222,14 @@ public class SecondFragment extends Fragment {
     }
 
     public void hideSoftwareKeyboard(EditText currentEditText) {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm.isActive()) {
-            imm.hideSoftInputFromWindow(currentEditText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+        try {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm.isActive()) {
+                imm.hideSoftInputFromWindow(currentEditText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
@@ -241,6 +243,7 @@ public class SecondFragment extends Fragment {
         binding.progressBarScan.setVisibility(View.GONE);
         binding.fabSecondFragment.setVisibility(View.VISIBLE);
         binding.buttonScanRangePort.setText("Scan");
+        //  binding.buttonScanRangePort.setTextColor(R.color.white_color);
 
 
     }

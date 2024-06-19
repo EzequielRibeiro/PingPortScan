@@ -9,70 +9,76 @@
 
     <Button
         android:id="@+id/buttonTracert"
-        android:layout_width="wrap_content"
+        style="@style/AppBaseTheme"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="Tracert"
         android:textColor="@color/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/buttonWhois"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLocal"
+        app:layout_constraintStart_toEndOf="@+id/buttonPing"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonSecond"
+        style="@style/AppBaseTheme"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Scan"
         android:textColor="@color/ic_launcher_background"
         app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
-        app:layout_constraintEnd_toEndOf="@+id/buttonLocal"
-        app:layout_constraintStart_toStartOf="@+id/buttonLocal"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLocal" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonWhois"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonPing"
-        android:layout_width="wrap_content"
+        style="@style/AppBaseTheme"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:text="Ping"
         android:textColor="@color/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/buttonExec"
         app:layout_constraintEnd_toStartOf="@+id/buttonTracert"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonLocal"
-        android:layout_width="wrap_content"
+        style="@style/AppBaseTheme"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="Local"
         android:textColor="@color/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSecond"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
+        app:layout_constraintEnd_toStartOf="@+id/buttonExec"
         app:layout_constraintStart_toEndOf="@+id/buttonTracert"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonWhois"
+        style="@style/AppBaseTheme"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Whois"
         android:textColor="@color/ic_launcher_background"
         app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
-        app:layout_constraintEnd_toEndOf="@+id/buttonTracert"
-        app:layout_constraintStart_toStartOf="@+id/buttonTracert"
-        app:layout_constraintTop_toBottomOf="@+id/buttonTracert" />
+        app:layout_constraintEnd_toStartOf="@+id/buttonSecond"
+        app:layout_constraintStart_toEndOf="@+id/buttonExec"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/buttonExec"
+        style="@style/AppBaseTheme"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Exec"
         android:textColor="@color/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@id/progressBarPing"
-        app:layout_constraintEnd_toEndOf="@+id/buttonPing"
-        app:layout_constraintStart_toStartOf="@+id/buttonPing"
-        app:layout_constraintTop_toBottomOf="@+id/buttonPing" />
+        app:layout_constraintBottom_toTopOf="@+id/progressBarPing"
+        app:layout_constraintEnd_toStartOf="@+id/buttonWhois"
+        app:layout_constraintStart_toEndOf="@+id/buttonLocal"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/progressBarPing"
