@@ -30,8 +30,10 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input_layout_url"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="60dp"
         android:layout_marginTop="8dp"
+        android:textColorHint="@color/black_color"
+        app:counterOverflowTextAppearance="@style/TextAppearance.AppTheme.TextInputLayout.HintTextAlt"
         app:hintTextColor="@color/black_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,17 +41,22 @@
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextUrl"
-            style="@style/AppBaseTheme"
+            style="@style/AppTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginStart="@dimen/activity_vertical_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:background="@drawable/rounded_layout"
+            android:cursorVisible="true"
             android:dropDownSelector="@android:drawable/list_selector_background"
             android:hint="@string/placeholder"
-            android:textAppearance="@style/TextAppearance.AppTheme.TextInputLayout.HintTextAlt"
+            android:popupTheme="@style/AppTheme"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/black_color"
+            android:textColorHighlight="@color/black_color"
             android:textColorHint="@color/black_color"
-            android:textColorLink="@color/purple_error_color"
+            android:textColorLink="@color/black_color"
+            android:textCursorDrawable="@color/black_color"
             android:textSize="20sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
