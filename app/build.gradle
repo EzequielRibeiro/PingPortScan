@@ -20,11 +20,13 @@ android {
 
     defaultConfig {
         applicationId "org.ping.cool"
-        minSdkVersion 34
-        versionCode 32
-        versionName "1.32"
+        minSdkVersion 21
+        versionCode 34
+        versionName '1.34'
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        //noinspection OldTargetApi
+        targetSdk 34
     }
 
     buildTypes {
@@ -51,6 +53,7 @@ android {
         checkReleaseBuilds false
     }
     namespace 'org.ping.cool'
+    buildToolsVersion '35.0.0'
 
 }
 
