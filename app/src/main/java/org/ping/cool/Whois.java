@@ -1,14 +1,8 @@
 package org.ping.cool;
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.NetworkOnMainThreadException;
 import android.os.StrictMode;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-
 import org.apache.commons.net.whois.WhoisClient;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,14 +29,14 @@ public class Whois {
 
         public String getWhois(String domainName) {
 
-            StringBuilder result = new StringBuilder("");
+            StringBuilder result = new StringBuilder();
 
             WhoisClient whois = new WhoisClient();
             try {
 
                 whois.setConnectTimeout(5000);
                // whois.connect(WhoisClient.DEFAULT_HOST);
-                whois.connect("whois.geektools.com",43);
+                whois.connect("api.apilayer.com",43);
 
                 // whois =google.com
                 //String whoisData1 = whois.query("=" + domainName);
@@ -54,7 +48,7 @@ public class Whois {
 
                 // get the google.com whois server - whois.markmonitor.com
                 String whoisServerUrl = getWhoisServer(whoisData1);
-                if (!whoisServerUrl.equals("")) {
+                if (!whoisServerUrl.isEmpty()) {
 
                     // whois -h whois.markmonitor.com google.com
                     String whoisData2 =
@@ -64,12 +58,8 @@ public class Whois {
                     result.append(whoisData2);
                 }
 
-            } catch (SocketException e) {
-                e.printStackTrace();
-                if(e.getMessage() != null)
-                result.append(e.getMessage());
             } catch (IOException | NetworkOnMainThreadException e) {
-                e.printStackTrace();
+
                 if(e.getMessage() != null)
                     result.append(e.getMessage());
             }
@@ -88,12 +78,8 @@ public class Whois {
                 result = whois.query(domainName);
                 whois.disconnect();
 
-            } catch (SocketException e) {
-                e.printStackTrace();
-                if(e.getMessage() != null)
-                    result = e.getMessage();
             } catch (IOException e) {
-                e.printStackTrace();
+
                 if(e.getMessage() != null)
                     result = e.getMessage();
             }

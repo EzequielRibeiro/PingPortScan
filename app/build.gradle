@@ -15,14 +15,14 @@ android {
             keyPassword '123456'
         }
     }
-    compileSdk 34
+    compileSdk 35
 
 
     defaultConfig {
         applicationId "org.ping.cool"
-        minSdkVersion 21
-        versionCode 34
-        versionName '1.34'
+        minSdkVersion 23
+        versionCode 36
+        versionName '1.36'
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //noinspection OldTargetApi
@@ -58,19 +58,19 @@ android {
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:33.9.0')
+    implementation platform('com.google.firebase:firebase-bom:33.13.0')
     implementation 'com.google.android.play:review:2.0.2'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
-    implementation 'androidx.navigation:navigation-fragment:2.8.7'
-    implementation 'androidx.navigation:navigation-ui:2.8.7'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.navigation:navigation-fragment:2.9.0'
+    implementation 'androidx.navigation:navigation-ui:2.9.0'
     implementation 'commons-cli:commons-cli:1.9.0'
-    implementation 'com.google.android.gms:play-services-ads:23.6.0'
-    implementation 'com.google.firebase:firebase-analytics:22.2.0'
-    implementation 'com.google.firebase:firebase-inappmessaging-display:21.0.1'
-    implementation 'com.google.android.gms:play-services-measurement-api:22.2.0'
-    implementation 'com.google.firebase:firebase-crashlytics:19.4.0'
+    implementation 'com.google.android.gms:play-services-ads:24.2.0'
+    implementation 'com.google.firebase:firebase-analytics:22.4.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:21.0.2'
+    implementation 'com.google.android.gms:play-services-measurement-api:22.4.0'
+    implementation 'com.google.firebase:firebase-crashlytics:19.4.3'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'commons-net:commons-net:3.11.1'
     implementation 'commons-validator:commons-validator:1.9.0'

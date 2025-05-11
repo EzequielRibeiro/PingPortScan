@@ -67,7 +67,8 @@
             android:layout_weight="1"
             android:maxLines="2"
             android:onClick="onCloseClick"
-            android:text="Close" />
+            android:text="Close"
+            android:textColor="@color/ic_launcher_background" />
 
 
         <Button
@@ -94,7 +95,8 @@
             android:layout_weight="1"
             android:maxLines="2"
             android:onClick="onReportClick"
-            android:text="Report" />
+            android:text="Report"
+            android:textColor="@color/ic_launcher_background" />
 
 
         <View

@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class FirstFragment extends Fragment implements MainAsyncResponse {
@@ -89,6 +90,8 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     private ListView listViewLocal;
     private InterstitialAd mInterstitialAd;
     private static boolean firstShowAd = true;
+
+    public static final String whoisRequest = "https://api.apilayer.com/whois/query?apikey=2vDOGKj9VnkwM4fAumoyIIYFdIsU1OTL&domain=";
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -183,13 +186,30 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     webView.setVisibility(View.INVISIBLE);
                     listViewLocal.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.VISIBLE);
+                    startProgressBar();
+                    buttonWhois.setEnabled(false);
 
-                    requireActivity().runOnUiThread(new Runnable() {
+                    WhoisTask whoisTask = new WhoisTask(FirstFragment.this,editTextTextConsole,autoCompleteTextInput.getText().toString());
+
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    Handler handler = new Handler(Looper.getMainLooper());
+
+                    executor.execute(() -> {
+                        //Background work here
+                        handler.post(() -> {
+                            whoisTask.startApi();
+                            stopProgressBar();
+                            buttonWhois.setEnabled(true);
+                        });
+                    });
+
+
+                   /* requireActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            new WhoisTask(FirstFragment.this, editTextTextConsole, autoCompleteTextInput.getText().toString()).execute();
+                            new WhoisTask(FirstFragment.this, progressBarPing ,editTextTextConsole,autoCompleteTextInput.getText().toString()).execute();
                         }
-                    });
+                    });*/
 
 
                 } else {
@@ -249,7 +269,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                 textInput();
                 if (autoCompleteTextInput.getText().length() == 0) {
                     Toast.makeText(getActivity(), getString(R.string.no_text), Toast.LENGTH_SHORT).show();
-                } else if (!isOnline(getActivity().getApplicationContext())) {
+                } else if (!isOnline(requireActivity().getApplicationContext())) {
                     Toast.makeText(getActivity(), "without internet connection", Toast.LENGTH_SHORT).show();
 
                 } else {

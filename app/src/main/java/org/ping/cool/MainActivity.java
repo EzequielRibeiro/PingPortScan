@@ -33,15 +33,18 @@ import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.multidex.BuildConfig;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import org.ping.cool.databinding.ActivityMainBinding;
 import android.os.StrictMode;
+import android.service.wallpaper.WallpaperService;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -74,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        HttpsTrustManager.allowAllSSL();
+
         new Thread(
                 () -> {
                     // Initialize the Google Mobile Ads SDK on a background thread.
@@ -95,8 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         refreshAutoCompleteTextView();
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+
 
         /*List<String> testDeviceIds = Arrays.asList("EDA6CBEC34D7AE15BA471460139D49DA");
         RequestConfiguration configuration =
@@ -107,8 +115,49 @@ public class MainActivity extends AppCompatActivity {
       rateApp();
       checkUpdate(MainActivity.this);
 
+
+      getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+          @Override
+          public void handleOnBackPressed() {
+
+              if (Objects.requireNonNull(navController.getCurrentDestination()).getId() == R.id.FirstFragment) {
+                  if (materialAlertDialogBuilder != null) {
+
+                      materialAlertDialogBuilder.show();
+
+                         }
+              } else
+                  finish();
+
+          }
+      });
+
     }
 
+    private void showDialog(){
+        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.Base_Theme_MaterialComponents_Light_Dialog_Alert);
+        materialAlertDialogBuilder.setTitle(R.string.app_name);
+        materialAlertDialogBuilder.setIcon(R.mipmap.ic_launcher_foreground);
+        materialAlertDialogBuilder.setMessage("Close the application ?");
+        materialAlertDialogBuilder.setCancelable(false);
+        materialAlertDialogBuilder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //System.exit(1);
+                        finishAffinity();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        loadAdMobExit();
+                        showDialog();
+
+                    }
+                });
+
+
+    }
     private void checkUpdate(Context context){
 
         Activity activity = (Activity) context;
@@ -152,9 +201,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        materialAlertDialogBuilder = null;
+        adView = null;
+        showDialog();
         loadAdMob();
         loadAdMobExit();
+
 
     }
 
@@ -234,37 +286,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadAdMobExit() {
 
-        materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivity.this, R.style.Base_Theme_MaterialComponents_Light_Dialog_Alert);
-        materialAlertDialogBuilder.setTitle(R.string.app_name);
-        materialAlertDialogBuilder.setIcon(R.mipmap.ic_launcher_foreground);
-        materialAlertDialogBuilder.setMessage("Close the application ?");
-        materialAlertDialogBuilder.setCancelable(false);
-        materialAlertDialogBuilder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //System.exit(1);
-                        finishAffinity();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        materialAlertDialogBuilder = null;
-                        adView = null;
-                        loadAdMobExit();
-                    }
-                });
-            AdSize adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 320);
+          //  AdSize adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 320);
             AdRequest adRequest = new AdRequest.Builder().build();
             adView = new AdView(this);
             adView.setAdUnitId(getString(R.string.ad_banner_exit_id));
-           // adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
-            adView.setAdSize(adSize);
+            adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+          //  adView.setAdSize(adSize);
             adView.loadAd(adRequest);
             adView.setAdListener(new AdListener() {
                 @Override
                 public void onAdLoaded() {
-                    materialAlertDialogBuilder.setView(adView);
+                    if(materialAlertDialogBuilder != null) {
+
+                        materialAlertDialogBuilder.setView(adView);
+                    }
                 }
 
                 @Override
@@ -295,24 +330,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-    @Override
-    public void onBackPressed() {
 
-       if (navController.getCurrentDestination().getId() == R.id.FirstFragment) {
-            if (materialAlertDialogBuilder != null) {
-                try {
-
-                      materialAlertDialogBuilder.show();
-
-                }catch (IllegalStateException e){
-                    System.err.println(e);
-
-                }
-            }
-        } else
-            super.onBackPressed();
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
