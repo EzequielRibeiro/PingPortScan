@@ -9,7 +9,7 @@
 
     <Button
         android:id="@+id/buttonTracert"
-        style="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -21,7 +21,7 @@
 
     <Button
         android:id="@+id/buttonSecond"
-        style="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Scan"
@@ -32,7 +32,7 @@
 
     <Button
         android:id="@+id/buttonPing"
-        style="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Ping"
@@ -42,7 +42,7 @@
 
     <Button
         android:id="@+id/buttonLocal"
-        style="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Local"
@@ -53,7 +53,7 @@
 
     <Button
         android:id="@+id/buttonWhois"
-        style="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Whois"
@@ -65,7 +65,7 @@
 
     <Button
         android:id="@+id/buttonExec"
-        style="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Exec"

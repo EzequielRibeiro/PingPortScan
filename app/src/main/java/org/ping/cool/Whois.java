@@ -34,7 +34,7 @@ public class Whois {
             WhoisClient whois = new WhoisClient();
             try {
 
-                whois.setConnectTimeout(5000);
+                whois.setConnectTimeout(10000);
                // whois.connect(WhoisClient.DEFAULT_HOST);
                 whois.connect("api.apilayer.com",43);
 

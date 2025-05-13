@@ -97,8 +97,8 @@ public class WhoisTask{
 
             URL url = new URL(urlLongLink);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000);
-            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
             conn.setRequestMethod("GET");
         //    conn.setRequestProperty("Accept", "application/json");
          //   conn.setRequestProperty("Content-Type", "application/json");
