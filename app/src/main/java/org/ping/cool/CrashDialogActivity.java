@@ -12,6 +12,8 @@ import android.text.style.StyleSpan;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
+
+import com.google.common.base.Throwables;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class CrashDialogActivity extends AppCompatActivity {
@@ -40,7 +42,10 @@ public class CrashDialogActivity extends AppCompatActivity {
                 new String[] { "%1$s", "%2$s" },
                 new CharSequence[] { boldExName, boldCauseName });
         text.setText(crashMessage);
-        textViewLog.setText(exception.getMessage());
+
+        String s = Throwables.getStackTraceAsString ( exception ) ;
+
+        textViewLog.setText(s);
     }
 
     private Throwable findCause(Throwable exception) {
@@ -57,6 +62,7 @@ public class CrashDialogActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         return;
     }
 

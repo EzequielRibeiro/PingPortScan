@@ -112,8 +112,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
+        android:selectAllOnFocus="true"
         android:text="LOG"
         android:textColor="@color/white_color"
+        android:textIsSelectable="true"
         android:textStyle="bold" />
 
     <TextView
@@ -121,6 +123,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:textColor="@android:color/holo_orange_light" />
+        android:selectAllOnFocus="true"
+        android:text="@string/app_name"
+        android:textColor="@android:color/holo_orange_light"
+        android:textIsSelectable="true" />
 
 </LinearLayout>

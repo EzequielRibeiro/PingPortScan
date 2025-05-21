@@ -1,6 +1,8 @@
 package org.ping.cool;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Objects;
+
 import android.app.Application;
 
 import android.content.Intent;
@@ -8,6 +10,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
+
+import com.google.common.base.Throwables;
+import com.google.firebase.crashlytics.CustomKeysAndValues;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class ApplicationException extends Application {
@@ -44,11 +49,18 @@ public class ApplicationException extends Application {
 
     void showCrashDisplayActivity(Throwable e) {
 
-        FirebaseCrashlytics.getInstance().recordException(e);
 
         Intent i = new Intent(this, CrashDialogActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         i.putExtra("e", e);
+
+        String s = Throwables.getStackTraceAsString ( e ) ;
+
+        CustomKeysAndValues keysAndValues = new CustomKeysAndValues.Builder()
+                .putString("crash", s)
+                .build();
+        FirebaseCrashlytics.getInstance().setCustomKeys(keysAndValues);
+
         startActivity(i);
     }
 

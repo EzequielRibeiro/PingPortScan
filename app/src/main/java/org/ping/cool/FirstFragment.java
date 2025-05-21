@@ -189,13 +189,11 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     startProgressBar();
                     buttonWhois.setEnabled(false);
 
-                    WhoisTask whoisTask = new WhoisTask(FirstFragment.this,editTextTextConsole,autoCompleteTextInput.getText().toString());
-
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     Handler handler = new Handler(Looper.getMainLooper());
 
                     executor.execute(() -> {
-                        //Background work here
+                        WhoisTask whoisTask = new WhoisTask(FirstFragment.this,editTextTextConsole,autoCompleteTextInput.getText().toString());
                         handler.post(() -> {
                             whoisTask.startApi();
                             stopProgressBar();
@@ -252,6 +250,9 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
                     discovery.stop();
 
                 }
+
+              //  throw new RuntimeException("Test Crash");
+
             }
         });
 
