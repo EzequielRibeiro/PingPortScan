@@ -182,17 +182,23 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
             public void onClick(View v) {
                 textInput();
                 if (!autoCompleteTextInput.getText().toString().isEmpty()) {
-
+                    hideSoftwareKeyboard(autoCompleteTextInput);
                     webView.setVisibility(View.INVISIBLE);
                     listViewLocal.setVisibility(View.INVISIBLE);
                     editTextTextConsole.setVisibility(View.VISIBLE);
-                    startProgressBar();
                     buttonWhois.setEnabled(false);
+
+                    requireActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startProgressBar();
+                        }
+                    });
 
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     Handler handler = new Handler(Looper.getMainLooper());
-
                     executor.execute(() -> {
+
                         WhoisTask whoisTask = new WhoisTask(FirstFragment.this,editTextTextConsole,autoCompleteTextInput.getText().toString());
                         handler.post(() -> {
                             whoisTask.startApi();
@@ -556,7 +562,7 @@ public class FirstFragment extends Fragment implements MainAsyncResponse {
     }
 
     public void stopProgressBar() {
-        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+        requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressBarPing.setVisibility(View.GONE);

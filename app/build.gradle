@@ -22,12 +22,12 @@ android {
     defaultConfig {
         applicationId "org.ping.cool"
         minSdkVersion 23
-        versionCode 38
-        versionName '1.38'
+        versionCode 39
+        versionName '1.39'
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //noinspection OldTargetApi
-        targetSdk 34
+        targetSdk 35
     }
 
     buildTypes {
@@ -54,24 +54,24 @@ android {
         checkReleaseBuilds false
     }
     namespace 'org.ping.cool'
-    buildToolsVersion '35.0.0'
+
 
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:33.14.0')
+    implementation platform('com.google.firebase:firebase-bom:33.16.0')
     implementation 'com.google.android.play:review:2.0.2'
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation 'androidx.navigation:navigation-fragment:2.9.0'
-    implementation 'androidx.navigation:navigation-ui:2.9.0'
+    implementation 'androidx.navigation:navigation-fragment:2.9.1'
+    implementation 'androidx.navigation:navigation-ui:2.9.1'
     implementation 'commons-cli:commons-cli:1.9.0'
-    implementation 'com.google.android.gms:play-services-ads:24.3.0'
-    implementation 'com.google.firebase:firebase-analytics:22.4.0'
+    implementation 'com.google.android.gms:play-services-ads:24.4.0'
+    implementation 'com.google.firebase:firebase-analytics:22.5.0'
     implementation 'com.google.firebase:firebase-inappmessaging-display:21.0.2'
-    implementation 'com.google.android.gms:play-services-measurement-api:22.4.0'
-    implementation 'com.google.firebase:firebase-crashlytics:19.4.3'
+    implementation 'com.google.android.gms:play-services-measurement-api:22.5.0'
+    implementation 'com.google.firebase:firebase-crashlytics:19.4.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'commons-net:commons-net:3.11.1'
     implementation 'commons-validator:commons-validator:1.9.0'
